@@ -11,7 +11,6 @@ DROP TABLE IF EXISTS `appr_line`;
 DROP TABLE IF EXISTS `appr_log`;
 DROP TABLE IF EXISTS `tbl_board_comments`;
 DROP TABLE IF EXISTS `dashboard_layout`;
-DROP TABLE IF EXISTS `shift_schedule`;
 DROP TABLE IF EXISTS `Salary`;
 DROP TABLE IF EXISTS `pw_reset_token`;
 DROP TABLE IF EXISTS `leave_req`;
@@ -28,10 +27,14 @@ DROP TABLE IF EXISTS `sales_hourly`;
 DROP TABLE IF EXISTS `product_details`;
 DROP TABLE IF EXISTS `product`;
 DROP TABLE IF EXISTS `weather_data`;
-DROP TABLE IF EXISTS `store`;
 DROP TABLE IF EXISTS `ai_model`;
 DROP TABLE IF EXISTS `category`;
 DROP TABLE IF EXISTS `department`;
+DROP TABLE IF EXISTS `part_timer_salary`;
+DROP TABLE IF EXISTS `shift_schedule`;
+DROP TABLE IF EXISTS `part_timer`;
+DROP TABLE IF EXISTS `store`;
+
 
 
 

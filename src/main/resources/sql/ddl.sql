@@ -59,7 +59,6 @@ CREATE TABLE `employee` (
                             `emp_id` INT NOT NULL COMMENT '사원 고유 번호',
                             `store_id` INT NULL COMMENT '매장고유번호',
                             `depart_id` INT NULL COMMENT '부서 고유번호',
-                            `salary_type` INT NULL COMMENT '1. 시급 , 2. 월급',
                             `emp_name` VARCHAR(30) NOT NULL COMMENT '사원 이름',
                             `emp_gender` INT NOT NULL COMMENT '성별',
                             `emp_phone` VARCHAR(30) NOT NULL COMMENT '사원전화번호',
@@ -78,21 +77,6 @@ CREATE TABLE `employee` (
                             PRIMARY KEY (`emp_id`),
                             FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`),
                             FOREIGN KEY (`depart_id`) REFERENCES `department` (`dept_id`)
-);
-
-CREATE TABLE `Salary` (
-                          `salary_id` INT NOT NULL COMMENT '급여 고유 번호',
-                          `emp_id` INT NOT NULL COMMENT '사원 고유 번호',
-                          `calculated_at` DATETIME NOT NULL COMMENT '정산날짜',
-                          `base_salary` INT NOT NULL COMMENT '기본급 (월급 or 시급 * 총 근무시간)',
-                          `bonus` INT NOT NULL COMMENT '상여급',
-                          `deduct_total` INT NOT NULL COMMENT '공제 금액 (4대보험, 지각/결근 등)',
-                          `deduct_extra` INT NULL COMMENT '기타공제금액',
-                          `net_salary` INT NOT NULL COMMENT '실 수령액',
-                          `pay_date` DATETIME NOT NULL COMMENT '급여일자',
-                          `pay_status` VARCHAR(20) NULL COMMENT '1.지급대기 2. 지급완료',
-                          PRIMARY KEY (`salary_id`),
-                          FOREIGN KEY (`emp_id`) REFERENCES `employee` (`emp_id`)
 );
 
 CREATE TABLE `product` (
@@ -382,28 +366,6 @@ CREATE TABLE `appr_log` (
                             FOREIGN KEY (`emp_id`) REFERENCES `employee` (`emp_id`)
 );
 
-CREATE TABLE `attendance` (
-                              `attend_id` INT NOT NULL COMMENT '근태 기록 고유번호',
-                              `emp_id` INT NOT NULL COMMENT '사원 고유 번호',
-                              `work_date` DATETIME NOT NULL COMMENT '근무일자',
-                              `Field` INT NULL DEFAULT 15 COMMENT '연차갯수',
-                              `in_time` DATETIME NOT NULL COMMENT '출근시간',
-                              `out_time` DATETIME NOT NULL COMMENT '퇴근시간',
-                              `attend_status` INT NOT NULL COMMENT '1: 출근, 2: 지각, 3: 조퇴, 4: 결근, 5: 연차, 6: 병가',
-                              PRIMARY KEY (`attend_id`),
-                              FOREIGN KEY (`emp_id`) REFERENCES `employee` (`emp_id`)
-);
-
-CREATE TABLE `shift_schedule` (
-                                  `schedule_id` int NOT NULL COMMENT '스케줄 고유 번호',
-                                  `emp_code` int NOT NULL COMMENT '고유번호',
-                                  `work_date` DATETIME NOT NULL COMMENT '근무시작일',
-                                  `start_time` DATETIME NOT NULL COMMENT '근무 시작시간',
-                                  `end_time` DATETIME NOT NULL COMMENT '근무 마감시간',
-                                  PRIMARY KEY (`schedule_id`),
-                                  FOREIGN KEY (`emp_code`) REFERENCES `employee` (`emp_id`)
-);
-
 CREATE TABLE `dashboard_layout` (
                                     `layout_id` INT NOT NULL COMMENT '레이아웃 ID',
                                     `emp_id` int NOT NULL COMMENT '고유번호',
@@ -435,6 +397,71 @@ CREATE TABLE `tbl_board_comments` (
                                       FOREIGN KEY (`post_id`) REFERENCES `tbl_board_posts` (`post_id`)
 );
 
+CREATE TABLE `part_timer` (
+                              `part_timer_id`	int	NOT NULL	COMMENT '아르바이트 고유 ID',
+                              `store_id`	int	NOT NULL	COMMENT '매장고유번호',
+                              `name`	VARCHAR(50)	NOT NULL	COMMENT '이름',
+                              `gender`	TINYINT	NOT NULL	COMMENT '성별 (1: 남자, 2: 여자)',
+                              `phone`	VARCHAR(30)	NOT NULL	COMMENT '연락처',
+                              `addres`	varchar(50)	NOT NULL	COMMENT '주소',
+                              `birth_date`	DATE	NOT NULL	COMMENT '생년월일',
+                              `hire_date`	DATETIME	NOT NULL	COMMENT '입사일',
+                              `resign_date`	DATETIME	NULL	COMMENT '퇴사일',
+                              `salary_type`	TINYINT	NOT NULL	COMMENT '급여 형태 (1: 시급, 2: 월급)',
+                              `hourly_wage`	INT	NULL	COMMENT '시급 (시급제일 경우 필수)',
+                              `account_bank`	VARCHAR(30)	NOT NULL	COMMENT '급여 은행명',
+                              `account_number`	VARCHAR(30)	NOT NULL	COMMENT '급여 계좌번호',
+                              `status`	TINYINT	NOT NULL	DEFAULT 1	COMMENT '재직 상태 (1: 재직, 2: 퇴사, 3: 휴직)',
+                              `created_at`	DATETIME	NOT NULL	DEFAULT CURRENT_TIMESTAMP	COMMENT '등록 시각',
+                              PRIMARY KEY (`part_timer_id`),
+                              FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`)
+
+);
+
+CREATE TABLE `shift_schedule` (
+                                  `schedule_id` int NOT NULL COMMENT '스케줄 고유 번호',
+                                  `part_timer_id`	int	NOT NULL	COMMENT '아르바이트 고유 ID',
+                                  `work_date` DATETIME NOT NULL COMMENT '근무시작일',
+                                  `start_time` DATETIME NOT NULL COMMENT '근무 시작시간',
+                                  `end_time` DATETIME NOT NULL COMMENT '근무 마감시간',
+                                  PRIMARY KEY (`schedule_id`),
+                                  FOREIGN KEY (`part_timer_id`) REFERENCES `part_timer` (`part_timer_id`)
+);
+
+CREATE TABLE `Salary` (
+                          `salary_id` INT NOT NULL COMMENT '급여 고유 번호',
+                          `emp_id` INT NULL COMMENT '사원 고유 번호',
+                          `part_timer_id`	int	NULL	COMMENT '아르바이트 고유 ID',
+                          `calculated_at` DATETIME NOT NULL COMMENT '정산날짜',
+                          `base_salary` INT NOT NULL COMMENT '기본급 (월급 or 시급 * 총 근무시간)',
+                          `bonus` INT NOT NULL COMMENT '상여급',
+                          `deduct_total` INT NOT NULL COMMENT '공제 금액 (4대보험, 지각/결근 등)',
+                          `deduct_extra` INT NULL COMMENT '기타공제금액',
+                          `net_salary` INT NOT NULL COMMENT '실 수령액',
+                          `pay_date` DATETIME NOT NULL COMMENT '급여일자',
+                          `pay_status` VARCHAR(20) NULL COMMENT '1.지급대기 2. 지급완료',
+                          PRIMARY KEY (`salary_id`),
+                          FOREIGN KEY (`emp_id`) REFERENCES `employee` (`emp_id`),
+                          FOREIGN KEY (`part_timer_id`) REFERENCES `part_timer` (`part_timer_id`)
+);
+
+CREATE TABLE `attendance` (
+                              `attend_id` INT NOT NULL COMMENT '근태 기록 고유번호',
+                              `emp_id` INT NULL COMMENT '사원 고유 번호',
+                              `part_timer_id`	int	NULL	COMMENT '아르바이트 고유 ID',
+                              `store_id`	int NULL	COMMENT '매장고유번호',
+                              `work_date` DATETIME NOT NULL COMMENT '근무일자',
+                              `Field` INT NULL DEFAULT 15 COMMENT '연차갯수',
+                              `in_time` DATETIME NOT NULL COMMENT '출근시간',
+                              `out_time` DATETIME NOT NULL COMMENT '퇴근시간',
+                              `attend_status` INT NOT NULL COMMENT '1: 출근, 2: 지각, 3: 조퇴, 4: 결근, 5: 연차, 6: 병가',
+                              PRIMARY KEY (`attend_id`),
+                              FOREIGN KEY (`emp_id`) REFERENCES `employee` (`emp_id`),
+                              FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`),
+                              FOREIGN KEY (`part_timer_id`) REFERENCES `part_timer` (`part_timer_id`)
+
+
+);
 
 CREATE TABLE `product_details` (
                                    `pro_detail_id`	INT	NOT NULL,
