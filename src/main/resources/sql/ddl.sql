@@ -123,7 +123,7 @@ CREATE TABLE `store_stock` (
                                `product_id` int NOT NULL COMMENT '상품 고유번호',
                                `quantity` int NOT NULL COMMENT '재고 갯수',
                                `last_in_date` DATETIME NULL COMMENT '입고 완료 날짜',
-                               `status` int NOT NULL DEFAULT 1 COMMENT '1. 정상 2. 유통기한 임박 3. 유통기한경과 4.재고부족 5. 입고예정 7.폐기 대기',
+                               `stock_status` int NOT NULL DEFAULT 1 COMMENT '1. 정상 2. 유통기한 임박 3. 유통기한경과 4.재고부족 5. 입고예정 7.폐기 대기',
                                PRIMARY KEY (`stock_id`),
                                FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`),
                                FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`)
@@ -133,7 +133,7 @@ CREATE TABLE `purchase_order` (
                                   `order_id` int NOT NULL COMMENT '발주 고유 번호',
                                   `store_id` int NOT NULL COMMENT '매장고유번호',
                                   `order_date` DATETIME NOT NULL COMMENT '발주한 등록 시간',
-                                  `status` int NOT NULL COMMENT '1.대기,2입고대기 3.완료',
+                                  `oreder_status` int NOT NULL COMMENT '1.대기,2입고대기 3.완료',
                                   `total_amount` int NOT NULL COMMENT '발주 총 금액',
                                   `total_quantity` int NOT NULL COMMENT '발주 총 갯수',
                                   PRIMARY KEY (`order_id`),
@@ -154,23 +154,6 @@ CREATE TABLE `purchase_order_item` (
                                        PRIMARY KEY (`item_id`),
                                        FOREIGN KEY (`order_id`) REFERENCES `purchase_order` (`order_id`),
                                        FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`)
-);
-
-CREATE TABLE `stock_in_history` (
-                                    `history_id` INT NOT NULL COMMENT '입고고유번호',
-                                    `store_id` int NOT NULL COMMENT '매장고유번호',
-                                    `product_id` int NOT NULL COMMENT '상품고유번호',
-                                    `emp_id` int NOT NULL COMMENT '입고처리한 사원',
-                                    `order_id` int NOT NULL COMMENT '발주 고유 번호',
-                                    `in_quantity` INT NOT NULL COMMENT '입고수량',
-                                    `in_date` DATETIME NOT NULL COMMENT '입고날짜',
-                                    `expire_date` DATETIME NULL COMMENT '유통기한',
-                                    `status` VARCHAR(30) NOT NULL DEFAULT '입고대기' COMMENT '1. 입고대기 2. 입고완료 3. 부분입고 4. 오입고 5. 폐기 6. 반품',
-                                    PRIMARY KEY (`history_id`),
-                                    FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`),
-                                    FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`),
-                                    FOREIGN KEY (`emp_id`) REFERENCES `employee` (`emp_id`),
-                                    FOREIGN KEY (`order_id`) REFERENCES `purchase_order` (`order_id`)
 );
 
 CREATE TABLE `disposal` (
@@ -336,7 +319,7 @@ CREATE TABLE `leave_req` (
                              `emp_id` INT NOT NULL COMMENT '사원 고유 번호',
                              `req_date` DATE NOT NULL COMMENT '요청날짜',
                              `req_reason` VARCHAR(255) NULL COMMENT '연차사유',
-                             `status` VARCHAR(20) NULL DEFAULT '대기' COMMENT '현재 상태',
+                             `req_status` VARCHAR(20) NULL DEFAULT '대기' COMMENT '현재 상태',
                              `created_at` DATETIME NULL COMMENT '생성날짜',
                              PRIMARY KEY (`req_id`),
                              FOREIGN KEY (`emp_id`) REFERENCES `employee` (`emp_id`)
@@ -410,7 +393,7 @@ CREATE TABLE `part_timer` (
                               `hourly_wage`	INT	NULL	COMMENT '시급 (시급제일 경우 필수)',
                               `account_bank`	VARCHAR(30)	NOT NULL	COMMENT '급여 은행명',
                               `account_number`	VARCHAR(30)	NOT NULL	COMMENT '급여 계좌번호',
-                              `status`	TINYINT	NOT NULL	DEFAULT 1	COMMENT '재직 상태 (1: 재직, 2: 퇴사, 3: 휴직)',
+                              `part_status`	TINYINT	NOT NULL	DEFAULT 1	COMMENT '재직 상태 (1: 재직, 2: 퇴사, 3: 휴직)',
                               `created_at`	DATETIME	NOT NULL	DEFAULT CURRENT_TIMESTAMP	COMMENT '등록 시각',
                               PRIMARY KEY (`part_timer_id`),
                               FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`)
@@ -431,6 +414,7 @@ CREATE TABLE `Salary` (
                           `salary_id` INT NOT NULL COMMENT '급여 고유 번호',
                           `emp_id` INT NULL COMMENT '사원 고유 번호',
                           `part_timer_id`	int	NULL	COMMENT '아르바이트 고유 ID',
+                          `store_id`	int NULL	COMMENT '매장고유번호',
                           `calculated_at` DATETIME NOT NULL COMMENT '정산날짜',
                           `base_salary` INT NOT NULL COMMENT '기본급 (월급 or 시급 * 총 근무시간)',
                           `bonus` INT NOT NULL COMMENT '상여급',
@@ -441,7 +425,9 @@ CREATE TABLE `Salary` (
                           `pay_status` VARCHAR(20) NULL COMMENT '1.지급대기 2. 지급완료',
                           PRIMARY KEY (`salary_id`),
                           FOREIGN KEY (`emp_id`) REFERENCES `employee` (`emp_id`),
-                          FOREIGN KEY (`part_timer_id`) REFERENCES `part_timer` (`part_timer_id`)
+                          FOREIGN KEY (`part_timer_id`) REFERENCES `part_timer` (`part_timer_id`),
+                          FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`)
+
 );
 
 CREATE TABLE `attendance` (
@@ -472,4 +458,21 @@ CREATE TABLE `product_details` (
                                    `storage_method`	VARCHAR(100)	NULL	COMMENT '보관방법, 냉동냉장,..',
                                    PRIMARY KEY (`pro_detail_id`),
                                    FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`)
+);
+
+CREATE TABLE `stock_in_history` (
+                                    `history_id` INT NOT NULL COMMENT '입고고유번호',
+                                    `store_id` int NOT NULL COMMENT '매장고유번호',
+                                    `part_timer_id`	int	NULL	COMMENT '아르바이트 고유 ID',
+                                    `product_id` int NOT NULL COMMENT '상품고유번호',
+                                    `order_id` int NOT NULL COMMENT '발주 고유 번호',
+                                    `in_quantity` INT NOT NULL COMMENT '입고수량',
+                                    `in_date` DATETIME NOT NULL COMMENT '입고날짜',
+                                    `expire_date` DATETIME NULL COMMENT '유통기한',
+                                    `history_status` VARCHAR(30) NOT NULL DEFAULT '입고대기' COMMENT '1. 입고대기 2. 입고완료 3. 부분입고 4. 오입고 5. 폐기 6. 반품',
+                                    PRIMARY KEY (`history_id`),
+                                    FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`),
+                                    FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`),
+                                    FOREIGN KEY (`order_id`) REFERENCES `purchase_order` (`order_id`),
+                                    FOREIGN KEY (`part_timer_id`) REFERENCES `part_timer` (`part_timer_id`)
 );

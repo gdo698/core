@@ -1,13 +1,14 @@
 -- 기본 테이블(독립 테이블) 데이터 먼저 삽입
 
 
--- 1. 매장 데이터 추가
+-- 1. store(매장) 데이터
+
 INSERT INTO `store` (`store_id`, `store_name`, `store_addr`, `store_tel`, `store_created_at`, `store_cert`, `store_acc`) VALUES
 (1, '강남점', '서울특별시 강남구 테헤란로 152', '02-555-1234', '2023-01-01 09:00:00', 'https://example.com/cert/gangnam.jpg', 'https://example.com/accounts/gangnam.jpg'),
 (2, '홍대점', '서울특별시 마포구 와우산로 94', '02-336-5678', '2023-02-15 10:30:00', 'https://example.com/cert/hongdae.jpg', 'https://example.com/accounts/hongdae.jpg'),
 (3, '부산점', '부산광역시 해운대구 해운대해변로 264', '051-747-9012', '2023-03-20 11:15:00', 'https://example.com/cert/busan.jpg', 'https://example.com/accounts/busan.jpg');
 
--- 2. 카테고리 데이터 추가
+-- 2. category(카테고리) 데이터
 INSERT INTO `category` (`category_id`, `category_name`, `category_filter`, `parent_category_id`) VALUES
 -- 대분류 (최상위 카테고리)
 (1, '식품', 1, NULL),
@@ -45,7 +46,7 @@ INSERT INTO `category` (`category_id`, `category_name`, `category_filter`, `pare
 (19, '라떼', 3, 11),
 (20, '녹차/홍차', 3, 11);
 
--- 3. AI 모델 데이터 추가
+-- 3. ai_model(AI 모델) 데이터
 INSERT INTO `ai_model` (`model_id`, `name`, `type`, `version`, `parameters`, `accuracy`, `training_date`, `is_active`, `created_at`, `updated_at`) VALUES
 (1, '재고예측모델', '시계열예측', '1.0.0', '{"learning_rate": 0.01, "layers": 3, "hidden_units": 64}', 87.5, '2023-05-15 00:00:00', TRUE, '2023-05-15 12:30:00', '2023-05-15 12:30:00'),
 (2, '판매량예측모델', '회귀분석', '2.1.0', '{"algorithm": "random_forest", "max_depth": 10, "n_estimators": 100}', 92.3, '2023-06-20 00:00:00', TRUE, '2023-06-20 14:45:00', '2023-07-15 09:30:00'),
@@ -53,7 +54,7 @@ INSERT INTO `ai_model` (`model_id`, `name`, `type`, `version`, `parameters`, `ac
 (4, '고객행동예측', '분류', '0.9.5', '{"algorithm": "svm", "kernel": "rbf", "C": 1.0}', 81.2, '2023-08-10 00:00:00', FALSE, '2023-08-10 11:00:00', '2023-08-10 11:00:00'),
 (5, '가격최적화모델', '강화학습', '0.7.0', '{"discount_factor": 0.95, "epochs": 500, "batch_size": 32}', 75.8, '2023-09-05 00:00:00', TRUE, '2023-09-05 15:30:00', '2023-10-01 13:45:00');
 
--- 4. 날씨 데이터 추가
+-- 4. weather_data(날씨) 데이터
 INSERT INTO `weather_data` (`weather_id`, `location`, `date`, `temperature`, `condition`, `humidity`, `precipitation`, `created_at`) VALUES
 (1, '서울', '2023-10-01', 22.5, '맑음', 45, 0.0, '2023-10-01 00:10:00'),
 (2, '서울', '2023-10-02', 23.1, '구름조금', 50, 0.0, '2023-10-02 00:10:00'),
@@ -66,7 +67,7 @@ INSERT INTO `weather_data` (`weather_id`, `location`, `date`, `temperature`, `co
 (9, '부산', '2023-10-04', 22.1, '흐림', 70, 2.5, '2023-10-04 00:10:00'),
 (10, '부산', '2023-10-05', 21.5, '비', 85, 12.3, '2023-10-05 00:10:00');
 
--- 5. 상품 데이터 추가 (카테고리 체계 변경에 맞게 수정)
+-- 5. product(상품) 데이터 추가 (카테고리 체계 변경에 맞게 수정)
 INSERT INTO `product` (`product_id`, `category_id`, `pro_name`, `pro_barcode`, `pro_cost`, `pro_sell_cost`, `pro_created_at`, `pro_update_at`, `pro_image`, `is_promo`) VALUES
 -- 냉장식품(7) 카테고리의 상품들
 (1, 7,  '삼각김밥 참치', 8801234567890, 450, 1200, '2023-01-15 08:00:00', '2023-01-15 08:00:00', 'https://example.com/images/samgak_tuna.jpg', 0),
@@ -89,8 +90,9 @@ INSERT INTO `product` (`product_id`, `category_id`, `pro_name`, `pro_barcode`, `
 (8, 5,  '메로나', 8801234567897, 350, 1000, '2023-01-17 09:00:00', '2023-01-17 09:00:00', 'https://example.com/images/melona.jpg', 1),
 (9, 5,  '비비빅', 8801234567898, 400, 1200, '2023-01-17 09:10:00', '2023-01-17 09:10:00', 'https://example.com/images/bbibig.jpg', 1),
 
--- 주류(6) 카테고리의 상품 '참이슬 후레쉬 360ml', 8801234567899, 950, 1700, '2023-01-18 10:00:00', '2023-01-18 10:00:00', 'https://example.com/images/soju_fresh.jpg', 0),
+-- 주류(6) 카테고리의 상품
 (10, 6, '참이슬 후레쉬 360ml', 8801234567899, 950, 1700, '2023-01-18 10:00:00', '2023-01-18 10:00:00', 'https://example.com/images/soju_fresh.jpg', 0),
+
 -- 냉장식품(7) 카테고리의 상품
 (11, 7, '요구르트 4입', 8801234567900, 1800, 3200, '2023-01-19 08:00:00', '2023-01-19 08:00:00', 'https://example.com/images/yogurt_4.jpg', 0),
 
@@ -98,29 +100,29 @@ INSERT INTO `product` (`product_id`, `category_id`, `pro_name`, `pro_barcode`, `
 (12, 8, '냉동만두 420g', 8801234567901, 3500, 6500, '2023-01-19 08:30:00', '2023-01-19 08:30:00', 'https://example.com/images/frozen_mandu.jpg', 0),
 
 -- 샌드위치(9) 카테고리의 상품
-(13, 9, '햄치즈 샌드위치', 8801234567902, 1800, 3500, '2023-01-20 07:00:00', '2023-01-20 07:00:00', 'https://example.com/images/ham_cheese_sandwich.jpg', 0),
+(13, 9,  '햄치즈 샌드위치', 8801234567902, 1800, 3500, '2023-01-20 07:00:00', '2023-01-20 07:00:00', 'https://example.com/images/ham_cheese_sandwich.jpg', 0),
 
 -- 도시락(10) 카테고리의 상품들
-(14, 10, '김치볶음밥 도시락', 8801234567903, 2500, 4500, '2023-01-20 07:30:00', '2023-01-20 07:30:00', 'https://example.com/images/kimchi_dosirak.jpg', 0),
-(15, 10,  '제육볶음 도시락', 8801234567904, 2700, 4800, '2023-01-20 07:35:00', '2023-01-20 07:35:00', 'https://example.com/images/jeyuk_dosirak.jpg', 0),
+(14, 10,  '김치볶음밥 도시락', 8801234567903, 2500, 4500, '2023-01-20 07:30:00', '2023-01-20 07:30:00', 'https://example.com/images/kimchi_dosirak.jpg', 0),
+(15, 10, '제육볶음 도시락', 8801234567904, 2700, 4800, '2023-01-20 07:35:00', '2023-01-20 07:35:00', 'https://example.com/images/jeyuk_dosirak.jpg', 0),
 
 -- 추가 상품들: 다양한 카테고리에 맞게 추가
 -- 커피/차(11) 카테고리의 상품들
-(16, 18,  '아메리카노 250ml', 8801234567905, 800, 1800, '2023-01-21 08:00:00', '2023-01-21 08:00:00', 'https://example.com/images/americano.jpg', 0),
-(17, 19,  '카페라떼 250ml', 8801234567906, 900, 2000, '2023-01-21 08:10:00', '2023-01-21 08:10:00', 'https://example.com/images/latte.jpg', 0),
-(18, 20,  '녹차 500ml', 8801234567907, 750, 1600, '2023-01-21 08:20:00', '2023-01-21 08:20:00', 'https://example.com/images/green_tea.jpg', 0),
+(16, 18, '아메리카노 250ml', 8801234567905, 800, 1800, '2023-01-21 08:00:00', '2023-01-21 08:00:00', 'https://example.com/images/americano.jpg', 0),
+(17, 19, '카페라떼 250ml', 8801234567906, 900, 2000, '2023-01-21 08:10:00', '2023-01-21 08:10:00', 'https://example.com/images/latte.jpg', 0),
+(18, 20, '녹차 500ml', 8801234567907, 750, 1600, '2023-01-21 08:20:00', '2023-01-21 08:20:00', 'https://example.com/images/green_tea.jpg', 0),
 
 -- 주스(12) 카테고리의 상품들
-(19, 12,  '오렌지주스 500ml', 8801234567908, 900, 1900, '2023-01-22 09:00:00', '2023-01-22 09:00:00', 'https://example.com/images/orange_juice.jpg', 0),
-(20, 12,  '사과주스 500ml', 8801234567909, 850, 1800, '2023-01-22 09:10:00', '2023-01-22 09:10:00', 'https://example.com/images/apple_juice.jpg', 0),
+(19, 12, '오렌지주스 500ml', 8801234567908, 900, 1900, '2023-01-22 09:00:00', '2023-01-22 09:00:00', 'https://example.com/images/orange_juice.jpg', 0),
+(20, 12, '사과주스 500ml', 8801234567909, 850, 1800, '2023-01-22 09:10:00', '2023-01-22 09:10:00', 'https://example.com/images/apple_juice.jpg', 0),
 
 -- 비스킷/쿠키(17) 카테고리의 상품
-(21, 17,  '초코칩쿠키 8개입', 8801234567910, 1800, 3500, '2023-01-23 10:00:00', '2023-01-23 10:00:00', 'https://example.com/images/choco_cookies.jpg', 0),
+(21, 17, '초코칩쿠키 8개입', 8801234567910, 1800, 3500, '2023-01-23 10:00:00', '2023-01-23 10:00:00', 'https://example.com/images/choco_cookies.jpg', 0),
 
 -- 세제류(14) 카테고리의 상품
-(22, 14,  '주방세제 500ml', 8801234567911, 1500, 3000, '2023-01-24 11:00:00', '2023-01-24 11:00:00', 'https://example.com/images/dish_soap.jpg', 0);
+(22, 14, '주방세제 500ml', 8801234567911, 1500, 3000, '2023-01-24 11:00:00', '2023-01-24 11:00:00', 'https://example.com/images/dish_soap.jpg', 0);
 
--- 변경된 product_details 테이블 데이터 삽입
+-- 상품 세부항목(product_details) 데이터
 INSERT INTO `product_details` (`pro_detail_id`, `product_id`, `manufacturer`, `manu_num`, `shelf_life`, `allergens`, `storage_method`) VALUES
 (1, 1, '삼각김밥 주식회사', '02-123-4567', '제조일로부터 1일', '쌀, 참치(대두,밀 함유)', '냉장보관'),
 (2, 2, '삼각김밥 주식회사', '02-123-4567', '제조일로부터 1일', '쌀, 불고기(대두,밀 함유)', '냉장보관'),
@@ -145,7 +147,7 @@ INSERT INTO `product_details` (`pro_detail_id`, `product_id`, `manufacturer`, `m
 (21, 21, '롯데제과', '02-901-2345', '제조일로부터 180일', '밀, 대두, 계란', '직사광선을 피해 서늘한 곳에 보관'),
 (22, 22, '애경', '02-012-3456', '제조일로부터 730일', NULL, '직사광선을 피해 서늘한 곳에 보관');
 
--- 7. 통계 데이터 추가 (판매 통계)
+-- 7. sales_statistics(판매 통계) 데이터
 INSERT INTO `sales_statistics` (`stats_id`, `store_id`, `category_id`, `date`, `hour`, `total_sales`, `transaction_count`, `avg_transaction`, `created_at`) VALUES
 (1, 1, 1, '2023-10-01', '2023-10-01 12:00:00', 58500.00, 45, 1300.00, '2023-10-01 23:59:00'),
 (2, 1, 2, '2023-10-01', '2023-10-01 12:00:00', 42000.00, 28, 1500.00, '2023-10-01 23:59:00'),
@@ -158,7 +160,7 @@ INSERT INTO `sales_statistics` (`stats_id`, `store_id`, `category_id`, `date`, `
 (9, 2, 1, '2023-10-02', '2023-10-02 12:00:00', 59800.00, 47, 1272.34, '2023-10-02 23:59:00'),
 (10, 3, 2, '2023-10-02', '2023-10-02 12:00:00', 54000.00, 36, 1500.00, '2023-10-02 23:59:00');
 
--- 8. 재고 통계 데이터 추가
+-- 8. inventory_statistics(재고 통계) 데이터
 INSERT INTO `inventory_statistics` (`stats_id`, `store_id`, `category_id`, `date`, `turnover_rate`, `stock_value`, `low_stock_count`, `excess_stock_count`, `expired_soon_count`, `created_at`) VALUES
 (1, 1, 1, '2023-10-01', 3.75, 125000.00, 2, 1, 3, '2023-10-01 23:59:00'),
 (2, 1, 2, '2023-10-01', 2.50, 87500.00, 1, 2, 0, '2023-10-01 23:59:00'),
@@ -171,7 +173,7 @@ INSERT INTO `inventory_statistics` (`stats_id`, `store_id`, `category_id`, `date
 (9, 2, 1, '2023-10-02', 4.25, 140000.00, 2, 0, 3, '2023-10-02 23:59:00'),
 (10, 3, 2, '2023-10-02', 3.50, 105000.00, 1, 2, 0, '2023-10-02 23:59:00');
 
--- 9. 발주 통계 데이터 추가
+-- 9. order_stats(발주 통계) 데이터
 INSERT INTO `order_stats` (`ostats_id`, `store_id`, `product_id`, `order_date`, `quantity`, `total_price`, `created_at`) VALUES
 (1, 1, 1, '2023-10-01', 50, 22500, '2023-10-01 09:00:00'),
 (2, 1, 2, '2023-10-01', 40, 20000, '2023-10-01 09:05:00'),
@@ -184,7 +186,7 @@ INSERT INTO `order_stats` (`ostats_id`, `store_id`, `product_id`, `order_date`, 
 (9, 3, 8, '2023-10-02', 40, 14000, '2023-10-02 11:00:00'),
 (10, 1, 9, '2023-10-02', 30, 12000, '2023-10-02 09:10:00');
 
--- 10. 수요 예측 데이터 추가
+-- 10. demand_prediction(수요 예측) 데이터
 INSERT INTO `demand_prediction` (`prediction_id`, `store_id`, `product_id`, `date`, `predicted_quantity`, `confidence_level`, `weather_factor`, `seasonal_factor`, `created_at`) VALUES
 (1, 1, 1, '2023-10-06', 55, 0.85, 0.75, 0.90, '2023-10-05 00:00:00'),
 (2, 1, 2, '2023-10-06', 45, 0.82, 0.70, 0.85, '2023-10-05 00:00:00'),
@@ -197,7 +199,7 @@ INSERT INTO `demand_prediction` (`prediction_id`, `store_id`, `product_id`, `dat
 (9, 3, 8, '2023-10-06', 45, 0.85, 0.75, 0.92, '2023-10-05 00:00:00'),
 (10, 1, 9, '2023-10-06', 35, 0.82, 0.70, 0.87, '2023-10-05 00:00:00');
 
--- 11. 이상 탐지 데이터 추가
+-- 11. anomaly_detection(이상 탐지) 데이터
 INSERT INTO `anomaly_detection` (`anomaly_id`, `store_id`, `type`, `detection_time`, `severity`, `description`, `is_resolved`, `resolution_notes`, `created_at`, `updated_at`) VALUES
 (1, 1, '재고 급감', '2023-10-01 14:23:15', 4, '삼각김밥 참치 제품의 재고가 1시간 내에 30개 이상 감소했습니다.', TRUE, '특별 할인 행사로 인한 정상적인 판매량 증가', '2023-10-01 14:23:15', '2023-10-01 16:45:00');
 
@@ -245,7 +247,7 @@ INSERT INTO annual_leave (leave_id, emp_id, year, total_days, used_days, rem_day
 (10, 10, 2023, 15, 0, 15, '2023-12-01');
 
 -- leave_req (연차 신청) 데이터
-INSERT INTO leave_req (req_id, emp_id, req_date, req_reason, status, created_at) VALUES
+INSERT INTO leave_req (req_id, emp_id, req_date, req_reason, req_status, created_at) VALUES
 (1, 1, '2023-12-25', '연말 휴가', '1', '2023-12-01 10:00:00'),
 (2, 2, '2023-12-26', '가족 행사', '2', '2023-12-02 11:00:00'),
 (3, 3, '2023-12-27', '개인 사유', '3', '2023-12-03 09:00:00'),
@@ -271,6 +273,12 @@ INSERT INTO appr_line (line_id, emp_id, req_id, appr_order, is_delegate) VALUES
 (10, 10, 10, 1, true);
 
 -- appr_log (연차 결재 로그) 데이터
+
+-- appr_status 정의
+-- 1: 승인
+-- 2: 반려
+-- 3: 대기
+
 INSERT INTO appr_log (log_id, req_id, emp_id, appr_status, appr_at, note) VALUES
 (1, 1, 1, 1, '2023-12-01 11:00:00', '승인합니다'),
 (2, 2, 2, 2, '2023-12-02 12:00:00', '인원 부족으로 반려'),
@@ -317,7 +325,7 @@ INSERT INTO attendance (attend_id, emp_id, work_date, Field, in_time, out_time, 
 -- 2: 건의사항 (점주→본사, 큰 규모의 개선 요청)
 -- 3: 점포문의 (점주→본사, 긴급하거나 작은 문제)
 
--- tbl_board_posts 테이블 데이터 삽입 (게시글)
+-- tbl_board_posts(게시글) 데이터
 INSERT INTO `tbl_board_posts` (`post_id`, `emp_id`, `board_type`, `title`, `content`, `created_at`) VALUES
 -- 공지사항 (board_type = 1)
 (1, 1, 1, '2024년 2분기 신상품 출시 안내', '안녕하세요. 2024년 2분기 신규 상품 10종이 출시되었습니다. 첨부된 가이드라인에 따라 매장 진열을 변경해주시기 바랍니다.', '2024-04-01 09:30:00'),
@@ -340,7 +348,7 @@ INSERT INTO `tbl_board_posts` (`post_id`, `emp_id`, `board_type`, `title`, `cont
 (14, 8, 3, '보안 카메라 고장 신고', '매장 입구 보안 카메라가 작동하지 않습니다. 보안 문제가 우려되니 빠른 수리 또는 교체 부탁드립니다.', '2024-05-20 09:50:00'),
 (15, 9, 3, '전기 누전 의심 신고', '창고 구역에서 전기 누전이 의심되는 상황이 발생했습니다. 안전을 위해 긴급 전기 안전 점검을 요청합니다.', '2024-06-10 16:40:00');
 
--- tbl_board_comments 테이블 데이터 삽입 (댓글/답변)
+-- tbl_board_comments(댓글/답변) 데이터
 INSERT INTO `tbl_board_comments` (`comment_id`, `post_id`, `content`, `created_at`) VALUES
 -- 공지사항에 대한 답변/댓글
 (1, 1, '신상품 가이드라인 확인했습니다. 진열 변경은 언제까지 완료해야 하나요?', '2024-04-01 11:20:00'),

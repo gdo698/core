@@ -1,0 +1,7 @@
+jwt:
+  secretKey:
+
+s3:
+  access-key:
+  secret-key:
+  bucket:
