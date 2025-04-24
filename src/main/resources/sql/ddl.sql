@@ -320,7 +320,7 @@ CREATE TABLE `leave_req` (
                              `emp_id` INT NOT NULL COMMENT '사원 고유 번호',
                              `req_date` DATE NOT NULL COMMENT '요청날짜',
                              `req_reason` VARCHAR(255) NULL COMMENT '연차사유',
-                             `req_status` VARCHAR(20) NULL DEFAULT '대기' COMMENT '현재 상태',
+                             `req_status` INT NULL DEFAULT 1 COMMENT '현재 상태',
                              `created_at` DATETIME NULL COMMENT '생성날짜',
                              PRIMARY KEY (`req_id`),
                              FOREIGN KEY (`emp_id`) REFERENCES `employee` (`emp_id`)

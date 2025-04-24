@@ -173,7 +173,7 @@ INSERT INTO `product` (`product_id`, `category_id`, `pro_name`, `pro_barcode`, `
 (37, 33, '칠성사이다 제로', 8801234567926, 800, 1800, '2024-01-28 12:10:00', '2024-01-28 12:10:00', 'https://example.com/images/cider_zero.jpg', 0),
 (38, 33, '스프라이트', 8801234567927, 750, 1700, '2024-01-28 12:15:00', '2024-01-28 12:15:00', 'https://example.com/images/sprite.jpg', 0);
 
--- 상품 세부항목(product_details) 데이터
+-- 6. 상품 세부항목(product_details) 데이터
 INSERT INTO `product_details` (`pro_detail_id`, `product_id`, `manufacturer`, `manu_num`, `shelf_life`, `allergens`, `storage_method`) VALUES
 (1, 1, '삼각김밥 주식회사', '02-123-4567', '제조일로부터 1일', '쌀, 참치(대두,밀 함유)', '냉장보관'),
 (2, 2, '삼각김밥 주식회사', '02-123-4567', '제조일로부터 1일', '쌀, 불고기(대두,밀 함유)', '냉장보관'),
@@ -270,11 +270,107 @@ INSERT INTO `demand_prediction` (`prediction_id`, `store_id`, `product_id`, `dat
 INSERT INTO `anomaly_detection` (`anomaly_id`, `store_id`, `type`, `detection_time`, `severity`, `description`, `is_resolved`, `resolution_notes`, `created_at`, `updated_at`) VALUES
 (1, 1, '재고 급감', '2023-10-01 14:23:15', 4, '삼각김밥 참치 제품의 재고가 1시간 내에 30개 이상 감소했습니다.', TRUE, '특별 할인 행사로 인한 정상적인 판매량 증가', '2023-10-01 14:23:15', '2023-10-01 16:45:00');
 
+-- 12. 아르바이트 추가
+
+-- part_status 정의
+
+-- 1: 재직
+-- 2: 퇴사
+-- 3: 휴직
+
+-- salary_type 정의
+
+-- 1: 시급
+-- 2: 월급
+
+INSERT INTO part_timer (part_timer_id, store_id, name, gender, phone, addres, birth_date, hire_date, resign_date, salary_type, hourly_wage, account_bank, account_number, part_status, created_at) VALUES
+(1, 1, '김철수', 1, '010-1234-5678', '서울 강남구', '2000-01-01', '2024-01-01', NULL, 1, 10000, '국민', '123-456-7890', 1, NOW()),
+(2, 2, '이영희', 2, '010-2345-6789', '서울 송파구', '1999-05-20', '2024-02-01', NULL, 1, 10500, '신한', '234-567-8901', 1, NOW()),
+(3, 3, '박민수', 1, '010-3456-7890', '서울 마포구', '1998-03-15', '2024-03-10', NULL, 1, 11000, '우리', '345-678-9012', 1, NOW()),
+(4, 2, '최지은', 2, '010-4567-8901', '서울 종로구', '1997-07-22', '2024-03-20', NULL, 1, 9500, '농협', '456-789-0123', 1, NOW()),
+(5, 1, '정우성', 1, '010-5678-9012', '서울 용산구', '1995-12-01', '2024-04-01', NULL, 1, 12000, '신한', '567-890-1234', 1, NOW());
+
+-- 13 근무 스케줄 추가
+INSERT INTO shift_schedule (schedule_id, part_timer_id, work_date, start_time, end_time) VALUES
+(1, 1, '2024-04-01 08:00:00', '2024-04-01 08:00:00', '2024-04-01 14:00:00'),
+(2, 2, '2024-04-01 10:00:00', '2024-04-01 10:00:00', '2024-04-01 16:00:00'),
+(3, 3, '2024-04-01 12:00:00', '2024-04-01 12:00:00', '2024-04-01 18:00:00'),
+(4, 4, '2024-04-01 14:00:00', '2024-04-01 14:00:00', '2024-04-01 20:00:00'),
+(5, 5, '2024-04-01 16:00:00', '2024-04-01 16:00:00', '2024-04-01 22:00:00');
+
+-- 14 재고 관리 추가
+
+-- stock_status 정의
+
+-- 1: 정상
+-- 2: 유통기한 임박
+-- 3: 유통기한 경과
+-- 4: 재고부족
+-- 5: 입고예정
+-- 6: 폐기대기
+
+INSERT INTO store_stock (stock_id, store_id, product_id, quantity, last_in_date, stock_status) VALUES
+(1, 1, 1, 13, '2024-04-01 10:00:00', 1),
+(2, 1, 2, 19, '2024-04-01 10:00:00', 1),
+(3, 1, 3, 5, '2024-04-01 10:00:00', 1),
+(4, 1, 4, 6, '2024-04-01 10:00:00', 1),
+(5, 1, 5, 17, '2024-04-01 10:00:00', 1);
+
+-- 15 발주 추가
+
+-- order_status 정의
+
+-- 1: 발주 완료
+-- 2: 발주 취소
+-- 3: 입고 대기
+-- 4: 입고완료
+
+INSERT INTO purchase_order (order_id, store_id, order_date, oreder_status, total_amount, total_quantity) VALUES
+(1, 1, '2024-04-02 10:00:00', 1, 24700, 7),
+(2, 1, '2024-04-03 10:00:00', 1, 32300, 14),
+(3, 1, '2024-04-04 10:00:00', 1, 30600, 15),
+(4, 1, '2024-04-05 10:00:00', 1, 34900, 20),
+(5, 1, '2024-04-06 10:00:00', 1, 24900, 11);
+
+-- 16 발주 항목 추가
+INSERT INTO purchase_order_item (item_id, order_id, product_id, order_quantity, unit_price, total_price, order_state, is_abnormal, is_fully_received, received_quantity) VALUES
+(1, 1, 1, 9, 1400, 12600, 1, false, false, NULL),
+(2, 2, 2, 6, 1800, 10800, 1, false, false, NULL),
+(3, 3, 3, 11, 1400, 15400, 1, false, false, NULL),
+(4, 4, 4, 18, 1200, 21600, 1, false, false, NULL),
+(5, 5, 5, 10, 1600, 16000, 1, false, false, NULL);
+
+-- 17 재고 기록 추가
+
+-- history_status 정의
+
+-- 1: 입고 대기
+-- 2: 입고 완료
+-- 3: 부분 입고
+-- 4: 오입고
+-- 5: 폐기
+-- 6: 반품
+
+INSERT INTO stock_in_history (history_id, store_id, product_id, part_timer_id, order_id, in_quantity, in_date, expire_date, history_status) VALUES
+(6, 1, 6, 2, 1, 20, '2024-04-02 12:00:00', '2024-08-01 00:00:00', 1),
+(7, 1, 7, 2, 2, 15, '2024-04-03 13:00:00', '2024-07-30 00:00:00', 2),
+(8, 1, 8, 3, 3, 18, '2024-04-04 09:00:00', '2024-08-15 00:00:00', 3),
+(9, 1, 9, 3, 4, 10, '2024-04-05 11:30:00', NULL, '오입고'),
+(10, 1, 10, 4, 5, 5, '2024-04-06 15:00:00', '2024-07-01 00:00:00', 4);
+
+-- 18 폐기 추가
+INSERT INTO disposal (disposal_id, stock_id, disposal_date, quantity, processed_by, total_loss_amount, reason) VALUES
+(6, 1, '2024-04-10 09:00:00', 3, '이영희', 3000, '파손'),
+(7, 2, '2024-04-11 10:30:00', 2, '박민수', 2000, '유통기한만료'),
+(8, 3, '2024-04-12 08:45:00', 1, '최지은', 1000, '반품'),
+(9, 4, '2024-04-13 11:15:00', 6, '정우성', 6000, '오입고로 인한 폐기'),
+(10, 5, '2024-04-14 12:00:00', 4, '김철수', 4000, '재고조사 누락');
+
 
 
 -- 본사 인사 더미 데이터
 
--- department (부서) 데이터
+-- 19. department (부서) 데이터
 INSERT INTO department (dept_id, dept_name, emp_role) VALUES
 (1, '인사팀', 'ROLE_HR'),
 (2, '재무팀', 'ROLE_FINANCE'),
@@ -287,7 +383,7 @@ INSERT INTO department (dept_id, dept_name, emp_role) VALUES
 (9, '구매팀', 'ROLE_PURCHASING'),
 (10, '개발팀', 'ROLE_DEV');
 
--- employee (사원) 데이터
+-- 20. employee (사원) 데이터
 INSERT INTO employee (emp_id, store_id, depart_id, emp_name, emp_gender, emp_phone, emp_addr, emp_birth, login_id, login_pwd, emp_img, emp_bank, emp_acount, emp_status, hire_date, work_type, email_auth, emp_ext) VALUES
 (1, 1, 1, '김인사', 1, '010-1234-5678', '서울시 강남구', '1990-01-01', 'hr1', 'password123', null, '국민', '111-222-333444', '1', '2022-01-01', '정규직', true, null),
 (2, 1, 2, '이재무', 2, '010-2345-6789', '서울시 서초구', '1991-02-02', 'finance1', 'password123', null, '신한', '222-333-444555', '1', '2022-02-01', '정규직', true, null),
@@ -300,7 +396,7 @@ INSERT INTO employee (emp_id, store_id, depart_id, emp_name, emp_gender, emp_pho
 (9, 3, 9, '유구매', 1, '010-9012-3456', '서울시 광진구', '1998-09-09', 'purchase1', 'password123', null, '국민', '999-000-111222', '1', '2022-09-01', '정규직', true, null),
 (10, 1, 10, '조개발', 2, '010-0123-4567', '서울시 중구', '1999-10-10', 'dev1', 'password123', null, '신한', '000-111-222333', '1', '2022-10-01', '정규직', true, null);
 
--- annual_leave (연차) 데이터
+-- 21. annual_leave (연차) 데이터
 INSERT INTO annual_leave (leave_id, emp_id, year, total_days, used_days, rem_days, uadate_at) VALUES
 (1, 1, 2023, 15, 5, 10, '2023-12-01'),
 (2, 2, 2023, 15, 3, 12, '2023-12-01'),
@@ -313,7 +409,15 @@ INSERT INTO annual_leave (leave_id, emp_id, year, total_days, used_days, rem_day
 (9, 9, 2023, 15, 9, 6, '2023-12-01'),
 (10, 10, 2023, 15, 0, 15, '2023-12-01');
 
--- leave_req (연차 신청) 데이터
+-- 22. leave_req (연차 신청) 데이터
+
+-- req_status 정의
+
+-- 1: 승인
+-- 2: 반려
+-- 3: 대기
+
+
 INSERT INTO leave_req (req_id, emp_id, req_date, req_reason, req_status, created_at) VALUES
 (1, 1, '2023-12-25', '연말 휴가', '1', '2023-12-01 10:00:00'),
 (2, 2, '2023-12-26', '가족 행사', '2', '2023-12-02 11:00:00'),
@@ -326,7 +430,7 @@ INSERT INTO leave_req (req_id, emp_id, req_date, req_reason, req_status, created
 (9, 9, '2024-01-04', '휴식', '2', '2023-12-09 13:30:00'),
 (10, 10, '2024-01-05', '가족 여행', '3', '2023-12-10 15:30:00');
 
--- appr_line (결재선) 데이터
+-- 23. appr_line (결재선) 데이터
 INSERT INTO appr_line (line_id, emp_id, req_id, appr_order, is_delegate) VALUES
 (1, 1, 1, 1, false),
 (2, 2, 2, 1, false),
@@ -339,7 +443,7 @@ INSERT INTO appr_line (line_id, emp_id, req_id, appr_order, is_delegate) VALUES
 (9, 9, 9, 1, false),
 (10, 10, 10, 1, true);
 
--- appr_log (연차 결재 로그) 데이터
+-- 24. appr_log (연차 결재 로그) 데이터
 
 -- appr_status 정의
 -- 1: 승인
@@ -358,7 +462,12 @@ INSERT INTO appr_log (log_id, req_id, emp_id, appr_status, appr_at, note) VALUES
 (9, 9, 9, 2, '2023-12-09 14:00:00', '일정 중복으로 반려'),
 (10, 10, 10, 3, '2023-12-10 16:00:00', '검토중');
 
--- Salary (급여) 데이터
+-- 25. Salary (급여) 데이터
+
+-- pay_status 정의
+-- 1: 지급대기
+-- 2: 지급완료
+
 INSERT INTO Salary (salary_id, emp_id, calculated_at, base_salary, bonus, deduct_total, deduct_extra, net_salary, pay_date, pay_status) VALUES
 (1, 1, '2023-11-30', 3000000, 300000, 300000, null, 3000000, '2023-12-05', '2'),
 (2, 2, '2023-11-30', 2800000, 280000, 280000, null, 2800000, '2023-12-05', '2'),
@@ -371,9 +480,27 @@ INSERT INTO Salary (salary_id, emp_id, calculated_at, base_salary, bonus, deduct
 (9, 9, '2023-11-30', 2500000, 250000, 250000, null, 2500000, '2023-12-05', '2'),
 (10, 10, '2023-11-30', 3500000, 350000, 350000, null, 3500000, '2023-12-05', '1');
 
--- attendance (근태 기록) 데이터
+INSERT INTO Salary (salary_id, emp_id, part_timer_id,store_id, calculated_at, base_salary, bonus, deduct_total, deduct_extra, net_salary, pay_date, pay_status) VALUES
+(11, NULL, 1,1, NOW(), 800000, 50000, 30000, NULL, 820000, NOW(), 1),
+(12, NULL, 2,2, NOW(), 850000, 20000, 15000, NULL, 855000, NOW(), 2),
+(13, NULL, 3,3, NOW(), 780000, 30000, 10000, NULL, 800000, NOW(), 1),
+(14, NULL, 4,2, NOW(), 750000, 25000, 25000, NULL, 750000, NOW(), 1),
+(15, NULL, 5,1, NOW(), 900000, 50000, 20000, NULL, 930000, NOW(), 2);
+
+
+-- 26. attendance (근태 기록) 데이터
+
+-- attend_status 정의
+-- 1: 출근
+-- 2: 지각
+-- 3: 조퇴
+-- 4: 결근
+-- 5: 연차
+-- 6: 병가
+
+
 INSERT INTO attendance (attend_id, emp_id, work_date, Field, in_time, out_time, attend_status) VALUES
-(1, 1, '2023-12-01', 15, '2023-12-01 09:00:00', '2023-12-01 18:00:00', 1),
+(1, 1,'2023-12-01', 15, '2023-12-01 09:00:00', '2023-12-01 18:00:00', 1),
 (2, 2, '2023-12-01', 15, '2023-12-01 09:30:00', '2023-12-01 18:00:00', 2),
 (3, 3, '2023-12-01', 15, '2023-12-01 09:00:00', '2023-12-01 17:30:00', 3),
 (4, 4, '2023-12-01', 15, '2023-12-01 09:00:00', '2023-12-01 18:00:00', 1),
@@ -384,6 +511,14 @@ INSERT INTO attendance (attend_id, emp_id, work_date, Field, in_time, out_time, 
 (9, 9, '2023-12-02', 15, '2023-12-02 00:00:00', '2023-12-02 00:00:00', 6),
 (10, 10, '2023-12-02', 15, '2023-12-02 09:00:00', '2023-12-02 18:00:00', 1);
 
+INSERT INTO attendance (attend_id, emp_id,store_id, part_timer_id, work_date, Field, in_time, out_time, attend_status) VALUES
+(11, NULL, 1,1, '2024-04-01 08:00:00', NULL, '2024-04-01 08:00:00', '2024-04-01 14:00:00', 1),
+(12, NULL, 2,2, '2024-04-01 10:00:00', NULL, '2024-04-01 10:00:00', '2024-04-01 16:00:00', 1),
+(13, NULL, 3,3, '2024-04-01 12:00:00', NULL, '2024-04-01 12:00:00', '2024-04-01 18:00:00', 1),
+(14, NULL, 2,4, '2024-04-01 14:00:00', NULL, '2024-04-01 14:00:00', '2024-04-01 20:00:00', 2),
+(15, NULL, 1,5, '2024-04-01 16:00:00', NULL, '2024-04-01 16:00:00', '2024-04-01 22:00:00', 3);
+
+
 
 -- 게시판 관련 더미 데이터
 
@@ -392,7 +527,9 @@ INSERT INTO attendance (attend_id, emp_id, work_date, Field, in_time, out_time, 
 -- 2: 건의사항 (점주→본사, 큰 규모의 개선 요청)
 -- 3: 점포문의 (점주→본사, 긴급하거나 작은 문제)
 
--- tbl_board_posts(게시글) 데이터
+
+
+-- 27 tbl_board_posts(게시글) 데이터
 INSERT INTO `tbl_board_posts` (`post_id`, `emp_id`, `board_type`, `title`, `content`, `created_at`) VALUES
 -- 공지사항 (board_type = 1)
 (1, 1, 1, '2024년 2분기 신상품 출시 안내', '안녕하세요. 2024년 2분기 신규 상품 10종이 출시되었습니다. 첨부된 가이드라인에 따라 매장 진열을 변경해주시기 바랍니다.', '2024-04-01 09:30:00'),
@@ -415,7 +552,7 @@ INSERT INTO `tbl_board_posts` (`post_id`, `emp_id`, `board_type`, `title`, `cont
 (14, 8, 3, '보안 카메라 고장 신고', '매장 입구 보안 카메라가 작동하지 않습니다. 보안 문제가 우려되니 빠른 수리 또는 교체 부탁드립니다.', '2024-05-20 09:50:00'),
 (15, 9, 3, '전기 누전 의심 신고', '창고 구역에서 전기 누전이 의심되는 상황이 발생했습니다. 안전을 위해 긴급 전기 안전 점검을 요청합니다.', '2024-06-10 16:40:00');
 
--- tbl_board_comments(댓글/답변) 데이터
+-- 28 tbl_board_comments(댓글/답변) 데이터
 INSERT INTO `tbl_board_comments` (`comment_id`, `post_id`, `content`, `created_at`) VALUES
 -- 공지사항에 대한 답변/댓글
 (1, 1, '신상품 가이드라인 확인했습니다. 진열 변경은 언제까지 완료해야 하나요?', '2024-04-01 11:20:00'),
@@ -437,7 +574,7 @@ INSERT INTO `tbl_board_comments` (`comment_id`, `post_id`, `content`, `created_a
 (13, 15, '전기안전공사에 긴급 점검 요청을 접수했습니다. 오늘 오후 5시까지 방문할 예정이니 담당자 대기 부탁드립니다.', '2024-06-10 17:00:00');
 
 
--- dashboard_layout 데이터 추가
+-- 29. dashboard_layout(대시보드) 데이터
 INSERT INTO `dashboard_layout` (`layout_id`, `emp_id`, `widget_code`, `grid_positions`, `created_at`, `updated_at`) VALUES
 -- 인사팀장 (emp_id: 1)
 (1, 1, 'HR_ATTENDANCE', '1,2,3,4', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
@@ -500,7 +637,7 @@ INSERT INTO `dashboard_layout` (`layout_id`, `emp_id`, `widget_code`, `grid_posi
 (40, 10, 'DEV_PERFORMANCE', '13,14,15,16', '2024-01-01 09:00:00', '2024-01-01 09:00:00');
 
 
--- sales_stats (상품별 매출 통계) 데이터
+-- 30. sales_stats (상품별 매출 통계) 데이터
 INSERT INTO `sales_stats` (`sales_stats_id`, `store_id`, `product_id`, `sale_date`, `quantity`, `total_sales`, `created_at`) VALUES
 (1, 1, 1, '2023-10-01', 25, 30000, '2023-10-01 23:59:00'),
 (2, 1, 2, '2023-10-01', 18, 23400, '2023-10-01 23:59:00'),
@@ -510,7 +647,7 @@ INSERT INTO `sales_stats` (`sales_stats_id`, `store_id`, `product_id`, `sale_dat
 (6, 1, 6, '2023-10-02', 15, 19500, '2023-10-02 23:59:00'),
 (7, 2, 7, '2023-10-02', 11, 26400, '2023-10-02 23:59:00');
 
--- sales_hourly (시간대별 매출 통계) 데이터
+-- 31. sales_hourly (시간대별 매출 통계) 데이터
 INSERT INTO `sales_hourly` (`sales_hourly_id`, `store_id`, `sale_date`, `hour`, `quantity`, `total_sales`, `created_at`) VALUES
 (1, 1, '2023-10-01', 9, 15, 18000, '2023-10-01 09:59:00'),
 (2, 1, '2023-10-01', 10, 12, 15000, '2023-10-01 10:59:00'),
@@ -522,7 +659,7 @@ INSERT INTO `sales_hourly` (`sales_hourly_id`, `store_id`, `sale_date`, `hour`, 
 
 
 
--- sales (POS 매출 기록) 데이터
+-- 32. sales (POS 매출 기록) 데이터
 INSERT INTO `sales` (`sales_id`, `store_id`, `emp_id`, `product_id`, `total_sales`, `payment_method`,
                      `sale_time`, `quantity`, `is_refunded`, `discount_price`, `created_at`,
                      `final_amount`, `cost_price`, `real_income`, `is_settled`) VALUES
@@ -547,7 +684,7 @@ INSERT INTO `sales` (`sales_id`, `store_id`, `emp_id`, `product_id`, `total_sale
 (19, 3, 5, 23, 6900, '카카오페이', '2024-04-03 17:30:00', 2, false, 0, '2024-04-03 17:30:00', 6900, 2800, 4100, true),
 (20, 2, 3, 5, 2100, '카드', '2024-04-02 16:00:00', 1, false, 0, '2024-04-02 16:00:00', 2100, 700, 1400, true);
 
--- today_sales (오늘 매출) 데이터 삽입
+-- 32. today_sales (오늘 매출) 데이터 삽입
 INSERT INTO `sales` (`sales_id`, `store_id`, `emp_id`, `product_id`, `total_sales`, `payment_method`,
                      `sale_time`, `quantity`, `is_refunded`, `discount_price`, `created_at`,
                      `final_amount`, `cost_price`, `real_income`, `is_settled`) VALUES
@@ -558,7 +695,7 @@ INSERT INTO `sales` (`sales_id`, `store_id`, `emp_id`, `product_id`, `total_sale
 (104, 1, 2, 6, 12000, '현금', '2024-04-24 13:00:00', 1, FALSE, 500, '2024-04-24 13:00:00', 11500, 4500, 7000, TRUE),
 (105, 2, 4, 7, 22000, '현금', '2024-04-24 14:00:00', 3, FALSE, 0, '2024-04-24 14:00:00', 22000, 8500, 13500, TRUE);
 
--- issue_log (최근 이슈) 데이터 삽입
+-- 33. issue_log (최근 이슈) 데이터 삽입
 INSERT INTO `issue_log` (`issue_id`, `store_id`, `issue_title`, `issue_desc`, `issue_type`, `created_at`) VALUES
 (1, 1, '재고 급감', '삼각김밥 참치 제품의 재고가 급격히 감소', '재고', '2024-04-23 14:30:00'),
 (2, 2, 'POS 시스템 오류', 'POS 시스템에서 결제 오류가 발생', '시스템', '2024-04-23 10:00:00'),

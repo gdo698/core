@@ -107,3 +107,11 @@ SELECT
 FROM sales_statistics ss
 GROUP BY DATE_FORMAT(ss.hour, '%H:00')
 ORDER BY DATE_FORMAT(ss.hour, '%H:00');
+
+-- 11. 특정 지점의 스케줄 전체 조회
+
+SELECT * FROM shift_schedule a
+         Join part_timer b on a.part_timer_id =b.part_timer_id
+         WHERE store_id = 1;
+
+-- 12. 특정 알바의 스케줄 조회
