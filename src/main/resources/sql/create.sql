@@ -1,17 +1,17 @@
 # -- DDL: 테이블 생성 (Data Definition Language)
-# create user 'core'@'%' identified by 'core';
+create user 'core'@'%' identified by 'core';
 #
-# show databases;
-# use mysql;
+show databases;
+use mysql;
 #
-# select * from user;
-# select User from user;
+select * from user;
+select User from user;
 #
-# create database core;
+create database core;
 #
-# grant all privileges on core.* to 'core'@'%';
+grant all privileges on core.* to 'core'@'%';
 #
-# show grants for 'core'@'%';
+show grants for 'core'@'%';
 #
 # -- udigo로 이동
 use core;

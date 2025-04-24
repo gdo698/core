@@ -18,10 +18,14 @@ CREATE TABLE `store` (
 );
 
 CREATE TABLE `category` (
-                            `category_id` int NOT NULL COMMENT '자동생성 , 카테고리 id',
-                            `category_name` VARCHAR(30) NOT NULL COMMENT '식품 , 용품,신선식품, 샌드위치...',
-                            `category_filter` int NULL COMMENT '대분류1 , 중분류2 소분류3 ...',
-                            PRIMARY KEY (`category_id`)
+                            `category_id` int NOT NULL AUTO_INCREMENT COMMENT '자동생성, 카테고리 id',
+                            `category_name` VARCHAR(30) NOT NULL COMMENT '식품, 용품, 신선식품, 샌드위치...',
+                            `category_filter` int NULL COMMENT '대분류1, 중분류2, 소분류3 - 레벨 구분용',
+                            `parent_category_id` int NULL COMMENT '부모 카테고리 ID (최상위 카테고리는 NULL)',
+                            PRIMARY KEY (`category_id`),
+                            CONSTRAINT `fk_category_parent` FOREIGN KEY (`parent_category_id`)
+                                REFERENCES `category` (`category_id`)
+                                ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE `ai_model` (
@@ -96,7 +100,7 @@ CREATE TABLE `product` (
                            `category_id` int NOT NULL COMMENT '자동생성 , 카테고리 id',
                            `pro_detail_id` INT NULL,
                            `pro_name` varchar(255) NOT NULL COMMENT '제품 이름',
-                           `pro_barcode` int NOT NULL COMMENT '바코드 넘버',
+                           `pro_barcode` bigint NOT NULL COMMENT '바코드 넘버',
                            `pro_cost` int NOT NULL COMMENT '원가',
                            `pro_sell_cost` int NOT NULL COMMENT '판매가',
                            `pro_created_at` DATETIME NOT NULL COMMENT '생성했을때 시각',
@@ -431,12 +435,15 @@ CREATE TABLE `tbl_board_comments` (
                                       FOREIGN KEY (`post_id`) REFERENCES `tbl_board_posts` (`post_id`)
 );
 
+
 CREATE TABLE `product_details` (
-                                   `detail_id` INT NOT NULL,
-                                   `product_id` int NOT NULL COMMENT 'autoincrement',
-                                   `attribute_key` VARCHAR(50) NOT NULL COMMENT '키값 , 제조자명, 제조사 번호 ....',
-                                   `attribute_value` TEXT NULL COMMENT '벨류 내용',
-                                   PRIMARY KEY (`detail_id`),
+                                   `pro_detail_id`	INT	NOT NULL,
+                                   `product_id`	int	NOT NULL	COMMENT 'autoincrement',
+                                   `manufacturer`	VARCHAR(100)	NOT NULL	COMMENT '제조사',
+                                   `manu_num`	VARCHAR(30)	NULL	COMMENT '제조사번호',
+                                   `shelf_life`	VARCHAR(50)	NULL	COMMENT '제조일로부터 12개월..',
+                                   `allergens`	VARCHAR(255)	NULL	COMMENT '알러지',
+                                   `storage_method`	VARCHAR(100)	NULL	COMMENT '보관방법, 냉동냉장,..',
+                                   PRIMARY KEY (`pro_detail_id`),
                                    FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`)
 );
-
