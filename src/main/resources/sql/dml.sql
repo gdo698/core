@@ -2,11 +2,24 @@
 
 
 -- 1. store(매장) 데이터
+-- 매장 데이터 추가
+INSERT INTO store (store_id, store_name, store_addr, store_tel, store_created_at, store_cert, store_acc)
+VALUES
+-- 서울특별시 종로구 매장 (3개)
+(1, '종로점', '서울특별시 종로구 종로 1길 10', '02-1234-5678', '2023-01-01 09:00:00', 'https://example.com/cert/jongno.jpg', 'https://example.com/accounts/jongno.jpg'),
+(2, '광화문점', '서울특별시 종로구 세종대로 21', '02-2345-6789', '2023-01-22 09:00:00', 'https://example.com/cert/gwanghwamun.jpg', 'https://example.com/accounts/gwanghwamun.jpg'),
+(3, '인사동점', '서울특별시 종로구 인사동길 12', '02-3456-7890', '2023-04-16 09:00:00', 'https://example.com/cert/insadong.jpg', 'https://example.com/accounts/insadong.jpg'),
 
-INSERT INTO `store` (`store_id`, `store_name`, `store_addr`, `store_tel`, `store_created_at`, `store_cert`, `store_acc`) VALUES
-(1, '강남점', '서울특별시 강남구 테헤란로 152', '02-555-1234', '2023-01-01 09:00:00', 'https://example.com/cert/gangnam.jpg', 'https://example.com/accounts/gangnam.jpg'),
-(2, '홍대점', '서울특별시 마포구 와우산로 94', '02-336-5678', '2023-02-15 10:30:00', 'https://example.com/cert/hongdae.jpg', 'https://example.com/accounts/hongdae.jpg'),
-(3, '부산점', '부산광역시 해운대구 해운대해변로 264', '051-747-9012', '2023-03-20 11:15:00', 'https://example.com/cert/busan.jpg', 'https://example.com/accounts/busan.jpg');
+-- 서울특별시 강북구 매장 (3개)
+(4, '수유점', '서울특별시 강북구 도봉로 71', '02-4567-8901', '1997-01-01 09:00:00', 'https://example.com/cert/suyu.jpg', 'https://example.com/accounts/suyu.jpg'),
+(5, '미아점', '서울특별시 강북구 삼양로 153', '02-5678-9012', '2025-01-01 09:00:00', 'https://example.com/cert/mia.jpg', 'https://example.com/accounts/mia.jpg'),
+(6, '번동점', '서울특별시 강북구 번동로 45', '02-6789-0123', '2023-01-07 09:00:00', 'https://example.com/cert/beondong.jpg', 'https://example.com/accounts/beondong.jpg'),
+
+-- 서울특별시 강남구 매장 (4개)
+(7, '강남점', '서울특별시 강남구 강남대로 123', '02-7890-1234', '2024-02-01 09:00:00', 'https://example.com/cert/gangnam.jpg', 'https://example.com/accounts/gangnam.jpg'),
+(8, '신사점', '서울특별시 강남구 압구정로 45', '02-8901-2345', '2022-03-12 09:00:00', 'https://example.com/cert/sinsa.jpg', 'https://example.com/accounts/sinsa.jpg'),
+(9, '논현점', '서울특별시 강남구 논현로 67', '02-9012-3456', '2021-01-01 09:00:00', 'https://example.com/cert/nonhyeon.jpg', 'https://example.com/accounts/nonhyeon.jpg'),
+(10, '삼성점', '서울특별시 강남구 테헤란로 89', '02-0123-4567', '2023-12-22 09:00:00', 'https://example.com/cert/samsung.jpg', 'https://example.com/accounts/samsung.jpg');
 
 -- 2. category(카테고리) 데이터
 INSERT INTO `category` (`category_id`, `category_name`, `category_filter`, `parent_category_id`) VALUES
@@ -381,7 +394,10 @@ INSERT INTO department (dept_id, dept_name, emp_role) VALUES
 (7, '고객서비스팀', 'ROLE_CS'),
 (8, '물류팀', 'ROLE_LOGISTICS'),
 (9, '구매팀', 'ROLE_PURCHASING'),
-(10, '개발팀', 'ROLE_DEV');
+(10, '개발팀', 'ROLE_DEV'),
+(11,'미승인본사','ROLE_LOW'),
+(12,'미승인점주','ROLE_LOW2');
+;
 
 -- 20. employee (사원) 데이터
 INSERT INTO employee (emp_id, store_id, depart_id, emp_name, emp_gender, emp_phone, emp_addr, emp_birth, login_id, login_pwd, emp_img, emp_bank, emp_acount, emp_status, hire_date, work_type, email_auth, emp_ext) VALUES
