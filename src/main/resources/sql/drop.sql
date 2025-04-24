@@ -1,0 +1,37 @@
+DROP TABLE IF EXISTS `disposal`;
+DROP TABLE IF EXISTS `sales`;
+DROP TABLE IF EXISTS `stock_in_history`;
+DROP TABLE IF EXISTS `purchase_order_item`;
+DROP TABLE IF EXISTS `sales_stats`;
+DROP TABLE IF EXISTS `store_stock`;
+DROP TABLE IF EXISTS `order_stats`;
+DROP TABLE IF EXISTS `issue_log`;
+DROP TABLE IF EXISTS `demand_prediction`;
+DROP TABLE IF EXISTS `appr_line`;
+DROP TABLE IF EXISTS `appr_log`;
+DROP TABLE IF EXISTS `tbl_board_comments`;
+DROP TABLE IF EXISTS `dashboard_layout`;
+DROP TABLE IF EXISTS `shift_schedule`;
+DROP TABLE IF EXISTS `Salary`;
+DROP TABLE IF EXISTS `pw_reset_token`;
+DROP TABLE IF EXISTS `leave_req`;
+DROP TABLE IF EXISTS `tbl_board_posts`;
+DROP TABLE IF EXISTS `attendance`;
+DROP TABLE IF EXISTS `annual_leave`;
+DROP TABLE IF EXISTS `email_token`;
+DROP TABLE IF EXISTS `employee`;
+DROP TABLE IF EXISTS `sales_statistics`;
+DROP TABLE IF EXISTS `anomaly_detection`;
+DROP TABLE IF EXISTS `purchase_order`;
+DROP TABLE IF EXISTS `inventory_statistics`;
+DROP TABLE IF EXISTS `sales_hourly`;
+DROP TABLE IF EXISTS `product_details`;
+DROP TABLE IF EXISTS `product`;
+DROP TABLE IF EXISTS `weather_data`;
+DROP TABLE IF EXISTS `store`;
+DROP TABLE IF EXISTS `ai_model`;
+DROP TABLE IF EXISTS `category`;
+DROP TABLE IF EXISTS `department`;
+
+
+
