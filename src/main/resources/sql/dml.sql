@@ -381,7 +381,12 @@ INSERT INTO department (dept_id, dept_name, emp_role) VALUES
 (7, '고객서비스팀', 'ROLE_CS'),
 (8, '물류팀', 'ROLE_LOGISTICS'),
 (9, '구매팀', 'ROLE_PURCHASING'),
-(10, '개발팀', 'ROLE_DEV');
+(10, '개발팀', 'ROLE_DEV'),
+(11, '미승인점주', 'ROLE_OWNER_PENDING'),
+(12, '미승인본사', 'ROLE_HQ_PENDING'),
+(13, '승인점주', 'ROLE_OWNER');
+
+
 
 -- 20. employee (사원) 데이터
 INSERT INTO employee (emp_id, store_id, depart_id, emp_name, emp_gender, emp_phone, emp_addr, emp_birth, login_id, login_pwd, emp_img, emp_bank, emp_acount, emp_status, hire_date, work_type, email_auth, emp_ext) VALUES
@@ -394,7 +399,11 @@ INSERT INTO employee (emp_id, store_id, depart_id, emp_name, emp_gender, emp_pho
 (7, 1, 7, '곽서비스', 1, '010-7890-1234', '서울시 용산구', '1996-07-07', 'cs1', 'password123', null, '우리', '777-888-999000', '3', '2022-07-01', '정규직', true, null),
 (8, 2, 8, '송물류', 2, '010-8901-2345', '서울시 성동구', '1997-08-08', 'logistics1', 'password123', null, '농협', '888-999-000111', '1', '2022-08-01', '계약직', true, null),
 (9, 3, 9, '유구매', 1, '010-9012-3456', '서울시 광진구', '1998-09-09', 'purchase1', 'password123', null, '국민', '999-000-111222', '1', '2022-09-01', '정규직', true, null),
-(10, 1, 10, '조개발', 2, '010-0123-4567', '서울시 중구', '1999-10-10', 'dev1', 'password123', null, '신한', '000-111-222333', '1', '2022-10-01', '정규직', true, null);
+(10, 1, 10, '조개발', 2, '010-0123-4567', '서울시 중구', '1999-10-10', 'dev1', 'password123', null, '신한', '000-111-222333', '1', '2022-10-01', '정규직', true, null),
+(11, 1, 13, '김강남', 1, '010-1111-2222', '서울시 강남구', '1980-01-01', 'owner_gangnam', 'password123', null, '국민', '100-200-300400', '1', '2023-01-01', '점주', true, null),
+(12, 2, 13, '박홍대', 2, '010-2222-3333', '서울시 마포구', '1982-02-02', 'owner_hongdae', 'password123', null, '신한', '200-300-400500', '1', '2023-02-15', '점주', true, null),
+(13, 3, 13, '최부산', 1, '010-3333-4444', '부산시 해운대구', '1984-03-03', 'owner_busan', 'password123', null, '우리', '300-400-500600', '1', '2023-03-20', '점주', true, null);
+
 
 -- 21. annual_leave (연차) 데이터
 INSERT INTO annual_leave (leave_id, emp_id, year, total_days, used_days, rem_days, uadate_at) VALUES
@@ -684,18 +693,7 @@ INSERT INTO `sales` (`sales_id`, `store_id`, `emp_id`, `product_id`, `total_sale
 (19, 3, 5, 23, 6900, '카카오페이', '2024-04-03 17:30:00', 2, false, 0, '2024-04-03 17:30:00', 6900, 2800, 4100, true),
 (20, 2, 3, 5, 2100, '카드', '2024-04-02 16:00:00', 1, false, 0, '2024-04-02 16:00:00', 2100, 700, 1400, true);
 
--- 32. today_sales (오늘 매출) 데이터 삽입
-INSERT INTO `sales` (`sales_id`, `store_id`, `emp_id`, `product_id`, `total_sales`, `payment_method`,
-                     `sale_time`, `quantity`, `is_refunded`, `discount_price`, `created_at`,
-                     `final_amount`, `cost_price`, `real_income`, `is_settled`) VALUES
-(100, 1, 1, 1, 15000, '카드', '2024-04-24 09:15:00', 3, FALSE, 0, '2024-04-24 09:15:00', 15000, 5000, 10000, TRUE),
-(101, 1, 1, 2, 20000, '현금', '2024-04-24 10:00:00', 2, FALSE, 1000, '2024-04-24 10:00:00', 19000, 8000, 12000, TRUE),
-(102, 2, 3, 3, 25000, '카카오페이', '2024-04-24 11:00:00', 4, FALSE, 0, '2024-04-24 11:00:00', 25000, 9000, 16000, TRUE),
-(103, 3, 5, 5, 30000, '카드', '2024-04-24 12:00:00', 5, TRUE, 0, '2024-04-24 12:00:00', 0, 12000, 0, FALSE),
-(104, 1, 2, 6, 12000, '현금', '2024-04-24 13:00:00', 1, FALSE, 500, '2024-04-24 13:00:00', 11500, 4500, 7000, TRUE),
-(105, 2, 4, 7, 22000, '현금', '2024-04-24 14:00:00', 3, FALSE, 0, '2024-04-24 14:00:00', 22000, 8500, 13500, TRUE);
-
--- 33. issue_log (최근 이슈) 데이터 삽입
+-- 32. issue_log (최근 이슈) 데이터 삽입
 INSERT INTO `issue_log` (`issue_id`, `store_id`, `issue_title`, `issue_desc`, `issue_type`, `created_at`) VALUES
 (1, 1, '재고 급감', '삼각김밥 참치 제품의 재고가 급격히 감소', '재고', '2024-04-23 14:30:00'),
 (2, 2, 'POS 시스템 오류', 'POS 시스템에서 결제 오류가 발생', '시스템', '2024-04-23 10:00:00'),
