@@ -115,3 +115,125 @@ SELECT * FROM shift_schedule a
          WHERE store_id = 1;
 
 -- 12. 특정 알바의 스케줄 조회
+
+-- 인사
+
+-- 1. 사원 전체 조회
+SELECT
+    e.emp_id,
+    e.emp_name,
+    d.dept_name,
+    e.emp_phone,
+    e.work_type,
+    e.hire_date,
+    e.emp_status
+FROM employee e
+         LEFT JOIN department d ON e.depart_id = d.dept_id
+ORDER BY e.emp_id;
+
+-- 2. 사원 세부 조회(필터 조건 설정)
+-- 부서별, 매장별, 근무형태별 필터 예시
+SELECT
+    e.emp_id,
+    e.emp_name,
+    d.dept_name,
+    e.work_type,
+    e.emp_status
+FROM employee e
+         LEFT JOIN department d ON e.depart_id = d.dept_id
+WHERE
+    d.dept_id = 3  -- 특정 사원 조회(emp_id : 1-10까지 입력 가능)
+  AND e.work_type = '정규직'  -- 근무형태별 조회
+ORDER BY e.emp_id;
+
+-- 3. 사원 상세 정보 조회
+SELECT
+    e.*,
+    d.dept_name,
+    CONCAT(YEAR(CURDATE()) - YEAR(e.hire_date), '년') AS 근속연수,
+    al.total_days AS 연차총일수,
+    al.rem_days AS 잔여연차
+FROM employee e
+         LEFT JOIN department d ON e.depart_id = d.dept_id
+         LEFT JOIN annual_leave al ON e.emp_id = al.emp_id AND al.year = YEAR(CURDATE())
+WHERE e.emp_id = 1;  -- 특정 사원 조회(emp_id : 1-10까지 입력 가능)
+
+-- 3. 사원 정보 수정
+UPDATE employee
+SET
+    emp_name = '홍길동',
+    emp_phone = '010-1234-5678',
+    emp_addr = '서울시 강남구 역삼동',
+    emp_bank = '국민',
+    emp_acount = '123-456-789',
+    emp_status = '1',  -- 1: 재직
+    emp_ext = 1234     -- 내선번호
+WHERE emp_id = 1;
+
+-- 4. 연차 신청
+INSERT INTO leave_req (req_id, emp_id, req_date, req_reason, req_status, created_at)
+VALUES (11, 1, '2024-07-15', '개인 사유', '1', NOW());
+
+-- 결재선 추가 (결재자 설정)
+INSERT INTO appr_line (line_id, emp_id, req_id, appr_order, is_delegate)
+VALUES (11, 5, 11, 1, FALSE);  -- 5번 사원을 결재자로 지정, 새로운 req_id 사용
+
+-- 5. 연차 승인
+-- 특정 연차 신청을 승인하는 쿼리
+UPDATE leave_req
+SET req_status = '승인'  -- '승인', '반려', '대기' 등의 상태
+WHERE req_id = 11;
+
+-- 승인 로그 기록
+INSERT INTO appr_log (log_id, req_id, emp_id, appr_status, appr_at, note)
+VALUES (11, 11, 5, 1, NOW(), '승인합니다');  -- 새로운 log_id와 req_id 사용
+
+-- 연차 사용 기록 업데이트 (승인되면 사용한 연차 증가, 잔여 연차 감소)
+UPDATE annual_leave
+SET
+    used_days = used_days + 1,
+    rem_days = total_days - used_days - 1,
+    uadate_at = NOW()
+WHERE emp_id = (SELECT emp_id FROM leave_req WHERE req_id = 11)
+  AND year = YEAR(CURDATE());
+
+-- 관리자용 연차 신청 목록 조회
+-- 검색 필터 넣을지 말지 아직 미정
+SELECT
+    lr.req_id,
+    e.emp_id,
+    e.emp_name,
+    d.dept_name,
+    lr.req_date AS 신청연차일자,
+    lr.req_reason AS 연차사유,
+    lr.req_status AS 승인상태,
+    lr.created_at AS 신청일시,
+    al.rem_days AS 잔여연차,
+    CASE
+        WHEN lr.req_status = '대기' THEN '승인 대기중'
+        WHEN lr.req_status = '승인' THEN '승인 완료'
+        WHEN lr.req_status = '반려' THEN '반려됨'
+        ELSE lr.req_status
+        END AS 상태설명,
+    appr.emp_name AS 결재자
+FROM leave_req lr
+         JOIN employee e ON lr.emp_id = e.emp_id
+         LEFT JOIN department d ON e.depart_id = d.dept_id
+         LEFT JOIN annual_leave al ON e.emp_id = al.emp_id AND al.year = YEAR(CURDATE())
+         LEFT JOIN (
+    SELECT
+        al.req_id,
+        e.emp_name
+    FROM appr_line al
+             JOIN employee e ON al.emp_id = e.emp_id
+    WHERE al.appr_order = 1
+) appr ON lr.req_id = appr.req_id
+WHERE
+    1=1  -- 필터 조건이 없을 때도 쿼리가 동작하도록
+ORDER BY lr.created_at;  -- 최근 신청 순으로 정렬
+
+
+
+
+
+
