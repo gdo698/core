@@ -270,7 +270,7 @@ INSERT INTO `demand_prediction` (`prediction_id`, `store_id`, `product_id`, `dat
 INSERT INTO `anomaly_detection` (`anomaly_id`, `store_id`, `type`, `detection_time`, `severity`, `description`, `is_resolved`, `resolution_notes`, `created_at`, `updated_at`) VALUES
 (1, 1, '재고 급감', '2023-10-01 14:23:15', 4, '삼각김밥 참치 제품의 재고가 1시간 내에 30개 이상 감소했습니다.', TRUE, '특별 할인 행사로 인한 정상적인 판매량 증가', '2023-10-01 14:23:15', '2023-10-01 16:45:00');
 
--- 12. 아르바이트 추가
+-- 12. part_timer(아르바이트) 데이터
 
 -- part_status 정의
 
@@ -290,7 +290,7 @@ INSERT INTO part_timer (part_timer_id, store_id, name, gender, phone, addres, bi
 (4, 2, '최지은', 2, '010-4567-8901', '서울 종로구', '1997-07-22', '2024-03-20', NULL, 1, 9500, '농협', '456-789-0123', 1, NOW()),
 (5, 1, '정우성', 1, '010-5678-9012', '서울 용산구', '1995-12-01', '2024-04-01', NULL, 1, 12000, '신한', '567-890-1234', 1, NOW());
 
--- 13 근무 스케줄 추가
+-- 13 shift_schedule(근무 스케줄) 데이터
 INSERT INTO shift_schedule (schedule_id, part_timer_id, work_date, start_time, end_time) VALUES
 (1, 1, '2024-04-01 08:00:00', '2024-04-01 08:00:00', '2024-04-01 14:00:00'),
 (2, 2, '2024-04-01 10:00:00', '2024-04-01 10:00:00', '2024-04-01 16:00:00'),
@@ -298,7 +298,7 @@ INSERT INTO shift_schedule (schedule_id, part_timer_id, work_date, start_time, e
 (4, 4, '2024-04-01 14:00:00', '2024-04-01 14:00:00', '2024-04-01 20:00:00'),
 (5, 5, '2024-04-01 16:00:00', '2024-04-01 16:00:00', '2024-04-01 22:00:00');
 
--- 14 재고 관리 추가
+-- 14 store_stock(재고 관리) 데이터
 
 -- stock_status 정의
 
@@ -316,7 +316,7 @@ INSERT INTO store_stock (stock_id, store_id, product_id, quantity, last_in_date,
 (4, 1, 4, 6, '2024-04-01 10:00:00', 1),
 (5, 1, 5, 17, '2024-04-01 10:00:00', 1);
 
--- 15 발주 추가
+-- 15 purchase_order(발주) 데이터
 
 -- order_status 정의
 
@@ -332,7 +332,7 @@ INSERT INTO purchase_order (order_id, store_id, order_date, oreder_status, total
 (4, 1, '2024-04-05 10:00:00', 1, 34900, 20),
 (5, 1, '2024-04-06 10:00:00', 1, 24900, 11);
 
--- 16 발주 항목 추가
+-- 16 purchase_order_item(발주 항목) 데이터
 INSERT INTO purchase_order_item (item_id, order_id, product_id, order_quantity, unit_price, total_price, order_state, is_abnormal, is_fully_received, received_quantity) VALUES
 (1, 1, 1, 9, 1400, 12600, 1, false, false, NULL),
 (2, 2, 2, 6, 1800, 10800, 1, false, false, NULL),
@@ -340,7 +340,7 @@ INSERT INTO purchase_order_item (item_id, order_id, product_id, order_quantity, 
 (4, 4, 4, 18, 1200, 21600, 1, false, false, NULL),
 (5, 5, 5, 10, 1600, 16000, 1, false, false, NULL);
 
--- 17 재고 기록 추가
+-- 17 stock_in_history(재고 기록) 데이터
 
 -- history_status 정의
 
@@ -358,7 +358,7 @@ INSERT INTO stock_in_history (history_id, store_id, product_id, part_timer_id, o
 (9, 1, 9, 3, 4, 10, '2024-04-05 11:30:00', NULL, '오입고'),
 (10, 1, 10, 4, 5, 5, '2024-04-06 15:00:00', '2024-07-01 00:00:00', 4);
 
--- 18 폐기 추가
+-- 18 disposal(폐기) 데이터
 INSERT INTO disposal (disposal_id, stock_id, disposal_date, quantity, processed_by, total_loss_amount, reason) VALUES
 (6, 1, '2024-04-10 09:00:00', 3, '이영희', 3000, '파손'),
 (7, 2, '2024-04-11 10:30:00', 2, '박민수', 2000, '유통기한만료'),
