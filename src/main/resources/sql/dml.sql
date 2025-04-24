@@ -44,7 +44,26 @@ INSERT INTO `category` (`category_id`, `category_name`, `category_filter`, `pare
 -- 소분류 (커피/차의 하위 카테고리)
 (18, '아메리카노', 3, 11),
 (19, '라떼', 3, 11),
-(20, '녹차/홍차', 3, 11);
+(20, '녹차/홍차', 3, 11),
+
+-- 소분류 (아이스크림의 하위 카테고리)
+(23, '바', 3, 5),
+(24, '콘', 3, 5),
+(25, '캔디바', 3, 5),
+
+-- 소분류 (주류의 하위 카테고리)
+(26, '소주', 3, 6),
+(27, '맥주', 3, 6),
+(28, '전통주', 3, 6),
+
+-- 소분류 (주스의 하위 카테고리)
+(29, '과일주스', 3, 12),
+(30, '야채주스', 3, 12),
+(31, '혼합주스', 3, 12),
+
+-- 소분류 (탄산음료의 하위 카테고리)
+(32, '콜라', 3, 13),
+(33, '사이다', 3, 13);
 
 -- 3. ai_model(AI 모델) 데이터
 INSERT INTO `ai_model` (`model_id`, `name`, `type`, `version`, `parameters`, `accuracy`, `training_date`, `is_active`, `created_at`, `updated_at`) VALUES
@@ -120,7 +139,39 @@ INSERT INTO `product` (`product_id`, `category_id`, `pro_name`, `pro_barcode`, `
 (21, 17, '초코칩쿠키 8개입', 8801234567910, 1800, 3500, '2023-01-23 10:00:00', '2023-01-23 10:00:00', 'https://example.com/images/choco_cookies.jpg', 0),
 
 -- 세제류(14) 카테고리의 상품
-(22, 14, '주방세제 500ml', 8801234567911, 1500, 3000, '2023-01-24 11:00:00', '2023-01-24 11:00:00', 'https://example.com/images/dish_soap.jpg', 0);
+(22, 14, '주방세제 500ml', 8801234567911, 1500, 3000, '2023-01-24 11:00:00', '2023-01-24 11:00:00', 'https://example.com/images/dish_soap.jpg', 0),
+
+-- 아이스크림 바(23) 카테고리의 상품들
+(23, 23, '월드콘', 8801234567912, 800, 2000, '2024-01-25 09:00:00', '2024-01-25 09:00:00', 'https://example.com/images/worldcone.jpg', 0),
+(24, 23, '구구콘', 8801234567913, 700, 1800, '2024-01-25 09:05:00', '2024-01-25 09:05:00', 'https://example.com/images/gugucone.jpg', 0),
+
+-- 아이스크림 콘(24) 카테고리의 상품들
+(25, 24, '설레임', 8801234567914, 900, 2200, '2024-01-25 09:10:00', '2024-01-25 09:10:00', 'https://example.com/images/seolleim.jpg', 0),
+(26, 24, '쌍쌍바', 8801234567915, 600, 1500, '2024-01-25 09:15:00', '2024-01-25 09:15:00', 'https://example.com/images/ssangbar.jpg', 0),
+
+-- 소주(26) 카테고리의 상품들
+(27, 26, '처음처럼', 8801234567916, 1200, 2500, '2024-01-26 10:00:00', '2024-01-26 10:00:00', 'https://example.com/images/cheoeum.jpg', 0),
+(28, 26, '진로', 8801234567917, 1100, 2400, '2024-01-26 10:05:00', '2024-01-26 10:05:00', 'https://example.com/images/jinro.jpg', 0),
+
+-- 맥주(27) 카테고리의 상품들
+(29, 27, '카스', 8801234567918, 1500, 3000, '2024-01-26 10:10:00', '2024-01-26 10:10:00', 'https://example.com/images/cass.jpg', 0),
+(30, 27, '하이트', 8801234567919, 1400, 2900, '2024-01-26 10:15:00', '2024-01-26 10:15:00', 'https://example.com/images/hite.jpg', 0),
+
+-- 과일주스(29) 카테고리의 상품들
+(31, 29, '델몬트 오렌지', 8801234567920, 1200, 2500, '2024-01-27 11:00:00', '2024-01-27 11:00:00', 'https://example.com/images/delmonte_orange.jpg', 0),
+(32, 29, '델몬트 포도', 8801234567921, 1200, 2500, '2024-01-27 11:05:00', '2024-01-27 11:05:00', 'https://example.com/images/delmonte_grape.jpg', 0),
+
+-- 야채주스(30) 카테고리의 상품들
+(33, 30, '토마토주스', 8801234567922, 1300, 2700, '2024-01-27 11:10:00', '2024-01-27 11:10:00', 'https://example.com/images/tomato_juice.jpg', 0),
+(34, 30, '당근주스', 8801234567923, 1300, 2700, '2024-01-27 11:15:00', '2024-01-27 11:15:00', 'https://example.com/images/carrot_juice.jpg', 0),
+
+-- 콜라(32) 카테고리의 상품들
+(35, 32, '코카콜라 제로', 8801234567924, 800, 1800, '2024-01-28 12:00:00', '2024-01-28 12:00:00', 'https://example.com/images/coke_zero.jpg', 0),
+(36, 32, '펩시', 8801234567925, 750, 1700, '2024-01-28 12:05:00', '2024-01-28 12:05:00', 'https://example.com/images/pepsi.jpg', 0),
+
+-- 사이다(33) 카테고리의 상품들
+(37, 33, '칠성사이다 제로', 8801234567926, 800, 1800, '2024-01-28 12:10:00', '2024-01-28 12:10:00', 'https://example.com/images/cider_zero.jpg', 0),
+(38, 33, '스프라이트', 8801234567927, 750, 1700, '2024-01-28 12:15:00', '2024-01-28 12:15:00', 'https://example.com/images/sprite.jpg', 0);
 
 -- 상품 세부항목(product_details) 데이터
 INSERT INTO `product_details` (`pro_detail_id`, `product_id`, `manufacturer`, `manu_num`, `shelf_life`, `allergens`, `storage_method`) VALUES
@@ -145,7 +196,23 @@ INSERT INTO `product_details` (`pro_detail_id`, `product_id`, `manufacturer`, `m
 (19, 19, '델몬트', '02-789-0123', '제조일로부터 180일', NULL, '직사광선을 피해 서늘한 곳에 보관'),
 (20, 20, '해태음료', '02-890-1234', '제조일로부터 180일', NULL, '직사광선을 피해 서늘한 곳에 보관'),
 (21, 21, '롯데제과', '02-901-2345', '제조일로부터 180일', '밀, 대두, 계란', '직사광선을 피해 서늘한 곳에 보관'),
-(22, 22, '애경', '02-012-3456', '제조일로부터 730일', NULL, '직사광선을 피해 서늘한 곳에 보관');
+(22, 22, '애경', '02-012-3456', '제조일로부터 730일', NULL, '직사광선을 피해 서늘한 곳에 보관'),
+(23, 23, '빙그레', '02-901-2345', '제조일로부터 12개월', '우유', '냉동보관'),
+(24, 24, '롯데제과', '02-789-0123', '제조일로부터 12개월', '우유', '냉동보관'),
+(25, 25, '빙그레', '02-901-2345', '제조일로부터 12개월', '우유', '냉동보관'),
+(26, 26, '롯데제과', '02-789-0123', '제조일로부터 12개월', '우유', '냉동보관'),
+(27, 27, '롯데주류', '02-345-6789', '제조일로부터 12개월', NULL, '직사광선을 피해 서늘한 곳에 보관'),
+(28, 28, '진로', '02-456-7890', '제조일로부터 12개월', NULL, '직사광선을 피해 서늘한 곳에 보관'),
+(29, 29, '오비맥주', '02-567-8901', '제조일로부터 12개월', NULL, '직사광선을 피해 서늘한 곳에 보관'),
+(30, 30, '하이트맥주', '02-678-9012', '제조일로부터 12개월', NULL, '직사광선을 피해 서늘한 곳에 보관'),
+(31, 31, '델몬트', '02-789-0123', '제조일로부터 180일', NULL, '직사광선을 피해 서늘한 곳에 보관'),
+(32, 32, '델몬트', '02-789-0123', '제조일로부터 180일', NULL, '직사광선을 피해 서늘한 곳에 보관'),
+(33, 33, '해태음료', '02-890-1234', '제조일로부터 180일', NULL, '직사광선을 피해 서늘한 곳에 보관'),
+(34, 34, '해태음료', '02-890-1234', '제조일로부터 180일', NULL, '직사광선을 피해 서늘한 곳에 보관'),
+(35, 35, '코카콜라', '02-456-7890', '제조일로부터 12개월', NULL, '직사광선을 피해 서늘한 곳에 보관'),
+(36, 36, '롯데칠성', '02-567-8901', '제조일로부터 12개월', NULL, '직사광선을 피해 서늘한 곳에 보관'),
+(37, 37, '롯데칠성', '02-567-8901', '제조일로부터 12개월', NULL, '직사광선을 피해 서늘한 곳에 보관'),
+(38, 38, '코카콜라', '02-456-7890', '제조일로부터 12개월', NULL, '직사광선을 피해 서늘한 곳에 보관');
 
 -- 7. sales_statistics(판매 통계) 데이터
 INSERT INTO `sales_statistics` (`stats_id`, `store_id`, `category_id`, `date`, `hour`, `total_sales`, `transaction_count`, `avg_transaction`, `created_at`) VALUES
@@ -368,3 +435,178 @@ INSERT INTO `tbl_board_comments` (`comment_id`, `post_id`, `content`, `created_a
 (11, 13, '네트워크 엔지니어 내일 오전 10시 방문 예정입니다. 방문 전 통신사에 점검 요청도 병행할 예정입니다.', '2024-05-02 14:00:00'),
 (12, 14, '보안 업체에 수리 요청 접수 완료했습니다. 내일 오전 중으로 방문 예정이며, 임시 조치로 추가 순찰을 실시해주세요.', '2024-05-20 10:30:00'),
 (13, 15, '전기안전공사에 긴급 점검 요청을 접수했습니다. 오늘 오후 5시까지 방문할 예정이니 담당자 대기 부탁드립니다.', '2024-06-10 17:00:00');
+
+
+-- dashboard_layout 데이터 추가
+INSERT INTO `dashboard_layout` (`layout_id`, `emp_id`, `widget_code`, `grid_positions`, `created_at`, `updated_at`) VALUES
+-- 인사팀장 (emp_id: 1)
+(1, 1, 'HR_ATTENDANCE', '1,2,3,4', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(2, 1, 'HR_LEAVE', '5,6,7,8', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(3, 1, 'HR_SALARY', '9,10,11,12', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(4, 1, 'HR_STAFF_STATUS', '13,14,15,16', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+
+-- 재무팀장 (emp_id: 2)
+(5, 2, 'FINANCE_DAILY_SALES', '1,2,3,4', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(6, 2, 'FINANCE_MONTHLY_SALES', '5,6,7,8', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(7, 2, 'FINANCE_EXPENSE', '9,10,11,12', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(8, 2, 'FINANCE_PROFIT', '13,14,15,16', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+
+-- 영업팀장 (emp_id: 3)
+(9, 3, 'SALES_DAILY', '1,2,3,4', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(10, 3, 'SALES_HOURLY', '5,6,7,8', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(11, 3, 'SALES_PRODUCT_RANK', '9,10,11,12', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(12, 3, 'SALES_CATEGORY', '13,14,15,16', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+
+-- 운영팀장 (emp_id: 4)
+(13, 4, 'OPERATION_INVENTORY', '1,2,3,4', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(14, 4, 'OPERATION_ORDER', '5,6,7,8', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(15, 4, 'OPERATION_STOCK_ALERT', '9,10,11,12', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(16, 4, 'OPERATION_EXPIRY_ALERT', '13,14,15,16', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+
+-- IT팀장 (emp_id: 5)
+(17, 5, 'IT_SYSTEM_STATUS', '1,2,3,4', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(18, 5, 'IT_ISSUE_TRACKER', '5,6,7,8', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(19, 5, 'IT_PERFORMANCE', '9,10,11,12', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(20, 5, 'IT_MAINTENANCE', '13,14,15,16', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+
+-- 마케팅팀장 (emp_id: 6)
+(21, 6, 'MARKETING_CAMPAIGN', '1,2,3,4', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(22, 6, 'MARKETING_PROMOTION', '5,6,7,8', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(23, 6, 'MARKETING_CUSTOMER', '9,10,11,12', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(24, 6, 'MARKETING_SOCIAL', '13,14,15,16', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+
+-- 고객서비스팀장 (emp_id: 7)
+(25, 7, 'CS_COMPLAINT', '1,2,3,4', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(26, 7, 'CS_SATISFACTION', '5,6,7,8', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(27, 7, 'CS_FEEDBACK', '9,10,11,12', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(28, 7, 'CS_RESPONSE_TIME', '13,14,15,16', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+
+-- 물류팀장 (emp_id: 8)
+(29, 8, 'LOGISTICS_DELIVERY', '1,2,3,4', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(30, 8, 'LOGISTICS_INVENTORY', '5,6,7,8', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(31, 8, 'LOGISTICS_SHIPMENT', '9,10,11,12', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(32, 8, 'LOGISTICS_WAREHOUSE', '13,14,15,16', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+
+-- 구매팀장 (emp_id: 9)
+(33, 9, 'PURCHASE_ORDER', '1,2,3,4', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(34, 9, 'PURCHASE_SUPPLIER', '5,6,7,8', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(35, 9, 'PURCHASE_COST', '9,10,11,12', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(36, 9, 'PURCHASE_NEGOTIATION', '13,14,15,16', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+
+-- 개발팀장 (emp_id: 10)
+(37, 10, 'DEV_TASK', '1,2,3,4', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(38, 10, 'DEV_BUG', '5,6,7,8', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(39, 10, 'DEV_DEPLOYMENT', '9,10,11,12', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
+(40, 10, 'DEV_PERFORMANCE', '13,14,15,16', '2024-01-01 09:00:00', '2024-01-01 09:00:00');
+
+-- 데이터베이스 조회 쿼리 예시
+
+-- 1. 카테고리 계층 구조 조회
+SELECT 
+    c1.category_name AS '대분류',
+    c2.category_name AS '중분류',
+    c3.category_name AS '소분류'
+FROM category c1
+LEFT JOIN category c2 ON c2.parent_category_id = c1.category_id
+LEFT JOIN category c3 ON c3.parent_category_id = c2.category_id
+WHERE c1.parent_category_id IS NULL
+ORDER BY c1.category_id, c2.category_id, c3.category_id;
+
+-- 2. 상품별 상세 정보 조회
+SELECT 
+    p.product_id,
+    p.pro_name,
+    c.category_name,
+    pd.manufacturer,
+    pd.shelf_life,
+    pd.storage_method,
+    p.pro_cost,
+    p.pro_sell_cost
+FROM product p
+JOIN category c ON p.category_id = c.category_id
+JOIN product_details pd ON p.product_id = pd.product_id
+ORDER BY p.product_id;
+
+-- 3. 카테고리별 상품 수 및 평균 가격
+SELECT 
+    c.category_name,
+    COUNT(p.product_id) AS '상품 수',
+    AVG(p.pro_sell_cost) AS '평균 판매가',
+    MIN(p.pro_sell_cost) AS '최저가',
+    MAX(p.pro_sell_cost) AS '최고가'
+FROM category c
+LEFT JOIN product p ON c.category_id = p.category_id
+GROUP BY c.category_id, c.category_name
+ORDER BY COUNT(p.product_id) DESC;
+
+-- 4. 유통기한 임박 상품 조회
+SELECT 
+    p.product_id,
+    p.pro_name,
+    pd.shelf_life,
+    pd.storage_method
+FROM product p
+JOIN product_details pd ON p.product_id = pd.product_id
+WHERE pd.shelf_life IS NOT NULL
+ORDER BY pd.shelf_life;
+
+-- 5. 알레르기 정보가 있는 상품 조회
+SELECT 
+    p.product_id,
+    p.pro_name,
+    pd.allergens
+FROM product p
+JOIN product_details pd ON p.product_id = pd.product_id
+WHERE pd.allergens IS NOT NULL
+ORDER BY p.product_id;
+
+-- 6. 보관방법별 상품 수
+SELECT 
+    pd.storage_method,
+    COUNT(p.product_id) AS '상품 수'
+FROM product p
+JOIN product_details pd ON p.product_id = pd.product_id
+GROUP BY pd.storage_method
+ORDER BY COUNT(p.product_id) DESC;
+
+-- 7. 제조사별 상품 현황
+SELECT 
+    pd.manufacturer,
+    COUNT(p.product_id) AS '상품 수',
+    GROUP_CONCAT(p.pro_name) AS '상품 목록'
+FROM product p
+JOIN product_details pd ON p.product_id = pd.product_id
+GROUP BY pd.manufacturer
+ORDER BY COUNT(p.product_id) DESC;
+
+-- 8. 판매가 대비 원가 비율이 높은 상품
+SELECT 
+    product_id,
+    pro_name,
+    pro_cost,
+    pro_sell_cost,
+    ROUND((pro_sell_cost - pro_cost) / pro_cost * 100, 2) AS '마진율(%)'
+FROM product
+ORDER BY (pro_sell_cost - pro_cost) / pro_cost DESC;
+
+-- 9. 카테고리별 재고 현황 (재고 통계와 연계)
+SELECT 
+    c.category_name,
+    SUM(ist.stock_value) AS '총 재고 가치',
+    AVG(ist.turnover_rate) AS '평균 회전율',
+    SUM(ist.low_stock_count) AS '재고 부족 상품 수'
+FROM category c
+JOIN product p ON c.category_id = p.category_id
+JOIN inventory_statistics ist ON p.category_id = ist.category_id
+GROUP BY c.category_id, c.category_name
+ORDER BY SUM(ist.stock_value) DESC;
+
+-- 10. 시간대별 판매 현황 (판매 통계와 연계)
+SELECT 
+    DATE_FORMAT(ss.hour, '%H:00') AS '시간대',
+    SUM(ss.total_sales) AS '총 매출',
+    AVG(ss.avg_transaction) AS '평균 거래액',
+    SUM(ss.transaction_count) AS '총 거래 건수'
+FROM sales_statistics ss
+GROUP BY DATE_FORMAT(ss.hour, '%H:00')
+ORDER BY DATE_FORMAT(ss.hour, '%H:00');
