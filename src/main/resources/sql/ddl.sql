@@ -82,7 +82,6 @@ CREATE TABLE `employee` (
 CREATE TABLE `product` (
                            `product_id` int NOT NULL COMMENT 'autoincrement',
                            `category_id` int NOT NULL COMMENT '자동생성 , 카테고리 id',
-                           `pro_detail_id` INT NULL,
                            `pro_name` varchar(255) NOT NULL COMMENT '제품 이름',
                            `pro_barcode` bigint NOT NULL COMMENT '바코드 넘버',
                            `pro_cost` int NOT NULL COMMENT '원가',
@@ -464,7 +463,7 @@ CREATE TABLE `attendance` (
 );
 
 CREATE TABLE `product_details` (
-                                   `pro_detail_id`	INT	NOT NULL,
+                                   `pro_detail_id`	INT	NOT NULL AUTO_INCREMENT,
                                    `product_id`	int	NOT NULL	COMMENT 'autoincrement',
                                    `manufacturer`	VARCHAR(100)	NOT NULL	COMMENT '제조사',
                                    `manu_num`	VARCHAR(30)	NULL	COMMENT '제조사번호',

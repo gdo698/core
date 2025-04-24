@@ -67,59 +67,58 @@ INSERT INTO `weather_data` (`weather_id`, `location`, `date`, `temperature`, `co
 (10, '부산', '2023-10-05', 21.5, '비', 85, 12.3, '2023-10-05 00:10:00');
 
 -- 5. 상품 데이터 추가 (카테고리 체계 변경에 맞게 수정)
-INSERT INTO `product` (`product_id`, `category_id`, `pro_detail_id`, `pro_name`, `pro_barcode`, `pro_cost`, `pro_sell_cost`, `pro_created_at`, `pro_update_at`, `pro_image`, `is_promo`) VALUES
+INSERT INTO `product` (`product_id`, `category_id`, `pro_name`, `pro_barcode`, `pro_cost`, `pro_sell_cost`, `pro_created_at`, `pro_update_at`, `pro_image`, `is_promo`) VALUES
 -- 냉장식품(7) 카테고리의 상품들
-(1, 7, NULL, '삼각김밥 참치', 8801234567890, 450, 1200, '2023-01-15 08:00:00', '2023-01-15 08:00:00', 'https://example.com/images/samgak_tuna.jpg', 0),
-(2, 7, NULL, '삼각김밥 불고기', 8801234567891, 500, 1300, '2023-01-15 08:10:00', '2023-01-15 08:10:00', 'https://example.com/images/samgak_bulgogi.jpg', 0),
+(1, 7,  '삼각김밥 참치', 8801234567890, 450, 1200, '2023-01-15 08:00:00', '2023-01-15 08:00:00', 'https://example.com/images/samgak_tuna.jpg', 0),
+(2, 7, '삼각김밥 불고기', 8801234567891, 500, 1300, '2023-01-15 08:10:00', '2023-01-15 08:10:00', 'https://example.com/images/samgak_bulgogi.jpg', 0),
 
 -- 탄산음료(13) 카테고리의 상품들
-(3, 13, NULL, '콜라 500ml', 8801234567892, 700, 1500, '2023-01-15 09:00:00', '2023-01-15 09:00:00', 'https://example.com/images/cola_500.jpg', 0),
-(4, 13, NULL, '사이다 500ml', 8801234567893, 650, 1500, '2023-01-15 09:05:00', '2023-01-15 09:05:00', 'https://example.com/images/cider_500.jpg', 0),
+(3, 13,  '콜라 500ml', 8801234567892, 700, 1500, '2023-01-15 09:00:00', '2023-01-15 09:00:00', 'https://example.com/images/cola_500.jpg', 0),
+(4, 13,  '사이다 500ml', 8801234567893, 650, 1500, '2023-01-15 09:05:00', '2023-01-15 09:05:00', 'https://example.com/images/cider_500.jpg', 0),
 
 -- 화장지/물티슈(15) 카테고리의 상품
-(5, 15, NULL, '물티슈 60매', 8801234567894, 850, 1800, '2023-01-16 10:00:00', '2023-01-16 10:00:00', 'https://example.com/images/wipes_60.jpg', 0),
+(5, 15,  '물티슈 60매', 8801234567894, 850, 1800, '2023-01-16 10:00:00', '2023-01-16 10:00:00', 'https://example.com/images/wipes_60.jpg', 0),
 
 -- 과자/스낵(4) 카테고리의 상품
-(6, 4, NULL, '포테이토칩 오리지널', 8801234567895, 600, 1500, '2023-01-16 10:30:00', '2023-01-16 10:30:00', 'https://example.com/images/potato_org.jpg', 0),
+(6, 4, '포테이토칩 오리지널', 8801234567895, 600, 1500, '2023-01-16 10:30:00', '2023-01-16 10:30:00', 'https://example.com/images/potato_org.jpg', 0),
 
 -- 초콜릿(16) 카테고리의 상품
-(7, 16, NULL, '초코파이 12개입', 8801234567896, 2400, 3800, '2023-01-16 11:00:00', '2023-01-16 11:00:00', 'https://example.com/images/choco_pie.jpg', 0),
+(7, 16,  '초코파이 12개입', 8801234567896, 2400, 3800, '2023-01-16 11:00:00', '2023-01-16 11:00:00', 'https://example.com/images/choco_pie.jpg', 0),
 
 -- 아이스크림(5) 카테고리의 상품들
-(8, 5, NULL, '메로나', 8801234567897, 350, 1000, '2023-01-17 09:00:00', '2023-01-17 09:00:00', 'https://example.com/images/melona.jpg', 1),
-(9, 5, NULL, '비비빅', 8801234567898, 400, 1200, '2023-01-17 09:10:00', '2023-01-17 09:10:00', 'https://example.com/images/bbibig.jpg', 1),
+(8, 5,  '메로나', 8801234567897, 350, 1000, '2023-01-17 09:00:00', '2023-01-17 09:00:00', 'https://example.com/images/melona.jpg', 1),
+(9, 5,  '비비빅', 8801234567898, 400, 1200, '2023-01-17 09:10:00', '2023-01-17 09:10:00', 'https://example.com/images/bbibig.jpg', 1),
 
--- 주류(6) 카테고리의 상품
-(10, 6, NULL, '참이슬 후레쉬 360ml', 8801234567899, 950, 1700, '2023-01-18 10:00:00', '2023-01-18 10:00:00', 'https://example.com/images/soju_fresh.jpg', 0),
-
+-- 주류(6) 카테고리의 상품 '참이슬 후레쉬 360ml', 8801234567899, 950, 1700, '2023-01-18 10:00:00', '2023-01-18 10:00:00', 'https://example.com/images/soju_fresh.jpg', 0),
+(10, 6, '참이슬 후레쉬 360ml', 8801234567899, 950, 1700, '2023-01-18 10:00:00', '2023-01-18 10:00:00', 'https://example.com/images/soju_fresh.jpg', 0),
 -- 냉장식품(7) 카테고리의 상품
-(11, 7, NULL, '요구르트 4입', 8801234567900, 1800, 3200, '2023-01-19 08:00:00', '2023-01-19 08:00:00', 'https://example.com/images/yogurt_4.jpg', 0),
+(11, 7, '요구르트 4입', 8801234567900, 1800, 3200, '2023-01-19 08:00:00', '2023-01-19 08:00:00', 'https://example.com/images/yogurt_4.jpg', 0),
 
 -- 냉동식품(8) 카테고리의 상품
-(12, 8, NULL, '냉동만두 420g', 8801234567901, 3500, 6500, '2023-01-19 08:30:00', '2023-01-19 08:30:00', 'https://example.com/images/frozen_mandu.jpg', 0),
+(12, 8, '냉동만두 420g', 8801234567901, 3500, 6500, '2023-01-19 08:30:00', '2023-01-19 08:30:00', 'https://example.com/images/frozen_mandu.jpg', 0),
 
 -- 샌드위치(9) 카테고리의 상품
-(13, 9, NULL, '햄치즈 샌드위치', 8801234567902, 1800, 3500, '2023-01-20 07:00:00', '2023-01-20 07:00:00', 'https://example.com/images/ham_cheese_sandwich.jpg', 0),
+(13, 9, '햄치즈 샌드위치', 8801234567902, 1800, 3500, '2023-01-20 07:00:00', '2023-01-20 07:00:00', 'https://example.com/images/ham_cheese_sandwich.jpg', 0),
 
 -- 도시락(10) 카테고리의 상품들
-(14, 10, NULL, '김치볶음밥 도시락', 8801234567903, 2500, 4500, '2023-01-20 07:30:00', '2023-01-20 07:30:00', 'https://example.com/images/kimchi_dosirak.jpg', 0),
-(15, 10, NULL, '제육볶음 도시락', 8801234567904, 2700, 4800, '2023-01-20 07:35:00', '2023-01-20 07:35:00', 'https://example.com/images/jeyuk_dosirak.jpg', 0),
+(14, 10, '김치볶음밥 도시락', 8801234567903, 2500, 4500, '2023-01-20 07:30:00', '2023-01-20 07:30:00', 'https://example.com/images/kimchi_dosirak.jpg', 0),
+(15, 10,  '제육볶음 도시락', 8801234567904, 2700, 4800, '2023-01-20 07:35:00', '2023-01-20 07:35:00', 'https://example.com/images/jeyuk_dosirak.jpg', 0),
 
 -- 추가 상품들: 다양한 카테고리에 맞게 추가
 -- 커피/차(11) 카테고리의 상품들
-(16, 18, NULL, '아메리카노 250ml', 8801234567905, 800, 1800, '2023-01-21 08:00:00', '2023-01-21 08:00:00', 'https://example.com/images/americano.jpg', 0),
-(17, 19, NULL, '카페라떼 250ml', 8801234567906, 900, 2000, '2023-01-21 08:10:00', '2023-01-21 08:10:00', 'https://example.com/images/latte.jpg', 0),
-(18, 20, NULL, '녹차 500ml', 8801234567907, 750, 1600, '2023-01-21 08:20:00', '2023-01-21 08:20:00', 'https://example.com/images/green_tea.jpg', 0),
+(16, 18,  '아메리카노 250ml', 8801234567905, 800, 1800, '2023-01-21 08:00:00', '2023-01-21 08:00:00', 'https://example.com/images/americano.jpg', 0),
+(17, 19,  '카페라떼 250ml', 8801234567906, 900, 2000, '2023-01-21 08:10:00', '2023-01-21 08:10:00', 'https://example.com/images/latte.jpg', 0),
+(18, 20,  '녹차 500ml', 8801234567907, 750, 1600, '2023-01-21 08:20:00', '2023-01-21 08:20:00', 'https://example.com/images/green_tea.jpg', 0),
 
 -- 주스(12) 카테고리의 상품들
-(19, 12, NULL, '오렌지주스 500ml', 8801234567908, 900, 1900, '2023-01-22 09:00:00', '2023-01-22 09:00:00', 'https://example.com/images/orange_juice.jpg', 0),
-(20, 12, NULL, '사과주스 500ml', 8801234567909, 850, 1800, '2023-01-22 09:10:00', '2023-01-22 09:10:00', 'https://example.com/images/apple_juice.jpg', 0),
+(19, 12,  '오렌지주스 500ml', 8801234567908, 900, 1900, '2023-01-22 09:00:00', '2023-01-22 09:00:00', 'https://example.com/images/orange_juice.jpg', 0),
+(20, 12,  '사과주스 500ml', 8801234567909, 850, 1800, '2023-01-22 09:10:00', '2023-01-22 09:10:00', 'https://example.com/images/apple_juice.jpg', 0),
 
 -- 비스킷/쿠키(17) 카테고리의 상품
-(21, 17, NULL, '초코칩쿠키 8개입', 8801234567910, 1800, 3500, '2023-01-23 10:00:00', '2023-01-23 10:00:00', 'https://example.com/images/choco_cookies.jpg', 0),
+(21, 17,  '초코칩쿠키 8개입', 8801234567910, 1800, 3500, '2023-01-23 10:00:00', '2023-01-23 10:00:00', 'https://example.com/images/choco_cookies.jpg', 0),
 
 -- 세제류(14) 카테고리의 상품
-(22, 14, NULL, '주방세제 500ml', 8801234567911, 1500, 3000, '2023-01-24 11:00:00', '2023-01-24 11:00:00', 'https://example.com/images/dish_soap.jpg', 0);
+(22, 14,  '주방세제 500ml', 8801234567911, 1500, 3000, '2023-01-24 11:00:00', '2023-01-24 11:00:00', 'https://example.com/images/dish_soap.jpg', 0);
 
 -- 변경된 product_details 테이블 데이터 삽입
 INSERT INTO `product_details` (`pro_detail_id`, `product_id`, `manufacturer`, `manu_num`, `shelf_life`, `allergens`, `storage_method`) VALUES
@@ -145,30 +144,6 @@ INSERT INTO `product_details` (`pro_detail_id`, `product_id`, `manufacturer`, `m
 (20, 20, '해태음료', '02-890-1234', '제조일로부터 180일', NULL, '직사광선을 피해 서늘한 곳에 보관'),
 (21, 21, '롯데제과', '02-901-2345', '제조일로부터 180일', '밀, 대두, 계란', '직사광선을 피해 서늘한 곳에 보관'),
 (22, 22, '애경', '02-012-3456', '제조일로부터 730일', NULL, '직사광선을 피해 서늘한 곳에 보관');
-
--- 상품 테이블의 pro_detail_id 필드 업데이트
-UPDATE `product` SET pro_detail_id = 1 WHERE product_id = 1;
-UPDATE `product` SET pro_detail_id = 2 WHERE product_id = 2;
-UPDATE `product` SET pro_detail_id = 3 WHERE product_id = 3;
-UPDATE `product` SET pro_detail_id = 4 WHERE product_id = 4;
-UPDATE `product` SET pro_detail_id = 5 WHERE product_id = 5;
-UPDATE `product` SET pro_detail_id = 6 WHERE product_id = 6;
-UPDATE `product` SET pro_detail_id = 7 WHERE product_id = 7;
-UPDATE `product` SET pro_detail_id = 8 WHERE product_id = 8;
-UPDATE `product` SET pro_detail_id = 9 WHERE product_id = 9;
-UPDATE `product` SET pro_detail_id = 10 WHERE product_id = 10;
-UPDATE `product` SET pro_detail_id = 11 WHERE product_id = 11;
-UPDATE `product` SET pro_detail_id = 12 WHERE product_id = 12;
-UPDATE `product` SET pro_detail_id = 13 WHERE product_id = 13;
-UPDATE `product` SET pro_detail_id = 14 WHERE product_id = 14;
-UPDATE `product` SET pro_detail_id = 15 WHERE product_id = 15;
-UPDATE `product` SET pro_detail_id = 16 WHERE product_id = 16;
-UPDATE `product` SET pro_detail_id = 17 WHERE product_id = 17;
-UPDATE `product` SET pro_detail_id = 18 WHERE product_id = 18;
-UPDATE `product` SET pro_detail_id = 19 WHERE product_id = 19;
-UPDATE `product` SET pro_detail_id = 20 WHERE product_id = 20;
-UPDATE `product` SET pro_detail_id = 21 WHERE product_id = 21;
-UPDATE `product` SET pro_detail_id = 22 WHERE product_id = 22;
 
 -- 7. 통계 데이터 추가 (판매 통계)
 INSERT INTO `sales_statistics` (`stats_id`, `store_id`, `category_id`, `date`, `hour`, `total_sales`, `transaction_count`, `avg_transaction`, `created_at`) VALUES
