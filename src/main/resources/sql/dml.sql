@@ -499,114 +499,246 @@ INSERT INTO `dashboard_layout` (`layout_id`, `emp_id`, `widget_code`, `grid_posi
 (39, 10, 'DEV_DEPLOYMENT', '9,10,11,12', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
 (40, 10, 'DEV_PERFORMANCE', '13,14,15,16', '2024-01-01 09:00:00', '2024-01-01 09:00:00');
 
--- 데이터베이스 조회 쿼리 예시
 
--- 1. 카테고리 계층 구조 조회
-SELECT 
-    c1.category_name AS '대분류',
-    c2.category_name AS '중분류',
-    c3.category_name AS '소분류'
-FROM category c1
-LEFT JOIN category c2 ON c2.parent_category_id = c1.category_id
-LEFT JOIN category c3 ON c3.parent_category_id = c2.category_id
-WHERE c1.parent_category_id IS NULL
-ORDER BY c1.category_id, c2.category_id, c3.category_id;
+-- sales_stats (상품별 매출 통계) 데이터
+INSERT INTO `sales_stats` (`sales_stats_id`, `store_id`, `product_id`, `sale_date`, `quantity`, `total_sales`, `created_at`) VALUES
+(1, 1, 1, '2023-10-01', 25, 30000, '2023-10-01 23:59:00'),
+(2, 1, 2, '2023-10-01', 18, 23400, '2023-10-01 23:59:00'),
+(3, 1, 3, '2023-10-01', 10, 15000, '2023-10-01 23:59:00'),
+(4, 2, 4, '2023-10-01', 12, 18000, '2023-10-01 23:59:00'),
+(5, 3, 5, '2023-10-01', 8, 14400, '2023-10-01 23:59:00'),
+(6, 1, 6, '2023-10-02', 15, 19500, '2023-10-02 23:59:00'),
+(7, 2, 7, '2023-10-02', 11, 26400, '2023-10-02 23:59:00');
 
--- 2. 상품별 상세 정보 조회
-SELECT 
-    p.product_id,
-    p.pro_name,
-    c.category_name,
-    pd.manufacturer,
-    pd.shelf_life,
-    pd.storage_method,
-    p.pro_cost,
-    p.pro_sell_cost
-FROM product p
-JOIN category c ON p.category_id = c.category_id
-JOIN product_details pd ON p.product_id = pd.product_id
-ORDER BY p.product_id;
+-- sales_hourly (시간대별 매출 통계) 데이터
+INSERT INTO `sales_hourly` (`sales_hourly_id`, `store_id`, `sale_date`, `hour`, `quantity`, `total_sales`, `created_at`) VALUES
+(1, 1, '2023-10-01', 9, 15, 18000, '2023-10-01 09:59:00'),
+(2, 1, '2023-10-01', 10, 12, 15000, '2023-10-01 10:59:00'),
+(3, 1, '2023-10-01', 11, 20, 23000, '2023-10-01 11:59:00'),
+(4, 2, '2023-10-01', 9, 18, 19000, '2023-10-01 09:59:00'),
+(5, 2, '2023-10-01', 10, 22, 24000, '2023-10-01 10:59:00'),
+(6, 3, '2023-10-01', 11, 14, 17500, '2023-10-01 11:59:00'),
+(7, 1, '2023-10-02', 12, 10, 12000, '2023-10-02 12:59:00');
 
--- 3. 카테고리별 상품 수 및 평균 가격
-SELECT 
-    c.category_name,
-    COUNT(p.product_id) AS '상품 수',
-    AVG(p.pro_sell_cost) AS '평균 판매가',
-    MIN(p.pro_sell_cost) AS '최저가',
-    MAX(p.pro_sell_cost) AS '최고가'
-FROM category c
-LEFT JOIN product p ON c.category_id = p.category_id
-GROUP BY c.category_id, c.category_name
-ORDER BY COUNT(p.product_id) DESC;
 
--- 4. 유통기한 임박 상품 조회
-SELECT 
-    p.product_id,
-    p.pro_name,
-    pd.shelf_life,
-    pd.storage_method
-FROM product p
-JOIN product_details pd ON p.product_id = pd.product_id
-WHERE pd.shelf_life IS NOT NULL
-ORDER BY pd.shelf_life;
 
--- 5. 알레르기 정보가 있는 상품 조회
-SELECT 
-    p.product_id,
-    p.pro_name,
-    pd.allergens
-FROM product p
-JOIN product_details pd ON p.product_id = pd.product_id
-WHERE pd.allergens IS NOT NULL
-ORDER BY p.product_id;
+-- sales (POS 매출 기록) 데이터
+INSERT INTO `sales` (`sales_id`, `store_id`, `emp_id`, `product_id`, `total_sales`, `payment_method`,
+                     `sale_time`, `quantity`, `is_refunded`, `discount_price`, `created_at`,
+                     `final_amount`, `cost_price`, `real_income`, `is_settled`) VALUES
+(1, 1, 1, 1, 1200, '카드', '2024-04-01 09:15:00', 1, false, 0, '2024-04-01 09:15:00', 1200, 450, 750, true),
+(2, 1, 1, 2, 1300, '현금', '2024-04-01 09:30:00', 1, false, 100, '2024-04-01 09:30:00', 1200, 500, 700, true),
+(3, 2, 3, 3, 1500, '카카오페이', '2024-04-01 10:00:00', 1, false, 0, '2024-04-01 10:00:00', 1500, 700, 800, true),
+(4, 3, 5, 5, 1800, '카드', '2024-04-01 12:00:00', 1, true, 0, '2024-04-01 12:00:00', 0, 850, 0, false),
+(5, 1, 2, 12, 6500, '카드', '2024-04-01 14:00:00', 1, false, 500, '2024-04-01 14:00:00', 6000, 3500, 2500, true),
+(6, 2, 3, 4, 2700, '현금', '2024-04-01 11:00:00', 2, false, 300, '2024-04-01 11:00:00', 2400, 1300, 1100, true),
+(7, 1, 2, 14, 4500, '현금', '2024-04-01 15:00:00', 1, false, 0, '2024-04-01 15:00:00', 4500, 2500, 2000, true),
+(8, 1, 1, 15, 3000, '카드', '2024-04-02 09:00:00', 2, false, 0, '2024-04-02 09:00:00', 3000, 1000, 2000, true),
+(9, 2, 3, 13, 2400, '현금', '2024-04-02 10:30:00', 1, false, 100, '2024-04-02 10:30:00', 2300, 800, 1500, true),
+(10, 3, 5, 9, 2700, '카드', '2024-04-02 12:30:00', 2, false, 0, '2024-04-02 12:30:00', 2700, 1200, 1500, true),
+(11, 1, 2, 16, 4000, '현금', '2024-04-02 14:30:00', 2, false, 200, '2024-04-02 14:30:00', 3800, 1500, 2300, true),
+(12, 2, 3, 11, 2200, '카드', '2024-04-02 16:00:00', 1, false, 50, '2024-04-02 16:00:00', 2150, 900, 1250, true),
+(13, 3, 5, 18, 5400, '카카오페이', '2024-04-02 17:00:00', 1, false, 0, '2024-04-02 17:00:00', 5400, 2500, 2900, true),
+(14, 1, 1, 17, 5200, '카드', '2024-04-03 09:30:00', 2, false, 100, '2024-04-03 09:30:00', 5100, 1800, 3300, true),
+(15, 2, 3, 19, 3800, '현금', '2024-04-03 11:00:00', 1, false, 0, '2024-04-03 11:00:00', 3800, 1700, 2100, true),
+(16, 3, 5, 20, 6000, '카드', '2024-04-03 13:00:00', 2, false, 150, '2024-04-03 13:00:00', 5850, 2500, 3350, true),
+(17, 1, 2, 21, 6300, '현금', '2024-04-03 14:30:00', 1, false, 100, '2024-04-03 14:30:00', 6200, 1800, 4400, true),
+(18, 2, 3, 22, 6600, '카드', '2024-04-03 16:00:00', 1, false, 0, '2024-04-03 16:00:00', 6600, 2500, 4100, true),
+(19, 3, 5, 23, 6900, '카카오페이', '2024-04-03 17:30:00', 2, false, 0, '2024-04-03 17:30:00', 6900, 2800, 4100, true),
+(20, 2, 3, 5, 2100, '카드', '2024-04-02 16:00:00', 1, false, 0, '2024-04-02 16:00:00', 2100, 700, 1400, true);
 
--- 6. 보관방법별 상품 수
-SELECT 
-    pd.storage_method,
-    COUNT(p.product_id) AS '상품 수'
-FROM product p
-JOIN product_details pd ON p.product_id = pd.product_id
-GROUP BY pd.storage_method
-ORDER BY COUNT(p.product_id) DESC;
+-- today_sales (오늘 매출) 데이터 삽입
+INSERT INTO `sales` (`sales_id`, `store_id`, `emp_id`, `product_id`, `total_sales`, `payment_method`,
+                     `sale_time`, `quantity`, `is_refunded`, `discount_price`, `created_at`,
+                     `final_amount`, `cost_price`, `real_income`, `is_settled`) VALUES
+(100, 1, 1, 1, 15000, '카드', '2024-04-24 09:15:00', 3, FALSE, 0, '2024-04-24 09:15:00', 15000, 5000, 10000, TRUE),
+(101, 1, 1, 2, 20000, '현금', '2024-04-24 10:00:00', 2, FALSE, 1000, '2024-04-24 10:00:00', 19000, 8000, 12000, TRUE),
+(102, 2, 3, 3, 25000, '카카오페이', '2024-04-24 11:00:00', 4, FALSE, 0, '2024-04-24 11:00:00', 25000, 9000, 16000, TRUE),
+(103, 3, 5, 5, 30000, '카드', '2024-04-24 12:00:00', 5, TRUE, 0, '2024-04-24 12:00:00', 0, 12000, 0, FALSE),
+(104, 1, 2, 6, 12000, '현금', '2024-04-24 13:00:00', 1, FALSE, 500, '2024-04-24 13:00:00', 11500, 4500, 7000, TRUE),
+(105, 2, 4, 7, 22000, '현금', '2024-04-24 14:00:00', 3, FALSE, 0, '2024-04-24 14:00:00', 22000, 8500, 13500, TRUE);
 
--- 7. 제조사별 상품 현황
-SELECT 
-    pd.manufacturer,
-    COUNT(p.product_id) AS '상품 수',
-    GROUP_CONCAT(p.pro_name) AS '상품 목록'
-FROM product p
-JOIN product_details pd ON p.product_id = pd.product_id
-GROUP BY pd.manufacturer
-ORDER BY COUNT(p.product_id) DESC;
+-- issue_log (최근 이슈) 데이터 삽입
+INSERT INTO `issue_log` (`issue_id`, `store_id`, `issue_title`, `issue_desc`, `issue_type`, `created_at`) VALUES
+(1, 1, '재고 급감', '삼각김밥 참치 제품의 재고가 급격히 감소', '재고', '2024-04-23 14:30:00'),
+(2, 2, 'POS 시스템 오류', 'POS 시스템에서 결제 오류가 발생', '시스템', '2024-04-23 10:00:00'),
+(3, 3, '상품 손상', '냉장식품 일부가 손상되어 판매 불가 상태', '상품', '2024-04-23 13:00:00');
 
--- 8. 판매가 대비 원가 비율이 높은 상품
-SELECT 
-    product_id,
-    pro_name,
-    pro_cost,
-    pro_sell_cost,
-    ROUND((pro_sell_cost - pro_cost) / pro_cost * 100, 2) AS '마진율(%)'
-FROM product
-ORDER BY (pro_sell_cost - pro_cost) / pro_cost DESC;
 
--- 9. 카테고리별 재고 현황 (재고 통계와 연계)
-SELECT 
-    c.category_name,
-    SUM(ist.stock_value) AS '총 재고 가치',
-    AVG(ist.turnover_rate) AS '평균 회전율',
-    SUM(ist.low_stock_count) AS '재고 부족 상품 수'
-FROM category c
-JOIN product p ON c.category_id = p.category_id
-JOIN inventory_statistics ist ON p.category_id = ist.category_id
-GROUP BY c.category_id, c.category_name
-ORDER BY SUM(ist.stock_value) DESC;
 
--- 10. 시간대별 판매 현황 (판매 통계와 연계)
-SELECT 
-    DATE_FORMAT(ss.hour, '%H:00') AS '시간대',
-    SUM(ss.total_sales) AS '총 매출',
-    AVG(ss.avg_transaction) AS '평균 거래액',
-    SUM(ss.transaction_count) AS '총 거래 건수'
-FROM sales_statistics ss
-GROUP BY DATE_FORMAT(ss.hour, '%H:00')
-ORDER BY DATE_FORMAT(ss.hour, '%H:00');
+
+# -- 데이터베이스 조회 쿼리 예시
+#
+# -- 1. 카테고리 계층 구조 조회
+# SELECT
+#     c1.category_name AS '대분류',
+#     c2.category_name AS '중분류',
+#     c3.category_name AS '소분류'
+# FROM category c1
+# LEFT JOIN category c2 ON c2.parent_category_id = c1.category_id
+# LEFT JOIN category c3 ON c3.parent_category_id = c2.category_id
+# WHERE c1.parent_category_id IS NULL
+# ORDER BY c1.category_id, c2.category_id, c3.category_id;
+#
+# -- 2. 상품별 상세 정보 조회
+# SELECT
+#     p.product_id,
+#     p.pro_name,
+#     c.category_name,
+#     pd.manufacturer,
+#     pd.shelf_life,
+#     pd.storage_method,
+#     p.pro_cost,
+#     p.pro_sell_cost
+# FROM product p
+# JOIN category c ON p.category_id = c.category_id
+# JOIN product_details pd ON p.product_id = pd.product_id
+# ORDER BY p.product_id;
+#
+# -- 3. 카테고리별 상품 수 및 평균 가격
+# SELECT
+#     c.category_name,
+#     COUNT(p.product_id) AS '상품 수',
+#     AVG(p.pro_sell_cost) AS '평균 판매가',
+#     MIN(p.pro_sell_cost) AS '최저가',
+#     MAX(p.pro_sell_cost) AS '최고가'
+# FROM category c
+# LEFT JOIN product p ON c.category_id = p.category_id
+# GROUP BY c.category_id, c.category_name
+# ORDER BY COUNT(p.product_id) DESC;
+#
+# -- 4. 유통기한 임박 상품 조회
+# SELECT
+#     p.product_id,
+#     p.pro_name,
+#     pd.shelf_life,
+#     pd.storage_method
+# FROM product p
+# JOIN product_details pd ON p.product_id = pd.product_id
+# WHERE pd.shelf_life IS NOT NULL
+# ORDER BY pd.shelf_life;
+#
+# -- 5. 알레르기 정보가 있는 상품 조회
+# SELECT
+#     p.product_id,
+#     p.pro_name,
+#     pd.allergens
+# FROM product p
+# JOIN product_details pd ON p.product_id = pd.product_id
+# WHERE pd.allergens IS NOT NULL
+# ORDER BY p.product_id;
+#
+# -- 6. 보관방법별 상품 수
+# SELECT
+#     pd.storage_method,
+#     COUNT(p.product_id) AS '상품 수'
+# FROM product p
+# JOIN product_details pd ON p.product_id = pd.product_id
+# GROUP BY pd.storage_method
+# ORDER BY COUNT(p.product_id) DESC;
+#
+# -- 7. 제조사별 상품 현황
+# SELECT
+#     pd.manufacturer,
+#     COUNT(p.product_id) AS '상품 수',
+#     GROUP_CONCAT(p.pro_name) AS '상품 목록'
+# FROM product p
+# JOIN product_details pd ON p.product_id = pd.product_id
+# GROUP BY pd.manufacturer
+# ORDER BY COUNT(p.product_id) DESC;
+#
+# -- 8. 판매가 대비 원가 비율이 높은 상품
+# SELECT
+#     product_id,
+#     pro_name,
+#     pro_cost,
+#     pro_sell_cost,
+#     ROUND((pro_sell_cost - pro_cost) / pro_cost * 100, 2) AS '마진율(%)'
+# FROM product
+# ORDER BY (pro_sell_cost - pro_cost) / pro_cost DESC;
+#
+# -- 9. 카테고리별 재고 현황 (재고 통계와 연계)
+# SELECT
+#     c.category_name,
+#     SUM(ist.stock_value) AS '총 재고 가치',
+#     AVG(ist.turnover_rate) AS '평균 회전율',
+#     SUM(ist.low_stock_count) AS '재고 부족 상품 수'
+# FROM category c
+# JOIN product p ON c.category_id = p.category_id
+# JOIN inventory_statistics ist ON p.category_id = ist.category_id
+# GROUP BY c.category_id, c.category_name
+# ORDER BY SUM(ist.stock_value) DESC;
+#
+# -- 10. 시간대별 판매 현황 (판매 통계와 연계)
+# SELECT
+#     DATE_FORMAT(ss.hour, '%H:00') AS '시간대',
+#     SUM(ss.total_sales) AS '총 매출',
+#     AVG(ss.avg_transaction) AS '평균 거래액',
+#     SUM(ss.transaction_count) AS '총 거래 건수'
+# FROM sales_statistics ss
+# GROUP BY DATE_FORMAT(ss.hour, '%H:00')
+# ORDER BY DATE_FORMAT(ss.hour, '%H:00');
+#
+#
+# -- 일별 매출 요약 (예시: 매일 총 매출, 환불 제외 매출)
+# -- 매출 요약은 일별로 집계
+# SELECT
+#     store_id,
+#     DATE(sale_time) AS sale_date,
+#     SUM(total_sales) AS daily_sales,
+#     SUM(CASE WHEN is_refunded = false THEN total_sales ELSE 0 END) AS daily_net_sales,
+#     SUM(discount_price) AS total_discount
+# FROM sales
+# GROUP BY store_id, DATE(sale_time);
+#
+# -- 월별 매출 요약 (예시: 월별 매출)
+# SELECT
+#     store_id,
+#     YEAR(sale_time) AS sale_year,
+#     MONTH(sale_time) AS sale_month,
+#     SUM(total_sales) AS monthly_sales,
+#     SUM(CASE WHEN is_refunded = false THEN total_sales ELSE 0 END) AS monthly_net_sales,
+#     SUM(discount_price) AS monthly_discount
+# FROM sales
+# GROUP BY store_id, YEAR(sale_time), MONTH(sale_time);
+#
+# -- 연별 매출 요약 (예시: 연별 매출)
+# SELECT
+#     store_id,
+#     YEAR(sale_time) AS sale_year,
+#     SUM(total_sales) AS yearly_sales,
+#     SUM(CASE WHEN is_refunded = false THEN total_sales ELSE 0 END) AS yearly_net_sales,
+#     SUM(discount_price) AS yearly_discount
+# FROM sales
+# GROUP BY store_id, YEAR(sale_time);
+#
+# -- 매출 정리 (정산된 매출만)
+# SELECT
+#     store_id,
+#     DATE(sale_time) AS sale_date,
+#     SUM(real_income) AS total_income
+# FROM sales
+# WHERE is_settled = true
+# GROUP BY store_id, DATE(sale_time);
+#
+
+-- POS 영수증에 포함될 주요 항목 조회
+# SELECT
+#     s.store_id,
+#     st.store_name,
+#     st.store_addr,
+#     e.emp_name AS cashier_name,
+#     s.sales_id,
+#     p.pro_name AS product_name,
+#     s.quantity,
+#     s.total_sales,
+#     s.payment_method,
+#     s.sale_time,
+#     s.discount_price,
+#     s.final_amount,
+#     s.is_refunded
+# FROM sales s
+#          JOIN store st ON s.store_id = st.store_id
+#          JOIN employee e ON s.emp_id = e.emp_id
+#          JOIN product p ON s.product_id = p.product_id
+# WHERE s.sales_id = ?;  -- 특정 영수증을 위한 거래 ID

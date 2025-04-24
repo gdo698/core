@@ -64,7 +64,7 @@ CREATE TABLE `employee` (
                             `emp_phone` VARCHAR(30) NOT NULL COMMENT '사원전화번호',
                             `emp_addr` VARCHAR(30) NOT NULL COMMENT '사원 주소',
                             `emp_birth` VARCHAR(30) NOT NULL COMMENT '생년월일',
-                            `login_id` VARCHAR(30) NOT NULL COMMENT '사원 계정 ID',
+                            `login_id` VARCHAR(30) NOT NULL UNIQUE COMMENT '사원 계정 ID',
                             `login_pwd` VARCHAR(30) NOT NULL COMMENT '사원 계정 비밀번호',
                             `emp_img` VARCHAR(255) NULL COMMENT '사원 프로필 사진',
                             `emp_bank` ENUM('국민', '우리', '신한', '농협') NOT NULL COMMENT '급여 은행명',
@@ -184,6 +184,7 @@ CREATE TABLE `sales` (
                          `cost_price` int NOT NULL DEFAULT 0 COMMENT '상품의 원가',
                          `real_income` int NOT NULL DEFAULT 0 COMMENT '점주가 실제 수령하는 금액',
                          `is_settled` boolean NOT NULL DEFAULT false COMMENT 'true : 정산 처리 완료',
+                         `transaction_id` int NULL COMMENT 'POS 한 건의 거래 ID',
                          PRIMARY KEY (`sales_id`),
                          FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`),
                          FOREIGN KEY (`emp_id`) REFERENCES `employee` (`emp_id`),
@@ -429,7 +430,6 @@ CREATE TABLE `Salary` (
                           FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`)
 
 );
-
 CREATE TABLE `attendance` (
                               `attend_id` INT NOT NULL COMMENT '근태 기록 고유번호',
                               `emp_id` INT NULL COMMENT '사원 고유 번호',
