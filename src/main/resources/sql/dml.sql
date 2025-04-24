@@ -223,7 +223,7 @@ INSERT INTO `demand_prediction` (`prediction_id`, `store_id`, `product_id`, `dat
 (10, 1, 9, '2023-10-06', 35, 0.82, 0.70, 0.87, '2023-10-05 00:00:00');
 
 -- 11. 이상 탐지 데이터 추가
-INSERT INTO `anomaly_detection` (`anomaly_id`, `store_id`, `type`, `detection_time`, `severity`, `description`, `is_resolved`, `resolution_notes`, `created_at`, `updated_at`) VALUES
+INSERT INTO `anomaly_detection` (`anomaly_id`,  `store_id`, `type`, `detection_time`, `severity`, `description`, `is_resolved`, `resolution_notes`, `created_at`, `updated_at`) VALUES
 (1, 1, '재고 급감', '2023-10-01 14:23:15', 4, '삼각김밥 참치 제품의 재고가 1시간 내에 30개 이상 감소했습니다.', TRUE, '특별 할인 행사로 인한 정상적인 판매량 증가', '2023-10-01 14:23:15', '2023-10-01 16:45:00');
 
 

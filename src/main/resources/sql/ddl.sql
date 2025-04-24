@@ -25,6 +25,7 @@ CREATE TABLE `category` (
                             PRIMARY KEY (`category_id`),
                             CONSTRAINT `fk_category_parent` FOREIGN KEY (`parent_category_id`)
                                 REFERENCES `category` (`category_id`)
+
                                 ON DELETE CASCADE ON UPDATE CASCADE
 );
 
