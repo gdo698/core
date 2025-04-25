@@ -7,7 +7,6 @@ DROP TABLE IF EXISTS `store_stock`;
 DROP TABLE IF EXISTS `order_stats`;
 DROP TABLE IF EXISTS `issue_log`;
 DROP TABLE IF EXISTS `demand_prediction`;
-DROP TABLE IF EXISTS `appr_line`;
 DROP TABLE IF EXISTS `appr_log`;
 DROP TABLE IF EXISTS `tbl_board_comments`;
 DROP TABLE IF EXISTS `dashboard_layout`;
