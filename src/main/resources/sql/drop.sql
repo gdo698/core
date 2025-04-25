@@ -34,7 +34,3 @@ DROP TABLE IF EXISTS `part_timer_salary`;
 DROP TABLE IF EXISTS `shift_schedule`;
 DROP TABLE IF EXISTS `part_timer`;
 DROP TABLE IF EXISTS `store`;
-
-
-
-
