@@ -29,27 +29,27 @@ CREATE TABLE `category` (
 
 CREATE TABLE `ai_model` (
                             `model_id` INT NOT NULL COMMENT '모델 ID',
-                            `name` VARCHAR(100) NOT NULL COMMENT '모델 이름',
-                            `type` VARCHAR(50) NOT NULL COMMENT '모델 유형',
-                            `version` VARCHAR(20) NOT NULL COMMENT '버전',
-                            `parameters` JSON NULL COMMENT '모델 파라미터',
-                            `accuracy` DECIMAL(5,2) NULL COMMENT '정확도',
-                            `training_date` DATETIME NULL COMMENT '학습 날짜',
-                            `is_active` BOOLEAN NULL DEFAULT TRUE COMMENT '활성화 여부',
-                            `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성 시간',
-                            `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '수정 시간',
+                            `ai_name` VARCHAR(100) NOT NULL COMMENT '모델 이름',
+                            `ai_type` VARCHAR(50) NOT NULL COMMENT '모델 유형',
+                            `ai_version` VARCHAR(20) NOT NULL COMMENT '버전',
+                            `ai_parameters` JSON NULL COMMENT '모델 파라미터',
+                            `ai_accuracy` DECIMAL(5,2) NULL COMMENT '정확도',
+                            `ai_training_date` DATETIME NULL COMMENT '학습 날짜',
+                            `ai_is_active` BOOLEAN NULL DEFAULT TRUE COMMENT '활성화 여부',
+                            `ai_created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성 시간',
+                            `ai_updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '수정 시간',
                             PRIMARY KEY (`model_id`)
 );
 
 CREATE TABLE `weather_data` (
                                 `weather_id` INT NOT NULL COMMENT '날씨 데이터 ID',
-                                `location` VARCHAR(100) NOT NULL COMMENT '위치',
-                                `date` DATE NOT NULL COMMENT '날짜',
-                                `temperature` DECIMAL(5,2) NOT NULL COMMENT '평균 온도',
-                                `condition` VARCHAR(50) NOT NULL COMMENT '날씨 상태',
-                                `humidity` INT NULL COMMENT '습도',
-                                `precipitation` DECIMAL(5,2) NULL COMMENT '강수량',
-                                `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성 시간',
+                                `wt_location` VARCHAR(100) NOT NULL COMMENT '위치',
+                                `wt_date` DATE NOT NULL COMMENT '날짜',
+                                `wt_temperature` DECIMAL(5,2) NOT NULL COMMENT '평균 온도',
+                                `wt_condition` VARCHAR(50) NOT NULL COMMENT '날씨 상태',
+                                `wt_humidity` INT NULL COMMENT '습도',
+                                `wt_precipitation` DECIMAL(5,2) NULL COMMENT '강수량',
+                                `wt_created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성 시간',
                                 PRIMARY KEY (`weather_id`)
 );
 
@@ -235,13 +235,13 @@ CREATE TABLE `inventory_statistics` (
                                         `stats_id` INT NOT NULL COMMENT '통계 ID',
                                         `store_id` int NOT NULL COMMENT '매장고유번호',
                                         `category_id` int NOT NULL COMMENT '자동생성 , 카테고리 id',
-                                        `date` DATE NOT NULL COMMENT '날짜',
-                                        `turnover_rate` DECIMAL(5,2) NOT NULL COMMENT '재고 회전율',
-                                        `stock_value` DECIMAL(10,2) NOT NULL COMMENT '재고 가치',
-                                        `low_stock_count` INT NOT NULL COMMENT '부족 재고 상품 수',
-                                        `excess_stock_count` INT NOT NULL COMMENT '과잉 재고 상품 수',
-                                        `expired_soon_count` INT NOT NULL COMMENT '유통기한 임박 상품 수',
-                                        `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성 시간',
+                                        `inven_date` DATE NOT NULL COMMENT '날짜',
+                                        `inven_turnover_rate` DECIMAL(5,2) NOT NULL COMMENT '재고 회전율',
+                                        `inven_stock_value` DECIMAL(10,2) NOT NULL COMMENT '재고 가치',
+                                        `inven_low_stock_count` INT NOT NULL COMMENT '부족 재고 상품 수',
+                                        `inven_excess_stock_count` INT NOT NULL COMMENT '과잉 재고 상품 수',
+                                        `inven_expired_soon_count` INT NOT NULL COMMENT '유통기한 임박 상품 수',
+                                        `inven_created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성 시간',
                                         PRIMARY KEY (`stats_id`),
                                         FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`),
                                         FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`)
@@ -264,12 +264,12 @@ CREATE TABLE `demand_prediction` (
                                      `prediction_id` INT NOT NULL COMMENT '예측 ID',
                                      `store_id` int NOT NULL COMMENT '매장고유번호',
                                      `product_id` int NOT NULL COMMENT 'autoincrement',
-                                     `date` DATE NOT NULL COMMENT '예측 날짜',
-                                     `predicted_quantity` INT NOT NULL COMMENT '예측 수량',
-                                     `confidence_level` DECIMAL(5,2) NOT NULL COMMENT '신뢰도 (0-1)',
-                                     `weather_factor` DECIMAL(5,2) NULL COMMENT '날씨 요인',
-                                     `seasonal_factor` DECIMAL(5,2) NULL COMMENT '계절 요인',
-                                     `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성 시간',
+                                     `dmd_date` DATE NOT NULL COMMENT '예측 날짜',
+                                     `dmd_predicted_quantity` INT NOT NULL COMMENT '예측 수량',
+                                     `dmd_confidence_level` DECIMAL(5,2) NOT NULL COMMENT '신뢰도 (0-1)',
+                                     `dmd_weather_factor` DECIMAL(5,2) NULL COMMENT '날씨 요인',
+                                     `dmd_seasonal_factor` DECIMAL(5,2) NULL COMMENT '계절 요인',
+                                     `dmd_created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성 시간',
                                      PRIMARY KEY (`prediction_id`),
                                      FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`),
                                      FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`)
@@ -278,14 +278,14 @@ CREATE TABLE `demand_prediction` (
 CREATE TABLE `anomaly_detection` (
                                      `anomaly_id` INT NOT NULL COMMENT '이상 ID',
                                      `store_id` int NOT NULL COMMENT '매장고유번호',
-                                     `type` VARCHAR(50) NOT NULL COMMENT '이상 유형',
-                                     `detection_time` DATETIME NOT NULL COMMENT '탐지 시간',
-                                     `severity` INT NOT NULL COMMENT '심각도 (1-5)',
-                                     `description` TEXT NOT NULL COMMENT '설명',
-                                     `is_resolved` BOOLEAN NULL DEFAULT FALSE COMMENT '해결 여부',
-                                     `resolution_notes` TEXT NULL COMMENT '해결 노트',
-                                     `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성 시간',
-                                     `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '수정 시간',
+                                     `anom_type` VARCHAR(50) NOT NULL COMMENT '이상 유형',
+                                     `anom_detection_time` DATETIME NOT NULL COMMENT '탐지 시간',
+                                     `anom_severity` INT NOT NULL COMMENT '심각도 (1-5)',
+                                     `anom_description` TEXT NOT NULL COMMENT '설명',
+                                     `anom_is_resolved` BOOLEAN NULL DEFAULT FALSE COMMENT '해결 여부',
+                                     `anom_resolution_notes` TEXT NULL COMMENT '해결 노트',
+                                     `anom_created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성 시간',
+                                     `anom_updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '수정 시간',
                                      PRIMARY KEY (`anomaly_id`),
                                      FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`)
 );
@@ -352,10 +352,10 @@ CREATE TABLE `appr_log` (
 CREATE TABLE `dashboard_layout` (
                                     `layout_id` INT NOT NULL COMMENT '레이아웃 ID',
                                     `emp_id` int NOT NULL COMMENT '고유번호',
-                                    `widget_code` VARCHAR(30) NOT NULL COMMENT '위젯 코드',
-                                    `grid_positions` VARCHAR(50) NOT NULL COMMENT '위치 번호들 (쉼표로 구분, 예: "1,2,6,7")',
-                                    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성 시간',
-                                    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '수정 시간',
+                                    `dash_widget_code` VARCHAR(30) NOT NULL COMMENT '위젯 코드',
+                                    `dash_grid_positions` VARCHAR(50) NOT NULL COMMENT '위치 번호들 (쉼표로 구분, 예: "1,2,6,7")',
+                                    `dash_created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성 시간',
+                                    `dash_updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '수정 시간',
                                     PRIMARY KEY (`layout_id`),
                                     FOREIGN KEY (`emp_id`) REFERENCES `employee` (`emp_id`)
 );
@@ -364,9 +364,9 @@ CREATE TABLE `tbl_board_posts` (
                                    `post_id` INT NOT NULL COMMENT '게시글 고유 번호 (기본 키)',
                                    `emp_id` int NOT NULL COMMENT '사원 고유 번호',
                                    `board_type` INT NOT NULL COMMENT '공지시항 , 건의사항, 점포문의 분리코드',
-                                   `title` VARCHAR(255) NOT NULL COMMENT '게시글 제목',
-                                   `content` VARCHAR(255) NOT NULL COMMENT '게시글 본문 내용',
-                                   `created_at` DATETIME NOT NULL COMMENT '게시글 작성 시간',
+                                   `board_title` VARCHAR(255) NOT NULL COMMENT '게시글 제목',
+                                   `board_content` VARCHAR(255) NOT NULL COMMENT '게시글 본문 내용',
+                                   `board_created_at` DATETIME NOT NULL COMMENT '게시글 작성 시간',
                                    PRIMARY KEY (`post_id`),
                                    FOREIGN KEY (`emp_id`) REFERENCES `employee` (`emp_id`)
 );
@@ -374,8 +374,8 @@ CREATE TABLE `tbl_board_posts` (
 CREATE TABLE `tbl_board_comments` (
                                       `comment_id` INT NOT NULL COMMENT '답변 고유 번호 (기본 키)',
                                       `post_id` INT NOT NULL COMMENT '게시글 고유 번호 (기본 키)',
-                                      `content` VARCHAR(255) NOT NULL COMMENT '답변 본문 내용',
-                                      `created_at` DATETIME NOT NULL COMMENT '답변 작성 시간',
+                                      `com_content` VARCHAR(255) NOT NULL COMMENT '답변 본문 내용',
+                                      `com_created_at` DATETIME NOT NULL COMMENT '답변 작성 시간',
                                       PRIMARY KEY (`comment_id`),
                                       FOREIGN KEY (`post_id`) REFERENCES `tbl_board_posts` (`post_id`)
 );
