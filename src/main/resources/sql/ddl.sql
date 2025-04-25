@@ -89,7 +89,7 @@ CREATE TABLE `product` (
                            `pro_created_at` DATETIME NOT NULL COMMENT '생성했을때 시각',
                            `pro_update_at` DATETIME NULL COMMENT '수정했을때 시각',
                            `pro_image` varchar(225) NULL COMMENT '이미지 링크',
-                           `is_promo`	int	NULL	COMMENT '0기본 1 이벤트 2 이벤트',
+                           `is_promo`	int	NULL	COMMENT '1기본 2 이벤트 3 이벤트',
                            PRIMARY KEY (`product_id`),
                            FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`)
 );
