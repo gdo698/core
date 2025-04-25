@@ -254,7 +254,7 @@ INSERT INTO `inventory_statistics` (`stats_id`, `store_id`, `category_id`, `inve
 (10, 3, 2, '2023-10-02', 3.50, 105000.00, 1, 2, 0, '2023-10-02 23:59:00');
 
 -- 9. order_stats(발주 통계) 데이터
-INSERT INTO `order_stats` (`ostats_id`, `store_id`, `product_id`, `order_date`, `quantity`, `total_price`, `created_at`) VALUES
+INSERT INTO `order_stats` (`ostats_id`, `store_id`, `product_id`, `ostats_date`, `ostats_quantity`, `ostats_total`, `created_at`) VALUES
 (1, 1, 1, '2023-10-01', 50, 22500, '2023-10-01 09:00:00'),
 (2, 1, 2, '2023-10-01', 40, 20000, '2023-10-01 09:05:00'),
 (3, 1, 3, '2023-10-01', 60, 42000, '2023-10-01 09:10:00'),
@@ -530,6 +530,7 @@ INSERT INTO shift_schedule (schedule_id, part_timer_id, work_date, start_time, e
 (163, 65, Now(), '2025-04-05 07:00:00', '2025-04-05 15:00:00'),
 (164, 65, Now(), '2025-04-03 07:00:00', '2025-04-03 15:00:00'),
 (165, 65, Now(), '2025-04-02 07:00:00', '2025-04-02 15:00:00');
+
 -- 14 store_stock(재고 관리) 데이터
 
 -- stock_status 정의
@@ -742,6 +743,7 @@ INSERT INTO store_stock (stock_id, store_id, product_id, quantity, last_in_date,
 (198, 10, 14, 51, '2025-04-03 00:56:29', 4),
 (199, 10, 30, 77, '2025-04-12 00:56:29', 3),
 (200, 10, 29, 32, '2025-04-10 00:56:29', 5);
+
 -- 15 purchase_order(발주) 데이터
 
 -- order_status 정의
@@ -986,6 +988,7 @@ INSERT INTO stock_in_history (history_id, store_id, part_timer_id, product_id, o
 (91, 9, 35, 35, 25, 16, '2025-04-18 02:52:21', '2025-09-06', 6),
 (92, 10, 35, 21, 28, 8, '2025-04-24 02:52:21', '2025-08-03', 4),
 (93, 4, 60, 37, 20, 13, '2025-04-20 02:52:21', '2025-05-27', 4);
+
 -- 18 disposal(폐기) 데이터
 INSERT INTO disposal (disposal_id, stock_id, disposal_date, quantity, processed_by, total_loss_amount, reason) VALUES
 (1, 180, '2025-04-16 01:20:32', 9, '최영일', 11601, '유통기한만료'),
@@ -1050,9 +1053,11 @@ INSERT INTO employee (emp_id,emp_role, store_id ,depart_id, emp_name, emp_gender
 (8,'ROLE_LOGISTICS',2, 8, '송물류', 2, '010-8901-2345', '서울시 성동구', '1997-08-08', 'logistics1', 'password123', null, '농협', '888-999-000111', '1', '2022-08-01', 2, true, null),
 (9,'ROLE_OWNER_PENDING',3, 9, '유구매', 1, '010-9012-3456', '서울시 광진구', '1998-09-09', 'purchase1', 'password123', null, '국민', '999-000-111222', '1', '2022-09-01', 1, true, null),
 (10,'ROLE_HQ_PENDING',1, 10, '조개발', 2, '010-0123-4567', '서울시 중구', '1999-10-10', 'dev1', 'password123', null, '신한', '000-111-222333', '1', '2022-10-01', 1, true, null),
-(11,'ROLE_OWNER',1, 13, '김강남', 1, '010-1111-2222', '서울시 강남구', '1980-01-01', 'owner_gangnam', 'password123', null, '국민', '100-200-300400', '1', '2023-01-01', 3, true, null),
-(12,'ROLE_PURCHASING',2, 13, '박홍대', 2, '010-2222-3333', '서울시 마포구', '1982-02-02', 'owner_hongdae', 'password123', null, '신한', '200-300-400500', '1', '2023-02-15', 3, true, null),
-(13,'ROLE_DEV',3, 13, '최부산', 1, '010-3333-4444', '부산시 해운대구', '1984-03-03', 'owner_busan', 'password123', null, '우리', '300-400-500600', '1', '2023-03-20', 3, true, null);
+(11, 'ROLE_OWNER', 11, 13, '이민서', 2, '062-664-7698', '서울시 송파구', '1983-11-11', 'owner11@coreerp.com', '1234', null, '국민', '111-111-111111', '1', '2025-04-25', 3, true, null),
+(12, 'ROLE_OWNER', 12, 13, '박재현', 1, '055-689-0193', '서울시 노원구', '1984-12-12', 'owner12@coreerp.com', '1234', null, '신한', '222-222-222222', '1', '2025-04-25', 3, true, null),
+(13, 'ROLE_OWNER', 13, 13, '서정수', 2, '043-536-5108', '서울시 도봉구', '1985-10-10', 'owner13@coreerp.com', '1234', null, '우리', '333-333-333333', '1', '2025-04-25', 3, true, null),
+(14, 'ROLE_OWNER', 14, 13, '김민준', 1, '054-142-2222', '서울시 은평구', '1986-08-08', 'owner14@coreerp.com', '1234', null, '농협', '444-444-444444', '1', '2025-04-25', 3, true, null),
+(15, 'ROLE_OWNER', 15, 13, '서순자', 2, '063-134-8388', '서울시 중랑구', '1987-07-07', 'owner15@coreerp.com', '1234', null, '국민', '555-555-555555', '1', '2025-04-25', 3, true, null);
 
 -- 20. annual_leave (연차) 데이터
 INSERT INTO annual_leave (leave_id, emp_id, year, total_days, used_days, rem_days, uadate_at) VALUES
@@ -1339,7 +1344,7 @@ INSERT INTO `dashboard_layout` (`layout_id`, `emp_id`, `dash_widget_code`, `dash
 
 
 -- 30. sales_stats (상품별 매출 통계) 데이터
-INSERT INTO `sales_stats` (`sales_stats_id`, `store_id`, `product_id`, `sale_date`, `quantity`, `total_sales`, `created_at`) VALUES
+INSERT INTO `sales_stats` (`sales_stats_id`, `store_id`, `product_id`, `sst_date`, `sst_quantity`, `sst_total`, `created_at`) VALUES
 (1, 1, 1, '2023-10-01', 25, 30000, '2023-10-01 23:59:00'),
 (2, 1, 2, '2023-10-01', 18, 23400, '2023-10-01 23:59:00'),
 (3, 1, 3, '2023-10-01', 10, 15000, '2023-10-01 23:59:00'),
@@ -1349,7 +1354,7 @@ INSERT INTO `sales_stats` (`sales_stats_id`, `store_id`, `product_id`, `sale_dat
 (7, 2, 7, '2023-10-02', 11, 26400, '2023-10-02 23:59:00');
 
 -- 31. sales_hourly (시간대별 매출 통계) 데이터
-INSERT INTO `sales_hourly` (`sales_hourly_id`, `store_id`, `sale_date`, `hour`, `quantity`, `total_sales`, `created_at`) VALUES
+INSERT INTO `sales_hourly` (`sales_hourly_id`, `store_id`, `sho_date`, `sho_hour`, `sho_quantity`, `sho_total`, `created_at`) VALUES
 (1, 1, '2023-10-01', 9, 15, 18000, '2023-10-01 09:59:00'),
 (2, 1, '2023-10-01', 10, 12, 15000, '2023-10-01 10:59:00'),
 (3, 1, '2023-10-01', 11, 20, 23000, '2023-10-01 11:59:00'),
@@ -1360,9 +1365,9 @@ INSERT INTO `sales_hourly` (`sales_hourly_id`, `store_id`, `sale_date`, `hour`, 
 
 
 
--- sales (POS 매출 기록) 데이터 - 1번부터 29번까지 전체
-INSERT INTO `sales` (`sales_id`, `store_id`, `emp_id`, `product_id`, `total_sales`, `payment_method`,
-                     `sale_time`, `quantity`, `is_refunded`, `discount_price`, `created_at`,
+-- 32. sales (POS 매출 기록) 데이터 - 1번부터 29번까지 전체
+INSERT INTO `sales` (`sales_id`, `store_id`, `emp_id`, `product_id`, `sales_total`, `payment_method`,
+                     `sales_time`, `sales_quantity`, `is_refunded`, `discount_price`, `created_at`,
                      `final_amount`, `cost_price`, `real_income`, `is_settled`) VALUES
 (1, 1, 11, 1, 1200, '카드', '2024-04-01 09:15:00', 1, false, 0, '2024-04-01 09:15:00', 1200, 450, 750, true),
 (2, 1, 11, 2, 1300, '현금', '2024-04-01 09:30:00', 1, false, 100, '2024-04-01 09:30:00', 1200, 500, 700, true),
@@ -1396,8 +1401,17 @@ INSERT INTO `sales` (`sales_id`, `store_id`, `emp_id`, `product_id`, `total_sale
 (29, 3, 13, 35, 9900, '카카오페이', '2025-04-24 19:30:00', 1, false, 0, '2025-04-24 19:30:00', 9900, 4000, 5900, true);
 
 
--- 32. issue_log (최근 이슈) 데이터 삽입
+-- 33. issue_log (최근 이슈) 데이터 삽입
 INSERT INTO `issue_log` (`issue_id`, `store_id`, `issue_title`, `issue_desc`, `issue_type`, `created_at`) VALUES
 (1, 1, '재고 급감', '삼각김밥 참치 제품의 재고가 급격히 감소', '재고', '2024-04-23 14:30:00'),
 (2, 2, 'POS 시스템 오류', 'POS 시스템에서 결제 오류가 발생', '시스템', '2024-04-23 10:00:00'),
 (3, 3, '상품 손상', '냉장식품 일부가 손상되어 판매 불가 상태', '상품', '2024-04-23 13:00:00');
+
+
+-- 34. pw_reset_token (비밀번호 재설정 토큰)
+INSERT INTO pw_reset_token (prtoken_id, emp_id, reset_token, prtoken_exp, prtoken_used, created_at) VALUES
+(1, 11, 'reset-token-11', '2025-04-26 23:59:59', false, '2025-04-25 10:00:00'),
+(2, 12, 'reset-token-12', '2025-04-26 23:59:59', true, '2025-04-25 10:00:00'),
+(3, 13, 'reset-token-13', '2025-04-26 23:59:59', false, '2025-04-25 10:00:00'),
+(4, 14, 'reset-token-14', '2025-04-26 23:59:59', true, '2025-04-25 10:00:00');
+-- emp_id 15는 요청하지 않아서 없음
