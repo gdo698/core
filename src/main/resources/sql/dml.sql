@@ -79,7 +79,7 @@ INSERT INTO `category` (`category_id`, `category_name`, `category_filter`, `pare
 (33, '사이다', 3, 13);
 
 -- 3. ai_model(AI 모델) 데이터
-INSERT INTO `ai_model` (`model_id`, `name`, `type`, `version`, `parameters`, `accuracy`, `training_date`, `is_active`, `created_at`, `updated_at`) VALUES
+INSERT INTO `ai_model` (`model_id`, `ai_name`, `ai_type`, `ai_version`, `ai_parameters`, `ai_accuracy`, `ai_training_date`, `ai_is_active`, `ai_created_at`, `ai_updated_at`) VALUES
 (1, '재고예측모델', '시계열예측', '1.0.0', '{"learning_rate": 0.01, "layers": 3, "hidden_units": 64}', 87.5, '2023-05-15 00:00:00', TRUE, '2023-05-15 12:30:00', '2023-05-15 12:30:00'),
 (2, '판매량예측모델', '회귀분석', '2.1.0', '{"algorithm": "random_forest", "max_depth": 10, "n_estimators": 100}', 92.3, '2023-06-20 00:00:00', TRUE, '2023-06-20 14:45:00', '2023-07-15 09:30:00'),
 (3, '이상감지모델', '이상탐지', '1.5.0', '{"threshold": 0.85, "window_size": 24, "feature_count": 12}', 78.6, '2023-07-01 00:00:00', TRUE, '2023-07-01 10:15:00', '2023-09-01 16:20:00'),
@@ -87,7 +87,7 @@ INSERT INTO `ai_model` (`model_id`, `name`, `type`, `version`, `parameters`, `ac
 (5, '가격최적화모델', '강화학습', '0.7.0', '{"discount_factor": 0.95, "epochs": 500, "batch_size": 32}', 75.8, '2023-09-05 00:00:00', TRUE, '2023-09-05 15:30:00', '2023-10-01 13:45:00');
 
 -- 4. weather_data(날씨) 데이터
-INSERT INTO `weather_data` (`weather_id`, `location`, `date`, `temperature`, `condition`, `humidity`, `precipitation`, `created_at`) VALUES
+INSERT INTO `weather_data` (`weather_id`, `wt_location`, `wt_date`, `wt_temperature`, `wt_condition`, `wt_humidity`, `wt_precipitation`, `wt_created_at`) VALUES
 (1, '서울', '2023-10-01', 22.5, '맑음', 45, 0.0, '2023-10-01 00:10:00'),
 (2, '서울', '2023-10-02', 23.1, '구름조금', 50, 0.0, '2023-10-02 00:10:00'),
 (3, '서울', '2023-10-03', 20.8, '흐림', 65, 5.2, '2023-10-03 00:10:00'),
@@ -241,7 +241,7 @@ INSERT INTO `sales_statistics` (`stats_id`, `store_id`, `category_id`, `date`, `
 (10, 3, 2, '2023-10-02', '2023-10-02 12:00:00', 54000.00, 36, 1500.00, '2023-10-02 23:59:00');
 
 -- 8. inventory_statistics(재고 통계) 데이터
-INSERT INTO `inventory_statistics` (`stats_id`, `store_id`, `category_id`, `date`, `turnover_rate`, `stock_value`, `low_stock_count`, `excess_stock_count`, `expired_soon_count`, `created_at`) VALUES
+INSERT INTO `inventory_statistics` (`stats_id`, `store_id`, `category_id`, `inven_date`, `inven_turnover_rate`, `inven_stock_value`, `inven_low_stock_count`, `inven_excess_stock_count`, `inven_expired_soon_count`, `inven_created_at`) VALUES
 (1, 1, 1, '2023-10-01', 3.75, 125000.00, 2, 1, 3, '2023-10-01 23:59:00'),
 (2, 1, 2, '2023-10-01', 2.50, 87500.00, 1, 2, 0, '2023-10-01 23:59:00'),
 (3, 1, 4, '2023-10-01', 1.85, 65000.00, 0, 3, 0, '2023-10-01 23:59:00'),
@@ -267,7 +267,7 @@ INSERT INTO `order_stats` (`ostats_id`, `store_id`, `product_id`, `order_date`, 
 (10, 1, 9, '2023-10-02', 30, 12000, '2023-10-02 09:10:00');
 
 -- 10. demand_prediction(수요 예측) 데이터
-INSERT INTO `demand_prediction` (`prediction_id`, `store_id`, `product_id`, `date`, `predicted_quantity`, `confidence_level`, `weather_factor`, `seasonal_factor`, `created_at`) VALUES
+INSERT INTO `demand_prediction` (`prediction_id`, `store_id`, `product_id`, `dmd_date`, `dmd_predicted_quantity`, `dmd_confidence_level`, `dmd_weather_factor`, `dmd_seasonal_factor`, `dmd_created_at`) VALUES
 (1, 1, 1, '2023-10-06', 55, 0.85, 0.75, 0.90, '2023-10-05 00:00:00'),
 (2, 1, 2, '2023-10-06', 45, 0.82, 0.70, 0.85, '2023-10-05 00:00:00'),
 (3, 1, 3, '2023-10-06', 65, 0.88, 0.80, 0.95, '2023-10-05 00:00:00'),
@@ -280,7 +280,7 @@ INSERT INTO `demand_prediction` (`prediction_id`, `store_id`, `product_id`, `dat
 (10, 1, 9, '2023-10-06', 35, 0.82, 0.70, 0.87, '2023-10-05 00:00:00');
 
 -- 11. anomaly_detection(이상 탐지) 데이터
-INSERT INTO `anomaly_detection` (`anomaly_id`, `store_id`, `type`, `detection_time`, `severity`, `description`, `is_resolved`, `resolution_notes`, `created_at`, `updated_at`) VALUES
+INSERT INTO `anomaly_detection` (`anomaly_id`, `store_id`, `anom_type`, `anom_detection_time`, `anom_severity`, `anom_description`, `anom_is_resolved`, `anom_resolution_notes`, `anom_created_at`, `anom_updated_at`) VALUES
 (1, 1, '재고 급감', '2023-10-01 14:23:15', 4, '삼각김밥 참치 제품의 재고가 1시간 내에 30개 이상 감소했습니다.', TRUE, '특별 할인 행사로 인한 정상적인 판매량 증가', '2023-10-01 14:23:15', '2023-10-01 16:45:00');
 
 -- 12. part_timer(아르바이트) 데이터
@@ -1231,7 +1231,7 @@ INSERT INTO attendance (attend_id, emp_id,store_id, part_timer_id, work_date, le
 
 
 -- 27 tbl_board_posts(게시글) 데이터
-INSERT INTO `tbl_board_posts` (`post_id`, `emp_id`, `board_type`, `title`, `content`, `created_at`) VALUES
+INSERT INTO `tbl_board_posts` (`post_id`, `emp_id`, `board_type`, `board_title`, `board_content`, `board_created_at`) VALUES
 -- 공지사항 (board_type = 1)
 (1, 1, 1, '2024년 2분기 신상품 출시 안내', '안녕하세요. 2024년 2분기 신규 상품 10종이 출시되었습니다. 첨부된 가이드라인에 따라 매장 진열을 변경해주시기 바랍니다.', '2024-04-01 09:30:00'),
 (2, 1, 1, '하절기 위생 관리 지침 안내', '식품 안전을 위한 하절기 위생 관리 지침이 개정되었습니다. 모든 점포는 변경된 지침에 따라 냉장/냉동 상품 관리에 각별히 주의해주시기 바랍니다.', '2024-05-15 11:00:00'),
@@ -1254,7 +1254,7 @@ INSERT INTO `tbl_board_posts` (`post_id`, `emp_id`, `board_type`, `title`, `cont
 (15, 9, 3, '전기 누전 의심 신고', '창고 구역에서 전기 누전이 의심되는 상황이 발생했습니다. 안전을 위해 긴급 전기 안전 점검을 요청합니다.', '2024-06-10 16:40:00');
 
 -- 28 tbl_board_comments(댓글/답변) 데이터
-INSERT INTO `tbl_board_comments` (`comment_id`, `post_id`, `content`, `created_at`) VALUES
+INSERT INTO `tbl_board_comments` (`comment_id`, `post_id`, `com_content`, `com_created_at`) VALUES
 -- 공지사항에 대한 답변/댓글
 (1, 1, '신상품 가이드라인 확인했습니다. 진열 변경은 언제까지 완료해야 하나요?', '2024-04-01 11:20:00'),
 (2, 1, '4월 5일까지 진열 변경을 완료해주시기 바랍니다. 문의사항은 담당MD에게 연락 바랍니다.', '2024-04-01 13:45:00'),
@@ -1276,7 +1276,7 @@ INSERT INTO `tbl_board_comments` (`comment_id`, `post_id`, `content`, `created_a
 
 
 -- 29. dashboard_layout(대시보드) 데이터
-INSERT INTO `dashboard_layout` (`layout_id`, `emp_id`, `widget_code`, `grid_positions`, `created_at`, `updated_at`) VALUES
+INSERT INTO `dashboard_layout` (`layout_id`, `emp_id`, `dash_widget_code`, `dash_grid_positions`, `dash_created_at`, `dash_updated_at`) VALUES
 -- 인사팀장 (emp_id: 1)
 (1, 1, 'HR_ATTENDANCE', '1,2,3,4', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
 (2, 1, 'HR_LEAVE', '5,6,7,8', '2024-01-01 09:00:00', '2024-01-01 09:00:00'),
