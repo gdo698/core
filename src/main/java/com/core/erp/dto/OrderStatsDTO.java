@@ -22,8 +22,6 @@ public class OrderStatsDTO {
     private int ostatsTotal;
     private LocalDateTime createdAt;
 
-    private MultipartFile file;
-
     // Entity → DTO 변환 생성자
     public OrderStatsDTO(OrderStatsEntity entity) {
         this.ostatsId = entity.getOstatsId();

@@ -21,8 +21,6 @@ public class IssueLogDTO {
     private String issueType;
     private LocalDateTime createdAt;
 
-    private MultipartFile file;
-
     // Entity → DTO 변환 생성자
     public IssueLogDTO(IssueLogEntity entity) {
         this.issueId = entity.getIssueId();

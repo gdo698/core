@@ -1,0 +1,38 @@
+package com.core.erp.dto;
+
+import com.core.erp.domain.SalesDetailEntity;
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+public class SalesDetailDTO {
+
+    private int salesDetailId ;
+    private Integer transactionId; // FK (id만 관리)
+    private Integer productId; // FK (id만 관리)
+    private Integer  salesQuantity;
+    private Integer  unitPrice;
+    private Integer  discountPrice;
+    private Integer  finalAmount;
+    private Integer  costPrice;
+    private Integer  realIncome;
+
+    // Entity → DTO 변환 생성자
+    public SalesDetailDTO(SalesDetailEntity entity) {
+        this.salesDetailId = entity.getSalesDetailId();
+        this.transactionId = entity.getTransaction() != null ? entity.getTransaction().getTransactionId() : null;
+        this.productId = entity.getProduct() != null ? entity.getProduct().getProductId() : null;
+        this.salesQuantity = entity.getSalesQuantity();
+        this.unitPrice = entity.getUnitPrice();
+        this.discountPrice = entity.getDiscountPrice();
+        this.finalAmount = entity.getFinalAmount();
+        this.costPrice = entity.getCostPrice();
+        this.realIncome = entity.getRealIncome();
+    }
+
+}
+
+

@@ -22,8 +22,6 @@ public class SalesStatsDTO {
     private int sstTotal;
     private LocalDateTime createdAt;
 
-    private MultipartFile file;
-
     // Entity → DTO 변환 생성자
     public SalesStatsDTO(SalesStatsEntity entity) {
         this.salesStatsId = entity.getSalesStatsId();

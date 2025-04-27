@@ -1,4 +1,6 @@
 DROP TABLE IF EXISTS `disposal`;
+DROP TABLE IF EXISTS `sales_detail`;
+DROP TABLE IF EXISTS `sales_transaction`;
 DROP TABLE IF EXISTS `sales`;
 DROP TABLE IF EXISTS `stock_in_history`;
 DROP TABLE IF EXISTS `purchase_order_item`;

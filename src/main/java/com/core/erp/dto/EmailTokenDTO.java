@@ -20,8 +20,6 @@ public class EmailTokenDTO {
     private boolean etokenUsed;
     private LocalDateTime createdAt;
 
-    private MultipartFile file;
-
     // Entity → DTO 변환 생성자
     public EmailTokenDTO(EmailTokenEntity entity) {
         this.etokenId = entity.getEtokenId();

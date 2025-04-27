@@ -24,8 +24,6 @@ public class SalesStatisticsDTO {
     private Double avgTransaction;
     private LocalDateTime createdAt;
 
-    private MultipartFile file;
-
     // Entity → DTO 변환 생성자
     public SalesStatisticsDTO(SalesStatisticsEntity entity) {
         this.statsId = entity.getStatsId();

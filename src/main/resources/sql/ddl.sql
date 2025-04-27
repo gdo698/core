@@ -216,6 +216,39 @@ CREATE TABLE `sales_stats` (
                                FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`)
 );
 
+CREATE TABLE `sales_transaction` (
+                                     `transaction_id` INT AUTO_INCREMENT PRIMARY KEY COMMENT 'POS 거래 고유 ID',
+                                     `store_id` INT NOT NULL COMMENT '매장 고유번호',
+                                     `emp_id` INT NULL COMMENT '결제 담당자(점주) ID, 무인 결제 시 NULL',
+                                     `total_price` INT NOT NULL COMMENT '총 상품 정가 합산',
+                                     `discount_total` INT DEFAULT 0 COMMENT '총 할인 금액',
+                                     `final_amount` INT NOT NULL COMMENT '최종 결제 금액 (할인 적용 후)',
+                                     `payment_method` VARCHAR(20) NOT NULL COMMENT '결제 수단 (ex. 카드, 현금 등)',
+                                     `is_refunded` TINYINT(1) DEFAULT 0 COMMENT '환불 여부 (0: 정상, 1: 환불)',
+                                     `refund_reason` VARCHAR(255) DEFAULT NULL COMMENT '환불 사유 (환불 시 작성)',
+                                     `paid_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '결제 시간',
+                                     `refunded_at` DATETIME DEFAULT NULL COMMENT '환불 시간',
+                                     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '거래 생성 시간',
+
+                                     FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`),
+                                     FOREIGN KEY (`emp_id`) REFERENCES `employee` (`emp_id`)
+);
+
+CREATE TABLE `sales_detail` (
+                                `sales_detail_id` INT AUTO_INCREMENT PRIMARY KEY COMMENT '매출 상세 고유 ID',
+                                `transaction_id` INT NOT NULL COMMENT '거래 ID',
+                                `product_id` INT NOT NULL COMMENT '상품 ID',
+                                `sales_quantity` INT NOT NULL DEFAULT 1 COMMENT '판매 수량',
+                                `unit_price` INT NOT NULL COMMENT '상품 단가 (판매가)',
+                                `discount_price` INT DEFAULT 0 COMMENT '할인 금액',
+                                `final_amount` INT NOT NULL COMMENT '총 결제 금액 (수량*단가 - 할인)',
+                                `cost_price` INT NOT NULL COMMENT '상품 원가',
+                                `real_income` INT NOT NULL COMMENT '실 수익 = final_amount - cost_price',
+
+                                FOREIGN KEY (`transaction_id`) REFERENCES `sales_transaction` (`transaction_id`),
+                                FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`)
+);
+
 CREATE TABLE `sales_statistics` (
                                     `stats_id` INT NOT NULL COMMENT '통계 ID',
                                     `store_id` int NOT NULL COMMENT '매장고유번호',

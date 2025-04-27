@@ -20,8 +20,6 @@ public class PwResetTokenDTO {
     private boolean prtokenUsed;
     private LocalDateTime createdAt;
 
-    private MultipartFile file;
-
     // Entity → DTO 변환 생성자
     public PwResetTokenDTO(PwResetTokenEntity entity) {
         this.prtokenId = entity.getPrtokenId();
