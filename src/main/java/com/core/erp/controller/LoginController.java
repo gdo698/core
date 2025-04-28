@@ -43,10 +43,10 @@ public class LoginController {
         // 로그인 성공
         if (result == ResultStatus.SUCCESS) {
             EmployeeEntity employee = (EmployeeEntity) session.getAttribute("loginEmployee");
-
             Map<String, Object> response = new HashMap<>();
             response.put("message", "로그인 성공");
             response.put("workType", employee.getWorkType());
+            response.put("name", employee.getEmpName());
             return ResponseEntity.ok(response);
         }
 

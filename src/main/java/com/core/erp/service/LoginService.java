@@ -44,6 +44,7 @@ public class LoginService {
         }
 
         session.setAttribute("empId", employee.getEmpId());
+        session.setAttribute("empName", employee.getEmpName());
         session.setAttribute("storeId", employee.getStore() != null ? employee.getStore().getStoreId() : null);
         session.setAttribute("departId", employee.getDepartment() != null ? employee.getDepartment().getDeptId() : null);
         session.setAttribute("workType", employee.getWorkType());
