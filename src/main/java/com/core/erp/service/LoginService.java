@@ -4,7 +4,7 @@ import com.core.erp.domain.EmailTokenEntity;
 import com.core.erp.domain.EmployeeEntity;
 import com.core.erp.dto.LoginDTO;
 import com.core.erp.repository.EmailTokenRepository;
-import com.core.erp.repository.MemberRepository;
+import com.core.erp.repository.EmployeeRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class LoginService {
 
-    private final MemberRepository memberRepository;
+    private final EmployeeRepository memberRepository;
     private final EmailTokenRepository emailTokenRepository;
     private final HttpSession session;
 

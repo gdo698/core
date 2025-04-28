@@ -47,6 +47,11 @@ public class LoginController {
             response.put("message", "로그인 성공");
             response.put("workType", employee.getWorkType());
             response.put("name", employee.getEmpName());
+            response.put("branchName",
+                    (employee.getStore() != null && employee.getStore().getStoreName() != null)
+                            ? employee.getStore().getStoreName()
+                            : ""
+            );
             return ResponseEntity.ok(response);
         }
 
