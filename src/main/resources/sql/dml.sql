@@ -11,7 +11,7 @@ VALUES
 (3, '인사동점', '서울특별시 종로구 인사동길 12', '02-3456-7890', '2023-04-16 09:00:00', 'https://example.com/cert/insadong.jpg', 'https://example.com/accounts/insadong.jpg'),
 
 -- 서울특별시 강북구 매장 (3개)
-(4, '수유점', '서울특별시 강북구 도봉로 71', '02-4567-8901', '1997-01-01 09:00:00', 'https://example.com/cert/suyu.jpg', 'https://example.com/accounts/suyu.jpg'),
+(4, '수유점', '서울특별시 강북구 도봉로 71', '02-4567-8901', '1997-12-20 09:00:00', 'https://example.com/cert/suyu.jpg', 'https://example.com/accounts/suyu.jpg'),
 (5, '미아점', '서울특별시 강북구 삼양로 153', '02-5678-9012', '2025-01-01 09:00:00', 'https://example.com/cert/mia.jpg', 'https://example.com/accounts/mia.jpg'),
 (6, '번동점', '서울특별시 강북구 번동로 45', '02-6789-0123', '2023-01-07 09:00:00', 'https://example.com/cert/beondong.jpg', 'https://example.com/accounts/beondong.jpg'),
 
