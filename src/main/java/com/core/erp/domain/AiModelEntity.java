@@ -31,7 +31,7 @@ public class AiModelEntity {
     @Column(name = "ai_parameters", columnDefinition = "json")
     private String aiParameters;
 
-    @Column(name = "ai_accuracy", precision = 5, scale = 2)
+    @Column(name = "ai_accuracy")
     private Double aiAccuracy;
 
     @Column(name = "ai_training_date")

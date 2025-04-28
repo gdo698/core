@@ -1526,7 +1526,7 @@ INSERT INTO sales_transaction (
 
 -- 31.  sales_detail (거래 정보) 더미 데이터
 INSERT INTO sales_detail (
-    sales_id, transaction_id, product_id, sales_quantity,
+    sales_detail_id, transaction_id, product_id, sales_quantity,
     unit_price, discount_price, final_amount, cost_price, real_income) VALUES
 (1, 1, 12, 2, 4194, 84, 8304, 2516, 3272),
 (2, 1, 17, 3, 2730, 299, 7891, 1638, 2977),

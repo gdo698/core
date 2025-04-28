@@ -168,29 +168,6 @@ CREATE TABLE `disposal` (
                             FOREIGN KEY (`stock_id`) REFERENCES `store_stock` (`stock_id`)
 );
 
-CREATE TABLE `sales` (
-                         `sales_id` int NOT NULL COMMENT '개별 매출 고유ID',
-                         `store_id` int NOT NULL COMMENT '매장고유번호',
-                         `emp_id` int NOT NULL COMMENT '고유번호',
-                         `product_id` int NOT NULL COMMENT 'autoincrement',
-                         `sales_total` int NOT NULL DEFAULT 0 COMMENT '정가 기준 총 매출(할인 전)',
-                         `payment_method` varchar(20) NOT NULL COMMENT '현금, 카드 등',
-                         `sales_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '판매가 일어난 시간',
-                         `sales_quantity` int NOT NULL DEFAULT 1 COMMENT '판매수량',
-                         `is_refunded` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '0 : 실패, 2 성공',
-                         `discount_price` int NOT NULL DEFAULT 0 COMMENT '할인된 금액',
-                         `created_at` datetime NOT NULL COMMENT '데이터 기록 시간',
-                         `final_amount` int NOT NULL DEFAULT 0 COMMENT '실제 결제된 금액(정가 - 할인)',
-                         `cost_price` int NOT NULL DEFAULT 0 COMMENT '상품의 원가',
-                         `real_income` int NOT NULL DEFAULT 0 COMMENT '점주가 실제 수령하는 금액',
-                         `is_settled` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '0 : 실패, 2 성공',
-                         `transaction_id` int NULL COMMENT 'POS 한 건의 거래 ID',
-                         PRIMARY KEY (`sales_id`),
-                         FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`),
-                         FOREIGN KEY (`emp_id`) REFERENCES `employee` (`emp_id`),
-                         FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`)
-);
-
 CREATE TABLE `sales_hourly` (
                                 `sales_hourly_id` int NOT NULL COMMENT '시간대별 매출통계 고유번호',
                                 `store_id` int NOT NULL COMMENT '매장고유번호',

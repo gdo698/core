@@ -26,7 +26,7 @@ public class WeatherDataEntity {
     @Column(name = "wt_date", nullable = false)
     private LocalDate wtDate;
 
-    @Column(name = "wt_temperature", nullable = false, precision = 5, scale = 2)
+    @Column(name = "wt_temperature", nullable = false)
     private Double wtTemperature;
 
     @Column(name = "wt_condition", nullable = false, length = 50)
@@ -35,7 +35,7 @@ public class WeatherDataEntity {
     @Column(name = "wt_humidity")
     private Integer wtHumidity;
 
-    @Column(name = "wt_precipitation", precision = 5, scale = 2)
+    @Column(name = "wt_precipitation")
     private Double wtPrecipitation;
 
     @Column(name = "wt_created_at")
