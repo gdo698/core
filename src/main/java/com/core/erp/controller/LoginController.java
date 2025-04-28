@@ -1,19 +1,22 @@
 package com.core.erp.controller;
 
+import com.core.erp.domain.EmployeeEntity;
 import com.core.erp.dto.LoginDTO;
-import com.core.erp.service.ResultStatus;
 import com.core.erp.service.LoginService;
+import com.core.erp.service.ResultStatus;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/auth")
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class LoginController {
 
     private final LoginService loginService;
+    private final HttpSession session;
 
     @GetMapping("/login")
     public String loginForm() {
@@ -38,7 +42,12 @@ public class LoginController {
 
         // 로그인 성공
         if (result == ResultStatus.SUCCESS) {
-            return ResponseEntity.ok().body("로그인 성공");  // 성공 시 성공 메시지 반환
+            EmployeeEntity employee = (EmployeeEntity) session.getAttribute("loginEmployee");
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "로그인 성공");
+            response.put("workType", employee.getWorkType());
+            return ResponseEntity.ok(response);
         }
 
         // 로그인 실패: 아이디, 비밀번호 오류

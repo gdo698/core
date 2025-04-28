@@ -47,6 +47,7 @@ public class LoginService {
         session.setAttribute("storeId", employee.getStore() != null ? employee.getStore().getStoreId() : null);
         session.setAttribute("departId", employee.getDepartment() != null ? employee.getDepartment().getDeptId() : null);
         session.setAttribute("workType", employee.getWorkType());
+        session.setAttribute("loginEmployee", employee);
 
         log.info("로그인 성공: loginId={}", loginDTO.getLoginId());
         return ResultStatus.SUCCESS;
