@@ -26,8 +26,10 @@ public class SecurityConfig {
                 }))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/register", "/auth/**", "/css/**", "/js/**", "/images/**",
-                                "/headquarters/**", "/store/**").permitAll()
+                        .requestMatchers(
+                                "/auth/login", "/auth/register", "/auth/**", "/css/**", "/js/**", "/images/**",
+                                "/headquarters/**", "/store/**", "/api/products/all"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable

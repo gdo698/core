@@ -23,7 +23,8 @@ public class ProductDTO {
     private LocalDateTime proUpdateAt;
     private String proImage;
     private Integer isPromo;
-
+    private Integer proStock; // 재고
+    private String status;    // 상태
     private MultipartFile file;
 
     // Entity → DTO 변환 생성자
@@ -38,5 +39,7 @@ public class ProductDTO {
         this.proUpdateAt = entity.getProUpdateAt();
         this.proImage = entity.getProImage();
         this.isPromo = entity.getIsPromo();
+//        this.proStock = entity.getProStock();
+//        this.status = entity.getStatus();
     }
 }
