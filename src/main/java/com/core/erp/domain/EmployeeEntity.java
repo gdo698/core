@@ -48,7 +48,7 @@ public class EmployeeEntity {
     @Column(name = "login_id", nullable = false, unique = true, length = 30)
     private String loginId;
 
-    @Column(name = "login_pwd", nullable = false, length = 30)
+    @Column(name = "login_pwd", nullable = false, length = 225)
     private String loginPwd;
 
     @Column(name = "emp_img", length = 255)
@@ -96,5 +96,6 @@ public class EmployeeEntity {
         this.emailAuth = dto.getEmailAuth();
         this.empExt = dto.getEmpExt();
     }
+
 
 }

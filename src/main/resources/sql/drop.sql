@@ -18,6 +18,7 @@ DROP TABLE IF EXISTS `tbl_board_posts`;
 DROP TABLE IF EXISTS `attendance`;
 DROP TABLE IF EXISTS `annual_leave`;
 DROP TABLE IF EXISTS `email_token`;
+DROP TABLE IF EXISTS `sales`;
 DROP TABLE IF EXISTS `employee`;
 DROP TABLE IF EXISTS `sales_statistics`;
 DROP TABLE IF EXISTS `anomaly_detection`;
