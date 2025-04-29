@@ -3,7 +3,6 @@ package com.core.erp.dto;
 import com.core.erp.domain.PartTimerEntity;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -15,7 +14,7 @@ import java.time.LocalDateTime;
 public class PartTimerDTO {
 
     private int partTimerId;
-    private Integer storeId; // FK (id만 관리)
+    private Integer storeId;
     private String partName;
     private int partGender;
     private String partPhone;
@@ -31,6 +30,9 @@ public class PartTimerDTO {
     private LocalDateTime createdAt;
 
     private MultipartFile file;
+
+    private String position;
+    private String workType;
 
     // Entity → DTO 변환 생성자
     public PartTimerDTO(PartTimerEntity entity) {
@@ -49,5 +51,9 @@ public class PartTimerDTO {
         this.accountNumber = entity.getAccountNumber();
         this.partStatus = entity.getPartStatus();
         this.createdAt = entity.getCreatedAt();
+        this.position = entity.getPosition();
+        this.workType = entity.getWorkType();
+
+        // ✨ 추가 필드 매핑은 별도 가공 필요 (Entity에 없을 경우)
     }
 }

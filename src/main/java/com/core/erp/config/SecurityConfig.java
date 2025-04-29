@@ -28,8 +28,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/login", "/auth/register", "/auth/**", "/css/**", "/js/**", "/images/**",
-                                "/headquarters/**", "/store/**", "/api/products/all","/api/products/**","api/products/detail/**","/api/categories/tree","/api/products/upload-image","api/products/edit/**" , "/api/storeStock/**", "/api/storeStock/all", "/api/storeStock/detail/**"
+                                "/headquarters/**", "/store/**", "/api/products/all","/api/products/**","api/products/detail/**",
+                                "/api/categories/tree","/api/products/upload-image","api/products/edit/**" , "/api/storeStock/**",
+                                "/api/storeStock/all", "/api/storeStock/detail/**"
                         ).permitAll()
+                        .requestMatchers("/store/api/**").authenticated()  // 이 부분 추가
+                        .requestMatchers("/headquarters/**").hasRole("HQ")
+                        .requestMatchers("/store/**").hasAnyRole("OWNER", "HQ")
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable

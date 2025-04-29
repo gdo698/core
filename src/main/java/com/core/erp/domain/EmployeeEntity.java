@@ -96,4 +96,5 @@ public class EmployeeEntity {
         this.emailAuth = dto.getEmailAuth();
         this.empExt = dto.getEmpExt();
     }
+
 }

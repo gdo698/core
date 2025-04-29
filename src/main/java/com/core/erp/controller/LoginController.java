@@ -1,5 +1,6 @@
 package com.core.erp.controller;
 
+import com.core.erp.config.CustomUserDetails;
 import com.core.erp.domain.EmployeeEntity;
 import com.core.erp.dto.LoginDTO;
 import com.core.erp.service.LoginService;
@@ -9,6 +10,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -43,6 +48,30 @@ public class LoginController {
         // 로그인 성공
         if (result == ResultStatus.SUCCESS) {
             EmployeeEntity employee = (EmployeeEntity) session.getAttribute("loginEmployee");
+
+            String role = switch (employee.getDepartment().getDeptId()) {
+                case 13 -> "ROLE_OWNER";  // 점주
+                case 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 -> "ROLE_HQ"; // 본사
+                default -> "ROLE_UNKNOWN";
+            };
+
+            // 👇 인증 객체 수동 생성
+            CustomUserDetails userDetails = new CustomUserDetails(
+                    employee.getStore() != null ? employee.getStore().getStoreId() : null,
+                    employee.getDepartment() != null ? employee.getDepartment().getDeptId() : null,
+                    employee.getLoginId(),
+                    employee.getLoginPwd(),
+                    List.of(new SimpleGrantedAuthority(role)) // 또는 권한이 있으면 SimpleGrantedAuthority 리스트로 전달
+            );
+
+            UsernamePasswordAuthenticationToken auth =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+            // 👇 SecurityContextHolder에 인증 객체 등록
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+
             Map<String, Object> response = new HashMap<>();
             response.put("message", "로그인 성공");
             response.put("workType", employee.getWorkType());

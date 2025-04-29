@@ -17,12 +17,19 @@ import java.time.LocalDateTime;
 public class PartTimerEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "part_timer_id")
     private int partTimerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
     private StoreEntity store;
+
+    @Column(name = "position", nullable = false, length = 50)
+    private String position;
+
+    @Column(name = "work_type", nullable = false, length = 50)
+    private String workType;
 
     @Column(name = "part_name", nullable = false, length = 50)
     private String partName;
@@ -63,10 +70,26 @@ public class PartTimerEntity {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
     // DTO → Entity 변환 생성자
-    public PartTimerEntity(PartTimerDTO dto) {
+    public PartTimerEntity(PartTimerDTO dto, StoreEntity store) {
         this.partTimerId = dto.getPartTimerId();
-        // store는 별도 매핑 필요
+        this.store = store;
+        this.position = dto.getPosition();
+        this.workType = dto.getWorkType();
         this.partName = dto.getPartName();
         this.partGender = dto.getPartGender();
         this.partPhone = dto.getPartPhone();
@@ -80,5 +103,8 @@ public class PartTimerEntity {
         this.accountNumber = dto.getAccountNumber();
         this.partStatus = dto.getPartStatus();
         this.createdAt = dto.getCreatedAt();
+    }
+
+    public void setPartImg(String uploadedPath) {
     }
 }
