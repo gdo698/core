@@ -3,12 +3,17 @@ package com.core.erp.controller;
 import com.core.erp.dto.ProductDTO;
 import com.core.erp.dto.ProductDetailResponseDTO;
 import com.core.erp.dto.ProductUpdateRequestDTO;
+import com.core.erp.dto.ProductRegisterRequestDTO;
 import com.core.erp.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
@@ -38,5 +43,17 @@ public class ProductController {
         return "/product" + System.currentTimeMillis() + ".jpg";
     }
 
-
+    @PostMapping
+    public ResponseEntity<?> registerProduct(@ModelAttribute ProductRegisterRequestDTO dto) {
+        try {
+            int productId = productService.registerProduct(dto);
+            Map<String, Object> result = new HashMap<>();
+            result.put("productId", productId);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("등록 실패");
+        }
+    }
 }

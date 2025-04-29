@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class ProductEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id")
     private int productId;
 
@@ -58,7 +59,7 @@ public class ProductEntity {
 
     // DTO → Entity 변환 생성자
     public ProductEntity(ProductDTO dto) {
-        this.productId = dto.getProductId();
+        // this.productId = dto.getProductId(); // 신규 등록 시 productId는 세팅하지 않음
         // category는 별도로 매핑 필요
         this.proName = dto.getProName();
         this.proBarcode = dto.getProBarcode();

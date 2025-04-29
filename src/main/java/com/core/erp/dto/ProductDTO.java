@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @ToString
 public class ProductDTO {
 
-    private int productId;
+    private int productId; // 신규 등록 시에는 세팅하지 않음 (DB에서 자동 할당)
     private Integer categoryId; // category FK (id만 관리)
     private String proName;
     private Long proBarcode;

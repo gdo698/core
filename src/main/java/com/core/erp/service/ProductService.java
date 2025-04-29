@@ -3,6 +3,7 @@ package com.core.erp.service;
 import com.core.erp.domain.*;
 import com.core.erp.dto.ProductDTO;
 import com.core.erp.dto.ProductDetailResponseDTO;
+import com.core.erp.dto.ProductRegisterRequestDTO;
 import com.core.erp.dto.ProductUpdateRequestDTO;
 import com.core.erp.repository.*;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
 
 @Service
 public class ProductService {
@@ -187,4 +194,58 @@ public class ProductService {
         detail.setStorageMethod(dto.getStorageMethod());
         productDetailsRepository.save(detail);
     }
+
+
+    public int registerProduct(ProductRegisterRequestDTO dto) {
+        // 필수값 체크
+        if (dto.getProName() == null || dto.getProBarcode() == null || dto.getCategoryId() == null
+                || dto.getProCost() == null || dto.getProSellCost() == null) {
+            throw new IllegalArgumentException("필수값 누락");
+        }
+        if (dto.getProCost() < 0 || dto.getProSellCost() < 0) {
+            throw new IllegalArgumentException("가격은 0 이상이어야 합니다.");
+        }
+
+        ProductEntity product = new ProductEntity();
+        product.setProName(dto.getProName());
+        product.setProBarcode(Long.valueOf(dto.getProBarcode()));
+        product.setProCost(dto.getProCost());
+        product.setProSellCost(dto.getProSellCost());
+        product.setProStockLimit(dto.getProStockLimit() != null ? dto.getProStockLimit() : 0);
+        product.setIsPromo(0); // 기본값: 판매중
+        product.setProImage(null); // 일단 null, 아래에서 처리
+        product.setCategory(categoryRepository.findById(dto.getCategoryId()).orElseThrow());
+        product.setProCreatedAt(java.time.LocalDateTime.now());
+
+        // 이미지 파일 저장 (임시: /uploads/폴더에 저장, 실제 S3 연동 시 이 부분만 교체)
+        if (dto.getProImage() != null && !dto.getProImage().isEmpty()) {
+            try {
+                String uploadDir = "uploads/";
+                Files.createDirectories(Paths.get(uploadDir));
+                String fileName = System.currentTimeMillis() + "_" + dto.getProImage().getOriginalFilename();
+                Files.copy(dto.getProImage().getInputStream(), Paths.get(uploadDir + fileName), StandardCopyOption.REPLACE_EXISTING);
+                product.setProImage("/uploads/" + fileName);
+            } catch (Exception e) {
+                throw new RuntimeException("이미지 저장 실패");
+            }
+        }
+
+        productRepository.save(product);
+
+        // 부가정보 저장
+        if (dto.getManufacturer() != null || dto.getManuNum() != null || dto.getShelfLife() != null
+                || dto.getAllergens() != null || dto.getStorageMethod() != null) {
+            ProductDetailsEntity detail = new ProductDetailsEntity();
+            detail.setProduct(product);
+            detail.setManufacturer(dto.getManufacturer());
+            detail.setManuNum(dto.getManuNum());
+            detail.setShelfLife(dto.getShelfLife());
+            detail.setAllergens(dto.getAllergens());
+            detail.setStorageMethod(dto.getStorageMethod());
+            productDetailsRepository.save(detail);
+        }
+
+        return product.getProductId();
+    }
+
 }

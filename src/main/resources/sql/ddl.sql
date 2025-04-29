@@ -80,7 +80,7 @@ CREATE TABLE `employee` (
 );
 
 CREATE TABLE `product` (
-                           `product_id` int NOT NULL COMMENT 'autoincrement',
+                           `product_id` int NOT NULL AUTO_INCREMENT COMMENT 'autoincrement',
                            `category_id` int NOT NULL COMMENT '자동생성 , 카테고리 id',
                            `pro_name` varchar(255) NOT NULL COMMENT '제품 이름',
                            `pro_barcode` bigint NOT NULL COMMENT '바코드 넘버',
@@ -89,7 +89,7 @@ CREATE TABLE `product` (
                            `pro_created_at` DATETIME NOT NULL COMMENT '생성했을때 시각',
                            `pro_update_at` DATETIME NULL COMMENT '수정했을때 시각',
                            `pro_image` varchar(225) NULL COMMENT '이미지 링크',
-                           `is_promo`	TINYINT		NULL	COMMENT '1기본 2 이벤트 3 이벤트',
+                           `is_promo`	TINYINT	NULL	COMMENT '1기본 2 이벤트 3 이벤트',
                            `pro_stock_limit` int NOT NULL COMMENT '발주임계치',
                            PRIMARY KEY (`product_id`),
                            FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`)
