@@ -27,7 +27,8 @@ public class ProductDTO {
     private String status;    // 상태
     private MultipartFile file;
     private int proStockLimit;
-
+    private String categoryName;
+    private LocalDateTime recentStockInDate;
     // Entity → DTO 변환 생성자
     public ProductDTO(ProductEntity entity) {
         this.productId = entity.getProductId();

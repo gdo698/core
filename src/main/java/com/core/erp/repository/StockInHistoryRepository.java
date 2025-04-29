@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface StockInHistoryRepository extends JpaRepository<StockInHistoryEntity, Long> {
     List<StockInHistoryEntity> findTop3ByProduct_ProductIdOrderByInDateDesc(int productId);
+    StockInHistoryEntity findTop1ByProduct_ProductIdOrderByInDateDesc(int productId);
 }

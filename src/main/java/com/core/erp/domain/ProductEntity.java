@@ -50,6 +50,12 @@ public class ProductEntity {
     @Column(name = "pro_stock_limit")
     private int proStockLimit;
 
+    @Column(name = "event_start")
+    private LocalDateTime eventStart;
+
+    @Column(name = "event_end")
+    private LocalDateTime eventEnd;
+
     // DTO → Entity 변환 생성자
     public ProductEntity(ProductDTO dto) {
         this.productId = dto.getProductId();
