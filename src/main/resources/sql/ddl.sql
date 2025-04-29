@@ -90,6 +90,7 @@ CREATE TABLE `product` (
                            `pro_update_at` DATETIME NULL COMMENT '수정했을때 시각',
                            `pro_image` varchar(225) NULL COMMENT '이미지 링크',
                            `is_promo`	TINYINT		NULL	COMMENT '1기본 2 이벤트 3 이벤트',
+                           `pro_stock_limit` int NOT NULL COMMENT '발주임계치',
                            PRIMARY KEY (`product_id`),
                            FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`)
 );

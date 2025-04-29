@@ -47,6 +47,9 @@ public class ProductEntity {
     @Column(name = "is_promo")
     private Integer isPromo;
 
+    @Column(name = "pro_stock_limit")
+    private int proStockLimit;
+
     // DTO → Entity 변환 생성자
     public ProductEntity(ProductDTO dto) {
         this.productId = dto.getProductId();
@@ -59,5 +62,6 @@ public class ProductEntity {
         this.proUpdateAt = dto.getProUpdateAt();
         this.proImage = dto.getProImage();
         this.isPromo = dto.getIsPromo();
+        this.proStockLimit = dto.getProStockLimit();
     }
 }
