@@ -8,6 +8,9 @@ import com.core.erp.dto.ProductUpdateRequestDTO;
 import com.core.erp.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,7 +35,7 @@ public class ProductService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    // 전체 제품 목록
+    // 전체 제품 목록 (기존 메서드)
     public List<ProductDTO> getAllProducts() {
         List<ProductEntity> products = productRepository.findAll();
         List<ProductDTO> result = new ArrayList<>();
@@ -73,6 +76,51 @@ public class ProductService {
             result.add(dto);
         }
         return result;
+    }
+
+    // 페이징된 제품 목록
+    public Page<ProductDTO> getPagedProducts(Pageable pageable) {
+        Page<ProductEntity> productPage = productRepository.findAll(pageable);
+        List<ProductDTO> productDTOs = new ArrayList<>();
+        
+        for (ProductEntity p : productPage.getContent()) {
+            Integer stock = storeStockRepository.sumStockByProductId(Long.valueOf(p.getProductId()));
+            if (stock == null) stock = 0;
+
+            // isPromo 값에 따라 상태 결정
+            String status;
+            if (p.getIsPromo() != null) {
+                switch (p.getIsPromo()) {
+                    case 1: status = "단종"; break;
+                    case 2: status = "1+1 이벤트"; break;
+                    case 3: status = "2+1 이벤트"; break;
+                    default: status = "판매중";
+                }
+            } else {
+                status = "판매중";
+            }
+
+            ProductDTO dto = new ProductDTO(p);
+            dto.setProStock(stock);
+            dto.setStatus(status);
+
+            // 카테고리 이름 세팅
+            if (p.getCategory() != null) {
+                dto.setCategoryName(p.getCategory().getCategoryName());
+            }
+
+            // 최근 입고일 조회
+            StockInHistoryEntity recentStockIn = stockInHistoryRepository.findTop1ByProduct_ProductIdOrderByInDateDesc(p.getProductId());
+            if (recentStockIn != null) {
+                dto.setRecentStockInDate(recentStockIn.getInDate());
+            } else {
+                dto.setRecentStockInDate(null);
+            }
+
+            productDTOs.add(dto);
+        }
+        
+        return new PageImpl<>(productDTOs, pageable, productPage.getTotalElements());
     }
 
     // 상세페이지용 상세 정보

@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.HashMap;
@@ -26,10 +29,19 @@ public class ProductController {
         return productService.getAllProducts();
     }
 
+    @GetMapping("/paged")
+    public Page<ProductDTO> getPagedProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return productService.getPagedProducts(pageable);
+    }
+
     @GetMapping("/detail/{id}")
     public ProductDetailResponseDTO getProductDetail(@PathVariable int id) {
         return productService.getProductDetail(id);
     }
+
     @PutMapping("/edit/{id}")
     public void updateProduct(@PathVariable int id, @RequestBody ProductUpdateRequestDTO dto) {
         productService.updateProduct(id, dto);
