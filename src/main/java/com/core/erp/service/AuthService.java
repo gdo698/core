@@ -50,7 +50,7 @@ public class AuthService {
         String branchName = user.getStore() != null ? user.getStore().getStoreName() : null;
 
         // 9. AuthResponse 객체 생성 후 반환
-        return new AuthResponse(token, branchName, workType);
+        return new AuthResponse(token, branchName, workType, user.getEmpName());
     }
 
     // 부서에 따른 역할 결정

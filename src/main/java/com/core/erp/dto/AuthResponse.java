@@ -7,8 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public class AuthResponse {
     private String accessToken;
-    private String branchName;
+    private String branchName; // 지점명
     private int workType;
+    private String name;       // emp_name
 
 }
 

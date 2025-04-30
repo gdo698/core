@@ -22,10 +22,10 @@ public class EmployeeService {
 
         // 로그인 시 Employee 엔티티 조회
         EmployeeEntity employee = employeeRepository.findByLoginIdAndLoginPwd(loginId, loginPwd);
-
         if (employee != null) {
             result.put("workType", 3);
             result.put("message", "로그인 성공");
+            result.put("name", employee.getEmpName());
 
             // employee 엔티티에서 store 객체 가져오기
             StoreEntity store = employee.getStore();  // store 필드로 StoreEntity 가져오기
