@@ -37,30 +37,38 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         // 2. 요청 헤더에서 토큰 꺼내기
         String token = resolveToken(request);
+        System.out.println("==== JwtAuthFilter ====");
+        System.out.println("Request URI: " + request.getRequestURI());
+        System.out.println("Authorization Header: " + request.getHeader("Authorization"));
+        System.out.println("Extracted Token: " + token);
 
         // 3. 토큰이 존재하고 유효하다면
-    try {
-        if (token != null && jwtProvider.validateToken(token)) {
-            // 토큰에서 정보 추출
-            Claims claims = jwtProvider.getClaims(token);
+        try {
+            if (token != null && jwtProvider.validateToken(token)) {
+                System.out.println("JWT 토큰 유효성 검사 성공");
+                // 토큰에서 정보 추출
+                Claims claims = jwtProvider.getClaims(token);
 
-            String loginId = claims.get("loginId", String.class);
-            String role = claims.get("role", String.class);
-            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
+                String loginId = claims.get("loginId", String.class);
+                String role = claims.get("role", String.class);
+                List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
 
-            // 4. 인증 객체 생성
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(loginId, null, authorities);
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                // 4. 인증 객체 생성
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(loginId, null, authorities);
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            // 5. SecurityContext에 인증 객체 저장
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                // 5. SecurityContext에 인증 객체 저장
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+                System.out.println("JWT 토큰이 없거나 유효하지 않음");
+            }
+        } catch (Exception e) {
+            System.out.println("JWT 인증 실패: " + e.getMessage());
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "JWT 유효성 검사 실패");
+            return;
         }
-    } catch (Exception e) {
-        logger.warn("JWT 인증 실패: {}", e);
-        response.sendError(HttpServletResponse.SC_FORBIDDEN, "JWT 유효성 검사 실패");
-        return;
-    }
 
         // 6. 다음 필터로 넘기기
         filterChain.doFilter(request, response);

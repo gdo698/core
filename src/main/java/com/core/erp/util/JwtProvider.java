@@ -66,9 +66,12 @@ public class JwtProvider {
     // 토큰 유효성 검증
     public boolean validateToken(String token) {
         try {
+            System.out.println("validateToken() 호출, token: " + token);
             getClaims(token);  // 파싱이 되면 유효한 토큰
             return true;
         } catch (Exception e) {
+            System.out.println("validateToken() 예외: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }
