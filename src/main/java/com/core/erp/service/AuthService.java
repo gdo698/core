@@ -17,12 +17,8 @@ public class AuthService {
     private final JwtProvider jwtProvider;
 
     public AuthResponse login(String loginId, String loginPwd) {
-        EmployeeEntity user = employeeRepository.findByLoginId(loginId);
-
-        // 1. 아이디로 사용자 조회
-        if (user == null) {
-            throw new RuntimeException("존재하지 않는 아이디입니다.");
-        }
+        EmployeeEntity user = employeeRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 아이디입니다."));
 
         // 2. 이메일 인증 여부 확인
         if (user.getEmailAuth() == null || user.getEmailAuth() != 1) {

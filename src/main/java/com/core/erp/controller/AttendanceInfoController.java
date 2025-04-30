@@ -19,10 +19,8 @@ public class AttendanceInfoController {
     @GetMapping("/my-page")
     public AttendanceInfoDTO getMyAttendanceInfo(Authentication authentication) {
         String loginId = authentication.getName(); // JWT에서 loginId 추출
-        EmployeeEntity emp = employeeRepository.findByLoginId(loginId);
-        if (emp == null) {
-            throw new RuntimeException("사원 정보 없음");
-        }
+        EmployeeEntity emp = employeeRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new RuntimeException("사원 정보 없음"));
         return attendanceInfoService.getEmployeeAttendanceInfo(emp.getEmpId());
     }
 }

@@ -1,0 +1,88 @@
+package com.core.erp.security;
+
+import com.core.erp.domain.EmployeeEntity;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Component;
+
+import java.util.*;
+
+@Component
+public class JwtTokenProvider {
+
+    private final String secretKey = "your-very-secret-key-should-be-long-enough-1234567890";
+    private final long validityInMilliseconds = 60 * 60 * 1000; // 1시간
+
+    public String createToken(EmployeeEntity employee) {
+        Claims claims = Jwts.claims().setSubject(employee.getLoginId());
+        claims.put("empId", employee.getEmpId());
+        claims.put("deptId", employee.getDepartment().getDeptId());
+        claims.put("empName", employee.getEmpName());
+        claims.put("deptName", employee.getDepartment().getDeptName());
+    
+        // role 클레임 추가
+        claims.put("role", mapDeptIdToRole(employee.getDepartment().getDeptId()));
+    
+        // storeId 추가 (null이 아닌 경우에만)
+        if (employee.getStore() != null) {
+            claims.put("storeId", employee.getStore().getStoreId());
+        } else {
+            claims.put("storeId", null);  // 명시적으로 null 포함
+        }
+
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + validityInMilliseconds);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String resolveToken(HttpServletRequest request) {
+        String bearer = request.getHeader("Authorization");
+        if (bearer != null && bearer.startsWith("Bearer ")) {
+            return bearer.substring(7);
+        }
+        return null;
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build().parseClaimsJws(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public Authentication getAuthentication(String token) {
+        Claims claims = Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build().parseClaimsJws(token).getBody();
+        String loginId = claims.getSubject();
+        Integer deptId = claims.get("deptId", Integer.class);
+        String role = mapDeptIdToRole(deptId);
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+        return new UsernamePasswordAuthenticationToken(loginId, "", authorities);
+    }
+
+    private String mapDeptIdToRole(Integer deptId) {
+        // 부서 ID → 권한명 매핑 (예시)
+        return switch (deptId) {
+            case 1 -> "NON_STORE";
+            case 2 -> "NON_HQ";
+            case 3 -> "STORE";
+            case 4, 5 -> "HQ";
+            case 6, 7 -> "HQ_PRO";
+            case 8, 9 -> "HQ_BR";
+            case 10 -> "MASTER";
+            default -> "USER";
+        };
+    }
+}
