@@ -62,23 +62,24 @@ public class AuthService {
         switch (departId) {
             case 1: // 인사팀
                 if ("차장".equals(empRole) || "부장".equals(empRole)) {
-                    return "ROLE_HR_APPROVER";
+                    return "ROLE_HR_A";  // 승인자
                 } else {
                     return "ROLE_HR";
                 }
             case 2: // 상품관리팀
-                return "ROLE_PRODUCT_MANAGER";
+                return "ROLE_PRD";
             case 3: // 지점관리팀
                 if ("차장".equals(empRole) || "부장".equals(empRole)) {
-                    return "ROLE_BRANCH_EDITOR";
+                    return "ROLE_BRC_E";
                 } else {
-                    return "ROLE_BRANCH_VIEWER";
+                    return "ROLE_BRC_V";
                 }
             case 5: // 점주
-                return "ROLE_OWNER";
+                return "ROLE_OWN";
             default:
                 throw new RuntimeException("알 수 없는 부서입니다.");
         }
+
     }
 
     // 부서 ID에 따라 사용자 유형 결정
@@ -95,6 +96,6 @@ public class AuthService {
             return 3;
         }
         // 본사 관리자일 경우
-        return 2;  // 본사
+        return 1;  // 본사
     }
 }
