@@ -3,16 +3,17 @@ package com.core.erp.controller;
 import com.core.erp.dto.PartTimerDTO;
 import com.core.erp.dto.PartTimerSearchDTO;
 import com.core.erp.service.PartTimeService;
-import com.core.erp.config.CustomUserDetails;
+import com.core.erp.util.JwtProvider;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/store/parttimer")
@@ -21,54 +22,68 @@ import lombok.extern.slf4j.Slf4j;
 public class PartTimeController {
 
     private final PartTimeService partTimerService;
+    private final JwtProvider jwtProvider;
+
+    // 🔐 JWT에서 Claims 추출
+    private Claims extractClaims(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header == null || !header.startsWith("Bearer ")) {
+            throw new RuntimeException("토큰이 존재하지 않거나 유효하지 않습니다.");
+        }
+        String token = header.substring(7);
+        return jwtProvider.getClaims(token);
+    }
 
     // 🔍 (1) 검색 조회
     @GetMapping("/search")
     public ResponseEntity<List<PartTimerDTO>> searchPartTimers(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request,
             @ModelAttribute PartTimerSearchDTO searchDTO) {
 
-        Integer storeId = userDetails.getStoreId();
-        Integer departId = userDetails.getDepartId();
-        List<PartTimerDTO> list = partTimerService.searchPartTimers(storeId, departId, searchDTO);
+        Claims claims = extractClaims(request);
+        Integer storeId = claims.get("storeId", Integer.class);
+        String role = claims.get("role", String.class);
+
+        List<PartTimerDTO> list = partTimerService.searchPartTimers(role, storeId, searchDTO);
         return ResponseEntity.ok(list);
     }
 
     // 📄 (2) 전체 조회
     @GetMapping("/list")
     public ResponseEntity<Page<PartTimerDTO>> findAllPartTimers(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-    
-        // 디버깅을 위한 로그 추가
-        if (userDetails == null) {
-            log.error("인증 정보가 없습니다.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
 
-        Integer storeId = userDetails.getStoreId();
-        Integer departId = userDetails.getDepartId();
-        Page<PartTimerDTO> list = partTimerService.findAllPartTimers(storeId, departId,page,size);
+        Claims claims = extractClaims(request);
+        Integer storeId = claims.get("storeId", Integer.class);
+        String role = claims.get("role", String.class);
+
+        Page<PartTimerDTO> list = partTimerService.findAllPartTimers(role,storeId, page, size);
         return ResponseEntity.ok(list);
     }
 
     // 📄 (3) 단일 조회
     @GetMapping("/{id}")
     public ResponseEntity<PartTimerDTO> findPartTimerById(
+            HttpServletRequest request,
             @PathVariable("id") Integer partTimerId) {
 
-        PartTimerDTO dto = partTimerService.findPartTimerById(partTimerId);
+        Claims claims = extractClaims(request);
+        Integer storeId = claims.get("storeId", Integer.class);
+        String role = claims.get("role", String.class);
+
+        PartTimerDTO dto = partTimerService.findPartTimerById(role,partTimerId, storeId);
         return ResponseEntity.ok(dto);
     }
 
     // ✏️ (4) 등록
     @PostMapping
     public ResponseEntity<String> registerPartTimer(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request,
             @RequestBody PartTimerDTO partTimerDTO) {
 
-        Integer storeId = userDetails.getStoreId();
+        Integer storeId = extractClaims(request).get("storeId", Integer.class);
         partTimerService.registerPartTimer(storeId, partTimerDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("등록 완료");
@@ -77,24 +92,29 @@ public class PartTimeController {
     // ✏️ (5) 수정
     @PutMapping("/{id}")
     public ResponseEntity<String> updatePartTimer(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request,
             @PathVariable("id") Integer partTimerId,
             @RequestBody PartTimerDTO partTimerDTO) {
 
-        Integer storeId = userDetails.getStoreId();
-        partTimerService.updatePartTimer(storeId, partTimerId, partTimerDTO);
+        Claims claims = extractClaims(request);
+        Integer storeId = claims.get("storeId", Integer.class);
+        String role = claims.get("role", String.class);
+
+        partTimerService.updatePartTimer(role, storeId,  partTimerId, partTimerDTO);
         return ResponseEntity.ok("수정 완료");
     }
 
     // 🗑 (6) 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePartTimer(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request,
             @PathVariable("id") Integer partTimerId) {
 
-        Integer storeId = userDetails.getStoreId();
-        partTimerService.deletePartTimer(storeId, partTimerId);
+        Claims claims = extractClaims(request);
+        Integer storeId = claims.get("storeId", Integer.class);
+        String role = claims.get("role", String.class);
 
+        partTimerService.deletePartTimer(role, storeId,  partTimerId);
         return ResponseEntity.ok("삭제 완료");
     }
 }

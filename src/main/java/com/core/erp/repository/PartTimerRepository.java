@@ -38,12 +38,19 @@ public interface PartTimerRepository extends JpaRepository<PartTimerEntity, Inte
             "AND (:partStatus IS NULL OR p.partStatus = :partStatus) " +
             "AND (:storeId IS NULL OR p.store.storeId = :storeId) " +
             "AND (:partTimerId IS NULL OR p.partTimerId = :partTimerId)")
+
     Page<PartTimerEntity> searchHeadquarterSide(
             @Param("partName") String partName,
             @Param("partStatus") Integer partStatus,
             @Param("storeId") Integer storeId,
             @Param("partTimerId") Integer partTimerId,
             Pageable pageable);
+
+    @Query("SELECT p FROM PartTimerEntity p " +
+            "WHERE p.store.storeId = :storeId " +
+            "AND (:partName IS NULL OR p.partName LIKE %:partName%) " +
+            "AND (:partStatus IS NULL OR p.partStatus = :partStatus) " +
+            "AND (:partTimerId IS NULL OR p.partTimerId = :partTimerId)")
 
     Page<PartTimerEntity> findByStoreStoreId(Integer storeId,Pageable pageable);
 }

@@ -5,8 +5,6 @@ import com.core.erp.util.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,6 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+
 
 import java.util.List;
 
@@ -64,6 +65,10 @@ public class SecurityConfig {
 
                         // 공지사항, 통계 등 (점주, 본사 모두 허용)
                         .requestMatchers("/hq/notice/**", "/hq/statistics/**").hasAnyRole("OWNER", "PRD", "HR", "HR_A", "BRC_V", "BRC_E")
+
+                        .requestMatchers("/api/store/notifications").hasAnyRole("OWNER", "PRD", "HR", "HR_A", "BRC_V", "BRC_E")
+
+                        .requestMatchers("/store/parttimer/**").hasAnyRole("OWNER", "PRD", "HR", "HR_A", "BRC_V", "BRC_E")
 
                         // 나머지 요청은 인증 필요
                         .anyRequest().authenticated()

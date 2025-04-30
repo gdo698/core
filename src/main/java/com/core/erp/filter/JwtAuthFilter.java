@@ -7,13 +7,15 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
 
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -37,21 +39,28 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
 
         // 3. 토큰이 존재하고 유효하다면
+    try {
         if (token != null && jwtProvider.validateToken(token)) {
             // 토큰에서 정보 추출
             Claims claims = jwtProvider.getClaims(token);
 
             String loginId = claims.get("loginId", String.class);
             String role = claims.get("role", String.class);
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
 
             // 4. 인증 객체 생성
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(loginId, null, Collections.emptyList());
+                    new UsernamePasswordAuthenticationToken(loginId, null, authorities);
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             // 5. SecurityContext에 인증 객체 저장
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
+    } catch (Exception e) {
+        logger.warn("JWT 인증 실패: {}", e);
+        response.sendError(HttpServletResponse.SC_FORBIDDEN, "JWT 유효성 검사 실패");
+        return;
+    }
 
         // 6. 다음 필터로 넘기기
         filterChain.doFilter(request, response);

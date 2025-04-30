@@ -43,14 +43,21 @@ public class AuthService {
         // 6. 사용자 정보에 workType 추가
         int workType = determineWorkType(user.getDepartment().getDeptId(), user.getEmpRole());
 
-        // 7. 토큰 발급
-        String token = jwtProvider.createToken(user.getLoginId(), role, userType);
-
-        // 8. store 객체에서 지점명 가져오기 (storeName)
+        // 7. store 객체에서 지점명 가져오기 (storeName)
         String branchName = user.getStore() != null ? user.getStore().getStoreName() : null;
 
+        // 8. store 객체에서 지점번호 가져오기 (storeId)
+        Integer storeId = (user.getStore() != null) ? user.getStore().getStoreId() : null;
+
+        // 9. employee 객체에서 유저네임 가져오기 (empname)
+        String name = user.getEmpName();
+
+        // 7. 토큰 발급
+        String token = jwtProvider.createToken(user.getLoginId(), role, userType, storeId,name, branchName);
+
+
         // 9. AuthResponse 객체 생성 후 반환
-        return new AuthResponse(token, branchName, workType, user.getEmpName());
+        return new AuthResponse(token, branchName, workType, user.getEmpName(),storeId);
     }
 
     // 부서에 따른 역할 결정

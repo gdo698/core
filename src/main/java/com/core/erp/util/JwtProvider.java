@@ -32,11 +32,16 @@ public class JwtProvider {
     }
 
     // 토큰 생성
-    public String createToken(String loginId, String role, String userType) {
+    public String createToken(String loginId, String role, String userType,
+                              Integer storeId, String name, String branchName) {
         Claims claims = Jwts.claims();
         claims.put("loginId", loginId);
         claims.put("role", role);
         claims.put("userType", userType);
+        claims.put("storeId", storeId);
+        claims.put("name", name);
+        claims.put("branchName", branchName);
+
 
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + tokenValidTime);

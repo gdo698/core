@@ -1,5 +1,7 @@
 package com.core.erp.dto;
 
+import com.core.erp.domain.StoreEntity;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,6 +12,7 @@ public class AuthResponse {
     private String branchName; // 지점명
     private int workType;
     private String name;       // emp_name
+    private Integer storeId;
 
 }
 
