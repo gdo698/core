@@ -33,7 +33,10 @@ public class AuthController {
                 "empId", employee.getEmpId(),
                 "deptId", employee.getDepartment().getDeptId(),
                 "empName", employee.getEmpName(),
-                "deptName", employee.getDepartment().getDeptName()
+                "deptName", employee.getDepartment().getDeptName(),
+                "empRole", employee.getWorkType(),
+                "storeName", employee.getStore() != null ? employee.getStore().getStoreName() : null,
+                "storeId", employee.getStore() != null ? employee.getStore().getStoreId() : null
         ));
     }
 
