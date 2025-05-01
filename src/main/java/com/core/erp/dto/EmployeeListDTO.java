@@ -10,5 +10,10 @@ public class EmployeeListDTO {
     private String empRole;
     private String empStatus;
     private String hireDate;
+    private String totalWorkDays;
+    private String daysWorked;
+    private String empEmail;
+    private String empPhone;
+    private String empExt;
     // 필요시 추가
 } 
