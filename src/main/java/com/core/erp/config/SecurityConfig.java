@@ -31,7 +31,7 @@ public class SecurityConfig {
 
     /**
      * 보안 필터 체인 설정
-     * 모든 HTTP 요청에 대한 보안 규칙을 정의합니다.
+     * 모든 HTTP 요청에 대한 보안 규칙을 정의합니다.email_token
      * 
      * @param http HttpSecurity 객체
      * @return 구성된 SecurityFilterChain
