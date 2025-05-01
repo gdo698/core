@@ -7,6 +7,7 @@ import com.core.erp.dto.PartTimerSearchDTO;
 import com.core.erp.repository.PartTimerRepository;
 import com.core.erp.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,8 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -26,14 +28,27 @@ public class PartTimeService {
 
     private final PartTimerRepository partTimerRepository;
     private final StoreRepository storeRepository;
+
     private final String uploadDir = "/upload/parttimer/";
+
+    // 역할 헬퍼 메서드
+    private boolean isStore(String role) {
+        return "STORE".equals(role);
+    }
+
+    private boolean isHQ(String role) {
+        return role != null && role.startsWith("HQ");
+    }
+
+    private boolean isMaster(String role) {
+        return "MASTER".equals(role);
+    }
 
     public List<PartTimerDTO> searchPartTimers(String role, Integer storeId, PartTimerSearchDTO searchDTO) {
         Pageable pageable = PageRequest.of(searchDTO.getPage(), searchDTO.getSize());
         Page<PartTimerEntity> result;
 
-        if ("ROLE_HQ".equals(role)) {
-            // 본사 권한: 모든 지점 검색 가능
+        if (isHQ(role)) {
             result = partTimerRepository.searchHeadquarterSide(
                     searchDTO.getPartName(),
                     searchDTO.getPartStatus(),
@@ -41,8 +56,7 @@ public class PartTimeService {
                     searchDTO.getPartTimerId(),
                     pageable
             );
-        } else if ("ROLE_OWNER".equals(role)) {
-            // 점주 권한: 본인 매장만 검색 가능
+        } else if (isStore(role) || isMaster(role)) {
             result = partTimerRepository.searchStoreSide(
                     storeId,
                     searchDTO.getPartName(),
@@ -60,10 +74,11 @@ public class PartTimeService {
     public Page<PartTimerDTO> findAllPartTimers(String role, Integer storeId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<PartTimerEntity> result;
+        log.info("role = {}, storeId = {}", role, storeId);
 
-        if ("ROLE_HQ".equals(role)) {
+        if (isHQ(role)) {
             result = partTimerRepository.findAll(pageable);
-        } else if ("ROLE_OWNER".equals(role)) {
+        } else if (isStore(role) || isMaster(role)) {
             result = partTimerRepository.findByStoreStoreId(storeId, pageable);
         } else {
             throw new RuntimeException("권한이 없습니다.");
@@ -76,7 +91,8 @@ public class PartTimeService {
         PartTimerEntity entity = partTimerRepository.findById(partTimerId)
                 .orElseThrow(() -> new RuntimeException("해당 아르바이트를 찾을 수 없습니다."));
 
-        if ("ROLE_OWNER".equals(role) && entity.getStore().getStoreId() != storeId) {
+        if ((isStore(role) || isMaster(role)) &&
+                !Objects.equals(entity.getStore().getStoreId(), storeId)) {
             throw new RuntimeException("본인 지점의 아르바이트만 조회할 수 있습니다.");
         }
 
@@ -89,6 +105,7 @@ public class PartTimeService {
                 .orElseThrow(() -> new RuntimeException("지점을 찾을 수 없습니다."));
 
         PartTimerEntity entity = new PartTimerEntity(partTimerDTO, store);
+
         String uploadedPath = uploadFile(partTimerDTO.getFile());
         if (uploadedPath != null) {
             entity.setPartImg(uploadedPath);
@@ -102,7 +119,8 @@ public class PartTimeService {
         PartTimerEntity entity = partTimerRepository.findById(partTimerId)
                 .orElseThrow(() -> new RuntimeException("해당 아르바이트를 찾을 수 없습니다."));
 
-        if ("ROLE_OWNER".equals(role) && entity.getStore().getStoreId() != storeId) {
+        if ((isStore(role) || isMaster(role)) &&
+                !Objects.equals(entity.getStore().getStoreId(), storeId)) {
             throw new RuntimeException("본인 지점의 아르바이트만 수정할 수 있습니다.");
         }
 
@@ -130,7 +148,8 @@ public class PartTimeService {
         PartTimerEntity entity = partTimerRepository.findById(partTimerId)
                 .orElseThrow(() -> new RuntimeException("해당 아르바이트를 찾을 수 없습니다."));
 
-        if ("ROLE_OWNER".equals(role) && entity.getStore().getStoreId() != storeId) {
+        if ((isStore(role) || isMaster(role)) &&
+                !Objects.equals(entity.getStore().getStoreId(), storeId)) {
             throw new RuntimeException("본인 지점의 아르바이트만 삭제할 수 있습니다.");
         }
 

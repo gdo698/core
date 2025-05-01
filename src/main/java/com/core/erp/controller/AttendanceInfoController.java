@@ -1,6 +1,7 @@
 package com.core.erp.controller;
 
 import com.core.erp.dto.AttendanceInfoDTO;
+import com.core.erp.dto.CustomPrincipal;
 import com.core.erp.dto.EmployeeDTO;
 import com.core.erp.service.AttendanceInfoService;
 import com.core.erp.domain.EmployeeEntity;
@@ -21,7 +22,9 @@ public class AttendanceInfoController {
 
     @GetMapping("/my-page")
     public Map<String, Object> getMyAttendanceInfo(Authentication authentication) {
-        String loginId = authentication.getName(); // JWT에서 loginId 추출
+        CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
+        String loginId = principal.getLoginId();
+
         EmployeeEntity emp = employeeRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new RuntimeException("사원 정보 없음"));
 

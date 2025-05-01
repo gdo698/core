@@ -1,6 +1,7 @@
 package com.core.erp.security;
 
 import com.core.erp.domain.EmployeeEntity;
+import com.core.erp.dto.CustomPrincipal;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +27,7 @@ public class JwtTokenProvider {
         claims.put("deptName", employee.getDepartment().getDeptName());
     
         // role 클레임 추가
-        claims.put("role", mapDeptIdToRole(employee.getDepartment().getDeptId()));
+        claims.put("role", "ROLE_" + mapDeptIdToRole(employee.getDepartment().getDeptId()));
     
         // storeId 추가 (null이 아닌 경우에만)
         if (employee.getStore() != null) {
@@ -46,6 +47,15 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    public Claims getClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey.getBytes())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+
     public String resolveToken(HttpServletRequest request) {
         String bearer = request.getHeader("Authorization");
         if (bearer != null && bearer.startsWith("Bearer ")) {
@@ -53,6 +63,7 @@ public class JwtTokenProvider {
         }
         return null;
     }
+
 
     public boolean validateToken(String token) {
         try {
@@ -64,13 +75,25 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build().parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(secretKey.getBytes())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
         String loginId = claims.getSubject();
         Integer deptId = claims.get("deptId", Integer.class);
-        String role = mapDeptIdToRole(deptId);
-        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
-        return new UsernamePasswordAuthenticationToken(loginId, "", authorities);
+        Integer storeId = claims.get("storeId", Integer.class);
+        String mappedRole = mapDeptIdToRole(deptId); // STORE, HQ 등
+        String authorityRole = "ROLE_" + mappedRole;
+
+        CustomPrincipal principal = new CustomPrincipal(loginId, deptId, storeId, mappedRole);
+
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(authorityRole));
+
+        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
+
 
     private String mapDeptIdToRole(Integer deptId) {
         // 부서 ID → 권한명 매핑 (예시)
