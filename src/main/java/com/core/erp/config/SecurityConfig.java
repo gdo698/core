@@ -106,7 +106,7 @@ public class SecurityConfig {
                 // 6. MASTER 권한 모든 API 접근 설정 (전체 경로 설정)
                 // ⚠️ 주의: 이 설정을 활성화하면 위의 모든 설정보다 우선 적용되어 MASTER 외 다른 역할은 접근이 제한됩니다.
                 // 만약 활성화하려면 이 설정을 맨 마지막(authenticated 위)에 위치시켜야 합니다.
-                // .requestMatchers("/**").hasRole("MASTER")
+//                .requestMatchers("/**").hasRole("MASTER")
                 
                 // 7. 그 외 모든 요청은 인증 필요 (기본 설정)
                 .anyRequest().authenticated() // 명시되지 않은 모든 URL은 인증된 사용자만 접근 가능

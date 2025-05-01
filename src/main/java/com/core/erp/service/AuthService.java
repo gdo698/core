@@ -16,11 +16,18 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
+    /**
+     * 사용자 로그인 처리 메소드
+     * @param loginId 로그인 아이디
+     * @param loginPwd 로그인 비밀번호
+     * @return 인증 응답 객체 (토큰 및 사용자 정보 포함)
+     */
     public AuthResponse login(String loginId, String loginPwd) {
+        // 1. 사용자 ID로 사용자 검색
         EmployeeEntity user = employeeRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 아이디입니다."));
 
-        // 2. 이메일 인증 여부 확인
+        // 2. 이메일 인증 확인
         if (user.getEmailAuth() == null || user.getEmailAuth() != 1) {
             throw new RuntimeException("이메일 인증이 완료되지 않았습니다.");
         }
@@ -30,75 +37,40 @@ public class AuthService {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
 
-        // 4. 사용자 role 결정
-        String role = determineRole(user.getDepartment().getDeptId(), user.getEmpRole());
-
-        // 5. 사용자 타입 결정 (본사 or 점주)
-        String userType = determineUserType(user.getDepartment().getDeptId());
-
-        // 6. 사용자 정보에 workType 추가
-        int workType = determineWorkType(user.getDepartment().getDeptId(), user.getEmpRole());
-
-        // 7. store 객체에서 지점명 가져오기 (storeName)
+        // 4. 부서 이름을 직접 권한으로 사용 (SecurityConfig와 일치)
+        String role = "ROLE_" + user.getDepartment().getDeptName();
+        
+        // 5. 사용자 타입 결정 (부서명으로 구분)
+        String userType = determineUserType(user.getDepartment().getDeptName());
+        
+        // 6. 지점명 가져오기
         String branchName = user.getStore() != null ? user.getStore().getStoreName() : null;
-
-        // 8. store 객체에서 지점번호 가져오기 (storeId)
-        Integer storeId = (user.getStore() != null) ? user.getStore().getStoreId() : null;
-
-        // 9. employee 객체에서 유저네임 가져오기 (empname)
+        
+        // 7. 지점 ID 가져오기
+        Integer storeId = user.getStore() != null ? user.getStore().getStoreId() : null;
+        
+        // 8. 사용자 이름 가져오기
         String name = user.getEmpName();
-
-        // 7. 토큰 발급
-        String token = jwtProvider.createToken(user.getLoginId(), role, userType, storeId,name, branchName);
-
-
-        // 9. AuthResponse 객체 생성 후 반환
-        return new AuthResponse(token, branchName, workType, user.getEmpName(),storeId);
+        
+        // 9. JWT 토큰 생성
+        String token = jwtProvider.createToken(loginId, role, userType, storeId, name, branchName);
+        
+        // 10. 인증 응답 객체 반환
+        return new AuthResponse(token, branchName, user.getWorkType(), name, storeId);
     }
-
-    // 부서에 따른 역할 결정
-    private String determineRole(Integer departId, String empRole) {
-        if (departId == null) {
-            throw new RuntimeException("부서 정보가 존재하지 않습니다.");
+    
+    /**
+     * 부서명에 따른 사용자 타입 결정
+     */
+    private String determineUserType(String deptName) {
+        if (deptName.startsWith("STORE") || deptName.startsWith("NON_STORE")) {
+            return "STORE";
+        } else if (deptName.startsWith("HQ") || deptName.startsWith("NON_HQ")) {
+            return "HQ";
+        } else if (deptName.equals("MASTER")) {
+            return "MASTER";
+        } else {
+            return "USER"; // 기본값
         }
-
-        switch (departId) {
-            case 1: // 인사팀
-                if ("차장".equals(empRole) || "부장".equals(empRole)) {
-                    return "ROLE_HR_A";  // 승인자
-                } else {
-                    return "ROLE_HR";
-                }
-            case 2: // 상품관리팀
-                return "ROLE_PRD";
-            case 3: // 지점관리팀
-                if ("차장".equals(empRole) || "부장".equals(empRole)) {
-                    return "ROLE_BRC_E";
-                } else {
-                    return "ROLE_BRC_V";
-                }
-            case 5: // 점주
-                return "ROLE_OWN";
-            default:
-                throw new RuntimeException("알 수 없는 부서입니다.");
-        }
-
-    }
-
-    // 부서 ID에 따라 사용자 유형 결정
-    private String determineUserType(Integer deptId) {
-        if (deptId == 5) {  // 점주일 경우
-            return "OWNER";  // 점주
-        }
-        return "HEAD_OFFICE";  // 본사 관리자
-    }
-
-    // 부서 ID와 직급에 따른 workType 결정
-    private int determineWorkType(Integer deptId, String empRole) {
-        if (deptId == 5) {  // 점주인 경우
-            return 3;
-        }
-        // 본사 관리자일 경우
-        return 1;  // 본사
     }
 }
