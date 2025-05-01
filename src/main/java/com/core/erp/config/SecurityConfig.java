@@ -4,6 +4,7 @@ import com.core.erp.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -72,6 +73,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/products/all").hasAnyRole("HQ", "HQ_HRM", "HQ_PRO", "HQ_BR", "MASTER", "STORE")
                 .requestMatchers("/api/products/paged/**").hasAnyRole("HQ", "HQ_HRM", "HQ_PRO", "HQ_BR", "MASTER", "STORE")
                 .requestMatchers("/api/products/**").hasAnyRole("HQ", "HQ_HRM", "HQ_PRO", "HQ_BR", "MASTER", "STORE")
+                .requestMatchers("/api/products/register").hasAnyRole("HQ", "HQ_HRM", "HQ_PRO", "HQ_BR", "STORE")
                 
                 // 3. 점주 전용 API
                 .requestMatchers("/api/store/**").hasAnyRole("STORE", "MASTER") // 점주와 마스터 권한만 접근 가능
@@ -88,9 +90,19 @@ public class SecurityConfig {
                 // 4.3 지점 관리 기능 
                 .requestMatchers("/api/headquarters/branches/**").hasAnyRole("HQ_BR_M", "MASTER") // 팀장급만 접근 가능
                 
-                // 4.4 게시판 기능
-                .requestMatchers("/api/headquarters/board/write/**").hasAnyRole("HQ_BR", "HQ_BR_M", "MASTER") // 작성/수정/삭제
-                .requestMatchers("/api/headquarters/board/**").hasAnyRole("HQ", "HQ_HRM", "HQ_PRO", "HQ_BR", "MASTER") // 전체 조회
+                // 4.4 게시판 기능 - 모든 역할 명시적 허용
+                // 게시글 GET 조회는 모든 인증된 사용자(본사 및 점주) 허용
+                .requestMatchers(HttpMethod.GET, "/api/headquarters/board/**")
+                    .hasAnyRole("HQ", "HQ_HRM", "HQ_HRM_M", "HQ_PRO", "HQ_PRO_M", "HQ_BR", "HQ_BR_M", "MASTER", "STORE", "NON_STORE", "NON_HQ")
+                
+                // 건의사항, 점포문의사항은 모든 인증된 사용자가 등록 가능
+                .requestMatchers(HttpMethod.POST, "/api/headquarters/board/**")
+                    .hasAnyRole("HQ", "HQ_HRM", "HQ_HRM_M", "HQ_PRO", "HQ_PRO_M", "HQ_BR", "HQ_BR_M", "MASTER", "STORE", "NON_STORE", "NON_HQ")
+                
+                // 공지사항 관리(등록/수정/삭제)와 답변 관리는 지점관리팀과 마스터만 가능
+                .requestMatchers(HttpMethod.PUT, "/api/headquarters/board/**").hasAnyRole("HQ_BR", "HQ_BR_M", "MASTER")
+                .requestMatchers(HttpMethod.DELETE, "/api/headquarters/board/**").hasAnyRole("HQ_BR", "HQ_BR_M", "MASTER")
+                .requestMatchers(HttpMethod.POST, "/api/headquarters/board/comment/**").hasAnyRole("HQ_BR", "HQ_BR_M", "MASTER")
                 
                 // 4.5 공지사항, 통계 등 (점주, 본사 모두 허용)
                 .requestMatchers("/api/headquarters/notice/**", "/api/headquarters/statistics/**")

@@ -17,6 +17,7 @@ public class TblBoardPostsEntity {
 
     @Id
     @Column(name = "post_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int postId;
 
     @ManyToOne(fetch = FetchType.LAZY)

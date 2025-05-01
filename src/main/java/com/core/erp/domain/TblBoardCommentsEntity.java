@@ -17,6 +17,7 @@ public class TblBoardCommentsEntity {
 
     @Id
     @Column(name = "comment_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int commentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
