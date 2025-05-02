@@ -91,6 +91,24 @@ public class BoardService {
         return dto;
     }
     
+    // 최근 게시글 조회 (위젯용)
+    public List<BoardPostResponseDTO> getRecentPosts(int limit) {
+        List<TblBoardPostsEntity> recentPosts = boardPostsRepository.findTop4ByOrderByBoardCreatedAtDesc();
+        
+        List<BoardPostResponseDTO> result = new ArrayList<>();
+        for (TblBoardPostsEntity post : recentPosts) {
+            BoardPostResponseDTO dto = new BoardPostResponseDTO(post);
+            boolean hasComment = boardCommentsRepository.existsByPost(post);
+            dto.setHasComment(hasComment);
+            
+            // 댓글 정보는 위젯에서 표시하지 않으므로 빈 리스트로 설정
+            dto.setComments(new ArrayList<>());
+            result.add(dto);
+        }
+        
+        return result;
+    }
+    
     // 게시글 등록
     @Transactional
     public BoardPostResponseDTO createBoardPost(TblBoardPostsDTO dto, String loginId) {

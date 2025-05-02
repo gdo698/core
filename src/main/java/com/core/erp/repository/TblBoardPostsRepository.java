@@ -2,6 +2,7 @@
 package com.core.erp.repository;
 
 import com.core.erp.domain.TblBoardPostsEntity;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,4 +21,15 @@ public interface TblBoardPostsRepository extends JpaRepository<TblBoardPostsEnti
            "GROUP BY p.postId " +
            "ORDER BY p.boardCreatedAt DESC")
     List<Object[]> findByBoardTypeWithCommentStatus(@Param("boardType") int boardType);
+    
+    // 최근 게시글 4개 조회 (위젯용)
+    List<TblBoardPostsEntity> findTop4ByOrderByBoardCreatedAtDesc();
+    
+    // 대시보드 위젯을 위한 모든 게시판에서 최근 게시글 n개 조회
+    @Query("SELECT p FROM TblBoardPostsEntity p ORDER BY p.boardCreatedAt DESC")
+    List<TblBoardPostsEntity> findRecentPostsForDashboard(Pageable pageable);
+    
+    // 대시보드 위젯을 위한 게시판 타입별 최근 게시글 조회
+    @Query("SELECT p FROM TblBoardPostsEntity p WHERE p.boardType IN :boardTypes ORDER BY p.boardCreatedAt DESC")
+    List<TblBoardPostsEntity> findRecentPostsByBoardTypes(@Param("boardTypes") List<Integer> boardTypes, Pageable pageable);
 }

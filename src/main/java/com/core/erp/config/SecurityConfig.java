@@ -95,6 +95,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/headquarters/board/**")
                     .hasAnyRole("HQ", "HQ_HRM", "HQ_HRM_M", "HQ_PRO", "HQ_PRO_M", "HQ_BR", "HQ_BR_M", "MASTER", "STORE", "NON_STORE", "NON_HQ")
                 
+                // 게시판 최근 게시글 조회 API (위젯용)
+                .requestMatchers("/api/headquarters/board/recent")
+                    .hasAnyRole("HQ", "HQ_HRM", "HQ_HRM_M", "HQ_PRO", "HQ_PRO_M", "HQ_BR", "HQ_BR_M", "MASTER", "STORE", "NON_STORE", "NON_HQ")
+                
                 // 건의사항, 점포문의사항은 모든 인증된 사용자가 등록 가능
                 .requestMatchers(HttpMethod.POST, "/api/headquarters/board/**")
                     .hasAnyRole("HQ", "HQ_HRM", "HQ_HRM_M", "HQ_PRO", "HQ_PRO_M", "HQ_BR", "HQ_BR_M", "MASTER", "STORE", "NON_STORE", "NON_HQ")

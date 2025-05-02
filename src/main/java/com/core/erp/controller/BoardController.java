@@ -31,6 +31,12 @@ public class BoardController {
         return ResponseEntity.ok(boardService.getBoardPost(postId));
     }
 
+    // 게시판 최근 게시글 조회 (위젯용)
+    @GetMapping("/recent")
+    public ResponseEntity<List<BoardPostResponseDTO>> getRecentPosts() {
+        return ResponseEntity.ok(boardService.getRecentPosts(4)); // 최근 4개 게시글
+    }
+
     // 게시글 등록
     @PostMapping("/write")
     public ResponseEntity<BoardPostResponseDTO> createBoardPost(
