@@ -29,11 +29,13 @@ public class JwtTokenProvider {
         // role 클레임 추가
         claims.put("role", "ROLE_" + mapDeptIdToRole(employee.getDepartment().getDeptId()));
     
-        // storeId 추가 (null이 아닌 경우에만)
+        // store 정보 추가 (null이 아닌 경우에만)
         if (employee.getStore() != null) {
             claims.put("storeId", employee.getStore().getStoreId());
+            claims.put("storeName", employee.getStore().getStoreName());
         } else {
-            claims.put("storeId", null);  // 명시적으로 null 포함
+            claims.put("storeId", null);
+            claims.put("storeName", null);
         }
 
         Date now = new Date();
@@ -95,7 +97,7 @@ public class JwtTokenProvider {
     }
 
 
-    private String mapDeptIdToRole(Integer deptId) {
+    public String mapDeptIdToRole(Integer deptId) {
         // 부서 ID → 권한명 매핑 (예시)
         return switch (deptId) {
             case 1 -> "NON_STORE";

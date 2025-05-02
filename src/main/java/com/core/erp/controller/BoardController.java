@@ -6,9 +6,11 @@ import com.core.erp.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/headquarters/board")
@@ -22,48 +24,84 @@ public class BoardController {
     public ResponseEntity<List<BoardPostResponseDTO>> getBoardPosts(@PathVariable int boardType) {
         return ResponseEntity.ok(boardService.getBoardPostsByType(boardType));
     }
-    
+
     // 게시글 단일 조회
     @GetMapping("/post/{postId}")
     public ResponseEntity<BoardPostResponseDTO> getBoardPost(@PathVariable int postId) {
         return ResponseEntity.ok(boardService.getBoardPost(postId));
     }
-    
+
     // 게시글 등록
     @PostMapping("/write")
     public ResponseEntity<BoardPostResponseDTO> createBoardPost(
             @RequestBody TblBoardPostsDTO dto,
             Authentication authentication) {
-        String loginId = authentication.getName();
+
+        // CustomPrincipal 객체에서 loginId 추출
+        String loginId;
+        if (authentication.getPrincipal() instanceof CustomPrincipal) {
+            CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
+            loginId = principal.getLoginId();
+        } else {
+            loginId = authentication.getName();
+        }
+
         return ResponseEntity.ok(boardService.createBoardPost(dto, loginId));
     }
-    
+
     // 게시글 수정
     @PutMapping("/write/{postId}")
     public ResponseEntity<BoardPostResponseDTO> updateBoardPost(
             @PathVariable int postId,
             @RequestBody TblBoardPostsDTO dto,
             Authentication authentication) {
-        String loginId = authentication.getName();
+
+        // CustomPrincipal 객체에서 loginId 추출
+        String loginId;
+        if (authentication.getPrincipal() instanceof CustomPrincipal) {
+            CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
+            loginId = principal.getLoginId();
+        } else {
+            loginId = authentication.getName();
+        }
+
         return ResponseEntity.ok(boardService.updateBoardPost(postId, dto, loginId));
     }
-    
+
     // 게시글 삭제
     @DeleteMapping("/write/{postId}")
     public ResponseEntity<Void> deleteBoardPost(
             @PathVariable int postId,
             Authentication authentication) {
-        String loginId = authentication.getName();
+
+        // CustomPrincipal 객체에서 loginId 추출
+        String loginId;
+        if (authentication.getPrincipal() instanceof CustomPrincipal) {
+            CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
+            loginId = principal.getLoginId();
+        } else {
+            loginId = authentication.getName();
+        }
+
         boardService.deleteBoardPost(postId, loginId);
         return ResponseEntity.noContent().build();
     }
-    
+
     // 게시글 답변 등록
     @PostMapping("/comment")
     public ResponseEntity<BoardCommentResponseDTO> createBoardComment(
             @RequestBody TblBoardCommentsDTO dto,
             Authentication authentication) {
-        String loginId = authentication.getName();
+
+        // CustomPrincipal 객체에서 loginId 추출
+        String loginId;
+        if (authentication.getPrincipal() instanceof CustomPrincipal) {
+            CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
+            loginId = principal.getLoginId();
+        } else {
+            loginId = authentication.getName();
+        }
+
         return ResponseEntity.ok(boardService.createBoardComment(dto, loginId));
     }
 }

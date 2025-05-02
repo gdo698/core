@@ -106,7 +106,7 @@ public class SecurityConfig {
                 
                 // 4.5 공지사항, 통계 등 (점주, 본사 모두 허용)
                 .requestMatchers("/api/headquarters/notice/**", "/api/headquarters/statistics/**")
-                    .hasAnyRole("STORE", "HQ", "HQ_HRM", "HQ_PRO", "HQ_BR", "MASTER")
+                .hasAnyRole("STORE", "HQ", "HQ_HRM", "HQ_PRO", "HQ_BR", "MASTER")
                 
                 // 5. 점포 관련 API - 구체적인 경로 지정
                 .requestMatchers("/api/store/notifications/**").hasAnyRole("STORE", "MASTER")

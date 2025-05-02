@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -28,16 +29,25 @@ public class AuthController {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
         String token = jwtTokenProvider.createToken(employee);
-        return ResponseEntity.ok(Map.of(
-                "token", token,
-                "empId", employee.getEmpId(),
-                "deptId", employee.getDepartment().getDeptId(),
-                "empName", employee.getEmpName(),
-                "deptName", employee.getDepartment().getDeptName(),
-                "empRole", employee.getWorkType(),
-                "storeName", employee.getStore() != null ? employee.getStore().getStoreName() : null,
-                "storeId", employee.getStore() != null ? employee.getStore().getStoreId() : null
-        ));
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", token);
+        response.put("empId", employee.getEmpId());
+        response.put("deptId", employee.getDepartment().getDeptId());
+        response.put("empName", employee.getEmpName());
+        response.put("deptName", employee.getDepartment().getDeptName());
+        response.put("role", "ROLE_" + jwtTokenProvider.mapDeptIdToRole(employee.getDepartment().getDeptId()));
+        
+        // 매장 정보가 있는 경우 추가
+        if (employee.getStore() != null) {
+            response.put("storeId", employee.getStore().getStoreId());
+            response.put("storeName", employee.getStore().getStoreName());
+        } else {
+            response.put("storeId", null);
+            response.put("storeName", null);
+        }
+        
+        return ResponseEntity.ok(response);
     }
 
     @Data
