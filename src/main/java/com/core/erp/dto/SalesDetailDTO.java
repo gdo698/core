@@ -19,6 +19,7 @@ public class SalesDetailDTO {
     private Integer  finalAmount;
     private Integer  costPrice;
     private Integer  realIncome;
+    private Integer isPromo;
 
     // Entity → DTO 변환 생성자
     public SalesDetailDTO(SalesDetailEntity entity) {
@@ -31,6 +32,7 @@ public class SalesDetailDTO {
         this.finalAmount = entity.getFinalAmount();
         this.costPrice = entity.getCostPrice();
         this.realIncome = entity.getRealIncome();
+        this.isPromo = entity.getIsPromo();
     }
 
 }

@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public class InventoryStatisticsEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "stats_id")
     private int statsId;
 

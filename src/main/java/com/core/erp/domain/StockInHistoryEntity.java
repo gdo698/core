@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class StockInHistoryEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "history_id")
     private int historyId;
 

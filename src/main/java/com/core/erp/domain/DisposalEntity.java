@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class DisposalEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "disposal_id")
     private int disposalId;
 

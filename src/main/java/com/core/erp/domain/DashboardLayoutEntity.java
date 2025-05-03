@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class DashboardLayoutEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "layout_id")
     private int layoutId;
 

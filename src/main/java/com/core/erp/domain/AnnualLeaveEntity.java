@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class AnnualLeaveEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "leave_id")
     private int leaveId;
 

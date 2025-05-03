@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class AnomalyDetectionEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "anomaly_id")
     private int anomalyId;
 

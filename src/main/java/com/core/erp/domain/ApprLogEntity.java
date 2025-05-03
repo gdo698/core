@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class ApprLogEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "log_id")
     private int logId;
 

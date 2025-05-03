@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class EmailTokenEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "etoken_id")
     private int etokenId;
 

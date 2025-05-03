@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class ShiftScheduleEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "schedule_id")
     private int scheduleId;
 

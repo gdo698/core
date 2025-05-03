@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public class LeaveReqEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "req_id")
     private int reqId;
 

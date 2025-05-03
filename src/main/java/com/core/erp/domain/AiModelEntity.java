@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class AiModelEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "model_id")
     private int modelId;
 

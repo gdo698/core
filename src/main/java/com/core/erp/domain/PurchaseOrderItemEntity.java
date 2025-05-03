@@ -14,6 +14,7 @@ import lombok.*;
 public class PurchaseOrderItemEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "item_id")
     private int itemId;
 

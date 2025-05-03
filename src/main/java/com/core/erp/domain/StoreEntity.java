@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class StoreEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "store_id")
     private int storeId;
 

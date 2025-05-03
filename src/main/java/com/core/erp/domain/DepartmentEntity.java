@@ -14,6 +14,7 @@ import lombok.*;
 public class DepartmentEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "dept_id")
     private int deptId;
 

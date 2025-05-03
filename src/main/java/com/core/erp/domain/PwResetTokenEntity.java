@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class PwResetTokenEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "prtoken_id")
     private int prtokenId;
 

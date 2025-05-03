@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public class DemandPredictionEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "prediction_id")
     private int predictionId;
 

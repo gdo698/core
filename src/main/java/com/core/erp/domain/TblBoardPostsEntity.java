@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 public class TblBoardPostsEntity {
 
     @Id
-    @Column(name = "post_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "post_id")
     private int postId;
 
     @ManyToOne(fetch = FetchType.LAZY)

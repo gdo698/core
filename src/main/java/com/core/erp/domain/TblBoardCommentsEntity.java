@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 public class TblBoardCommentsEntity {
 
     @Id
-    @Column(name = "comment_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "comment_id")
     private int commentId;
 
     @ManyToOne(fetch = FetchType.LAZY)

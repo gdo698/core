@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public class WeatherDataEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "weather_id")
     private int weatherId;
 

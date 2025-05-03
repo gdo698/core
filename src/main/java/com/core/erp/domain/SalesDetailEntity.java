@@ -44,6 +44,9 @@ public class SalesDetailEntity {
     @Column(name = "real_income", nullable = false)
     private Integer realIncome;
 
+    @Column(name = "is_promo", nullable = false)
+    private Integer isPromo;
+
     // DTO → Entity 변환 생성자
     public SalesDetailEntity(SalesDetailDTO dto) {
         this.salesDetailId = dto.getSalesDetailId();
@@ -54,5 +57,6 @@ public class SalesDetailEntity {
         this.finalAmount = dto.getFinalAmount();
         this.costPrice = dto.getCostPrice();
         this.realIncome = dto.getRealIncome();
+        this.isPromo = dto.getIsPromo();
     }
 }
