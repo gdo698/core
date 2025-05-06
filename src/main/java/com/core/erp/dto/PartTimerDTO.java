@@ -54,6 +54,5 @@ public class PartTimerDTO {
         this.position = entity.getPosition();
         this.workType = entity.getWorkType();
 
-        // ✨ 추가 필드 매핑은 별도 가공 필요 (Entity에 없을 경우)
     }
 }

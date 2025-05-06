@@ -25,6 +25,7 @@ DROP TABLE IF EXISTS `anomaly_detection`;
 DROP TABLE IF EXISTS `purchase_order`;
 DROP TABLE IF EXISTS `inventory_statistics`;
 DROP TABLE IF EXISTS `sales_hourly`;
+DROP TABLE IF EXISTS `stock_adjust_log`;
 DROP TABLE IF EXISTS `product_details`;
 DROP TABLE IF EXISTS `product`;
 DROP TABLE IF EXISTS `weather_data`;

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -85,4 +86,16 @@ public class PartTimeController {
         partTimerService.deletePartTimer(user.getRole(), user.getStoreId(), partTimerId);
         return ResponseEntity.ok("삭제 완료");
     }
+
+    @GetMapping("/dropdown")
+    public ResponseEntity<List<PartTimerDTO>> getPartTimersForDropdown(
+            @AuthenticationPrincipal CustomPrincipal userDetails) {
+
+        Integer storeId = userDetails.getStoreId();
+        String role = userDetails.getRole();
+
+        List<PartTimerDTO> list = partTimerService.findAllByStore(storeId, role);
+        return ResponseEntity.ok(list);
+    }
+
 }

@@ -11,22 +11,24 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder
 public class ShiftScheduleDTO {
 
     private int scheduleId;
     private Integer partTimerId; // FK (id만 관리)
-    private LocalDateTime workDate;
+    private String title;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private String bgColor;
 
-    private MultipartFile file;
 
     // Entity → DTO 변환 생성자
     public ShiftScheduleDTO(ShiftScheduleEntity entity) {
         this.scheduleId = entity.getScheduleId();
         this.partTimerId = entity.getPartTimer() != null ? entity.getPartTimer().getPartTimerId() : null;
-        this.workDate = entity.getWorkDate();
+        this.title = entity.getTitle();
         this.startTime = entity.getStartTime();
         this.endTime = entity.getEndTime();
+        this.bgColor = entity.getBgColor();
     }
 }

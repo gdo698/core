@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface PartTimerRepository extends JpaRepository<PartTimerEntity, Integer> {
 
@@ -46,4 +48,11 @@ public interface PartTimerRepository extends JpaRepository<PartTimerEntity, Inte
      * - 쿼리 필요 없음: Spring Data JPA 메서드 이름 규칙으로 자동 처리됨
      */
     Page<PartTimerEntity> findByStoreStoreId(@Param("storeId") Integer storeId, Pageable pageable);
+
+    List<PartTimerEntity> findByStore_StoreId(Integer storeId);
+
+    // 근무 중인 아르바이트 목록 (storeId 기준)
+    List<PartTimerEntity> findByStore_StoreIdAndPartStatus(Integer storeId, int partStatus);
+
 }
+

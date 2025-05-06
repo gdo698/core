@@ -105,6 +105,10 @@ public class PartTimerEntity {
         this.createdAt = dto.getCreatedAt();
     }
 
+    public PartTimerDTO toDTO() {
+        return new PartTimerDTO(this);
+    }
+
     public void setPartImg(String uploadedPath) {
     }
 }

@@ -7,6 +7,7 @@ import com.core.erp.dto.PartTimerSearchDTO;
 import com.core.erp.repository.PartTimerRepository;
 import com.core.erp.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,8 +21,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
+@ToString
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PartTimeService {
@@ -176,5 +180,21 @@ public class PartTimeService {
         } catch (IOException e) {
             throw new RuntimeException("파일 업로드 실패", e);
         }
+    }
+
+    public List<PartTimerDTO> findAllByStore(Integer storeId, String role) {
+        List<PartTimerEntity> entities;
+
+        if ("ROLE_HQ".equals(role)) {
+            // 본사는 전체 조회
+            entities = partTimerRepository.findAll();
+        } else {
+            // 매장은 자기 storeId만 조회
+            entities = partTimerRepository.findByStore_StoreId(storeId);
+        }
+
+        return entities.stream()
+                .map(PartTimerEntity::toDTO)
+                .collect(Collectors.toList());
     }
 }

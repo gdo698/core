@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder
 public class ShiftScheduleEntity {
 
     @Id
@@ -24,8 +25,8 @@ public class ShiftScheduleEntity {
     @JoinColumn(name = "part_timer_id", nullable = false)
     private PartTimerEntity partTimer;
 
-    @Column(name = "work_date", nullable = false)
-    private LocalDateTime workDate;
+    @Column(name = "title", nullable = false)
+    private String title;
 
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
@@ -33,12 +34,16 @@ public class ShiftScheduleEntity {
     @Column(name = "end_time", nullable = false)
     private LocalDateTime endTime;
 
+    @Column(name = "bg_color", length = 20)
+    private String bgColor;
+
+
     // DTO → Entity 변환 생성자
     public ShiftScheduleEntity(ShiftScheduleDTO dto) {
         this.scheduleId = dto.getScheduleId();
-        // partTimer는 별도 매핑 필요
-        this.workDate = dto.getWorkDate();
+        this.title = dto.getTitle();
         this.startTime = dto.getStartTime();
         this.endTime = dto.getEndTime();
+        this.bgColor = dto.getBgColor();
     }
 }

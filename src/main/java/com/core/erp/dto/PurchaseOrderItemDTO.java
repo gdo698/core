@@ -14,6 +14,7 @@ public class PurchaseOrderItemDTO {
     private int itemId;
     private Integer orderId; // FK (id만 관리)
     private Integer productId; // FK (id만 관리)
+    private String productName;
     private int orderQuantity;
     private int unitPrice;
     private int totalPrice;
@@ -22,13 +23,12 @@ public class PurchaseOrderItemDTO {
     private int isFullyReceived;
     private Integer receivedQuantity;
 
-    private MultipartFile file;
-
     // Entity → DTO 변환 생성자
     public PurchaseOrderItemDTO(PurchaseOrderItemEntity entity) {
         this.itemId = entity.getItemId();
         this.orderId = entity.getPurchaseOrder() != null ? entity.getPurchaseOrder().getOrderId() : null;
         this.productId = entity.getProduct() != null ? entity.getProduct().getProductId() : null;
+        this.productName = entity.getProduct() != null ? entity.getProduct().getProName() : null;
         this.orderQuantity = entity.getOrderQuantity();
         this.unitPrice = entity.getUnitPrice();
         this.totalPrice = entity.getTotalPrice();
