@@ -26,7 +26,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // 인증이 필요하지 않은 경로 목록
     private final List<String> excludedPaths = Arrays.asList(
             "/api/auth/login", 
-            "/api/auth/register"
+            "/api/auth/register",
+            "/api/auth/check-email"
     );
 
     @Override

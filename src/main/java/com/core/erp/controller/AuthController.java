@@ -188,6 +188,41 @@ public class AuthController {
         return savedFileName;
     }
 
+    // 이메일 중복 확인 API
+    @PostMapping("/check-email")
+    public ResponseEntity<?> checkEmail(@RequestBody Map<String, String> request) {
+        String loginId = request.get("loginId");
+        if (loginId == null || loginId.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "available", false,
+                "message", "이메일 주소를 입력해주세요."
+            ));
+        }
+        
+        // 이메일 형식 검증 (간단한 검증)
+        if (!loginId.contains("@")) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "available", false,
+                "message", "유효한 이메일 형식이 아닙니다."
+            ));
+        }
+        
+        // 데이터베이스에서 중복 확인
+        boolean exists = employeeRepository.findByLoginId(loginId).isPresent();
+        
+        if (exists) {
+            return ResponseEntity.ok(Map.of(
+                "available", false,
+                "message", "이미 사용 중인 이메일입니다."
+            ));
+        } else {
+            return ResponseEntity.ok(Map.of(
+                "available", true,
+                "message", "사용 가능한 이메일입니다."
+            ));
+        }
+    }
+
     @Data
     public static class LoginRequest {
         private String loginId;
