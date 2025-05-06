@@ -1,0 +1,36 @@
+package com.core.pos.dto;
+
+import com.core.erp.domain.SalesTransactionEntity;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+public class SaleResponseDTO {
+
+    private Integer transactionId;
+    private Integer storeId;
+    private Integer empId;
+    private Integer totalPrice;
+    private Integer discountTotal;
+    private Integer finalAmount;
+    private String paymentMethod;
+    private LocalDateTime paidAt;
+    private Integer isRefunded;      // 환불 여부 (0: 정상, 1: 환불됨)
+
+    public SaleResponseDTO(SalesTransactionEntity entity) {
+        this.transactionId = entity.getTransactionId();
+        this.storeId = entity.getStore().getStoreId();
+        this.empId = entity.getEmployee() != null ? entity.getEmployee().getEmpId() : null;
+        this.totalPrice = entity.getTotalPrice();
+        this.discountTotal = entity.getDiscountTotal();
+        this.finalAmount = entity.getFinalAmount();
+        this.paymentMethod = entity.getPaymentMethod();
+        this.paidAt = entity.getPaidAt();
+        this.isRefunded = entity.getIsRefunded();
+    }
+}
