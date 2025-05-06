@@ -80,6 +80,20 @@ public class OrderController {
         return ResponseEntity.ok("입고 완료 처리되었습니다.");
     }
 
+    @PostMapping("/{orderId}/partial-complete")
+    public ResponseEntity<?> partialComplete(
+            @PathVariable Long orderId,
+            @RequestBody List<PartialItemDTO> itemList,
+            @AuthenticationPrincipal CustomPrincipal principal
+    ) {
+        orderService.partialComplete(orderId, itemList, principal.getStoreId(), principal.getRole());
+        return ResponseEntity.ok("부분 입고 완료");
+    }
+
+
+
+
+
     @GetMapping("/alert/pending-items")
     public ResponseEntity<List<PurchaseOrderItemDTO>> getPendingStockAlerts(
             @AuthenticationPrincipal CustomPrincipal user

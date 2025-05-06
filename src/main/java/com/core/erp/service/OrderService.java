@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -171,7 +173,7 @@ public class OrderService {
 
             stockInHistoryRepository.save(history);
 
-        // 7. 재고 증가 처리
+            // 7. 재고 증가 처리
             StoreStockEntity stock = storeStockRepository
                     .findByStore_StoreIdAndProduct_ProductId(order.getStore().getStoreId(), item.getProduct().getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("해당 매장의 재고 정보가 없습니다."));
@@ -183,4 +185,64 @@ public class OrderService {
 
     }
 
+    @Transactional
+    public void partialComplete(
+            Long orderId,
+            List<PartialItemDTO> items,
+            Integer loginStoreId,
+            String role
+    ) {
+        PurchaseOrderEntity order = purchaseOrderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("발주서가 존재하지 않습니다."));
+
+        if (!"ROLE_HQ".equals(role) && order.getStore().getStoreId() != loginStoreId) {
+            throw new SecurityException("입고 권한이 없습니다.");
+        }
+
+        boolean allReceived = true;
+
+        for (PartialItemDTO itemDto : items) {
+            PurchaseOrderItemEntity item = purchaseOrderItemRepository.findById(Long.valueOf(itemDto.getItemId()))
+                    .orElseThrow(() -> new IllegalArgumentException("발주 항목이 존재하지 않습니다."));
+
+            int inQty = itemDto.getInQuantity();
+            int orderedQty = item.getOrderQuantity();
+
+            if (inQty < orderedQty) {
+                item.setIsFullyReceived(0);
+                item.setOrderState(2); // 부분 입고
+                allReceived = false;
+            } else {
+                item.setIsFullyReceived(1);
+                item.setOrderState(1); // 입고 완료
+            }
+
+            item.setReceivedQuantity(inQty);
+            purchaseOrderItemRepository.save(item);
+
+            // 입고 이력
+            StockInHistoryEntity history = new StockInHistoryEntity();
+            history.setStore(order.getStore());
+            history.setPartTimer(null);
+            history.setProduct(item.getProduct());
+            history.setOrder(order);
+            history.setInQuantity(inQty);
+            history.setInDate(LocalDateTime.now());
+            history.setExpireDate(null);
+            history.setHistoryStatus(2);
+            stockInHistoryRepository.save(history);
+
+            // 재고 반영
+            StoreStockEntity stock = storeStockRepository
+                    .findByStore_StoreIdAndProduct_ProductId(order.getStore().getStoreId(), item.getProduct().getProductId())
+                    .orElseThrow(() -> new IllegalArgumentException("재고 정보가 없습니다."));
+
+            stock.setQuantity(stock.getQuantity() + inQty);
+            storeStockRepository.save(stock);
+        }
+
+        order.setOrderStatus(allReceived ? 1 : 2); // 1: 전체입고, 2: 부분입고
+        order.setOrderDate(LocalDateTime.now());
+        purchaseOrderRepository.save(order);
+    }
 }
