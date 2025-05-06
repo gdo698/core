@@ -1,6 +1,8 @@
 package com.core.erp.controller;
 
+import com.core.erp.domain.DepartmentEntity;
 import com.core.erp.domain.EmployeeEntity;
+import com.core.erp.repository.DepartmentRepository;
 import com.core.erp.repository.EmployeeRepository;
 import com.core.erp.security.JwtTokenProvider;
 import lombok.Data;
@@ -8,9 +10,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -18,8 +28,12 @@ import java.util.Map;
 public class AuthController {
 
     private final EmployeeRepository employeeRepository;
+    private final DepartmentRepository departmentRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    
+    // 파일 업로드 경로 설정
+    private final String uploadDir = "uploads/";
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
@@ -50,9 +64,145 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<?> register(
+            @RequestPart("data") RegisterRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file
+    ) {
+        // 이미 존재하는 아이디인지 확인
+        if (employeeRepository.findByLoginId(request.getLoginId()).isPresent()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "이미 사용 중인 아이디입니다."));
+        }
+
+        try {
+            // 회원 정보 저장
+            EmployeeEntity employee = new EmployeeEntity();
+            employee.setLoginId(request.getLoginId());
+            employee.setLoginPwd(passwordEncoder.encode(request.getLoginPwd()));
+            employee.setEmpName(request.getName());
+            employee.setEmpPhone(request.getPhoneNo());
+            
+            // 생년월일 및 성별 설정 (주민등록번호 앞 6자리 + 뒤 1자리)
+            // 생년월일 형식 변환 (yymmdd -> yyyy-mm-dd)
+            String birthDate = request.getBirthDate();
+            if (birthDate != null && birthDate.length() == 6) {
+                String year = birthDate.substring(0, 2);
+                String month = birthDate.substring(2, 4);
+                String day = birthDate.substring(4, 6);
+                
+                // 출생 연도 확인 (성별 번호로 판단)
+                String genderCode = request.getGender();
+                String fullYear;
+                if (genderCode.equals("1") || genderCode.equals("2")) {
+                    // 1900년대 출생
+                    fullYear = "19" + year;
+                } else {
+                    // 2000년대 출생
+                    fullYear = "20" + year;
+                }
+                
+                // yyyy-mm-dd 형식으로 설정
+                String formattedBirthDate = fullYear + "-" + month + "-" + day;
+                employee.setEmpBirth(formattedBirthDate);
+            } else {
+                employee.setEmpBirth("1900-01-01"); // 기본값
+            }
+            
+            // 성별 설정 (1, 3 -> 1(남자), 2, 4 -> 2(여자))
+            String genderCode = request.getGender();
+            if (genderCode != null) {
+                if (genderCode.equals("1") || genderCode.equals("3")) {
+                    employee.setEmpGender(1); // 남자
+                } else if (genderCode.equals("2") || genderCode.equals("4")) {
+                    employee.setEmpGender(2); // 여자
+                } else {
+                    employee.setEmpGender(0); // 기본값
+                }
+            } else {
+                employee.setEmpGender(0); // 기본값
+            }
+            
+            // 주소 설정
+            employee.setEmpAddr(request.getAddress());
+            
+            // 회원 유형에 따른 설정
+            if ("점주".equals(request.getEmpRole())) {
+                employee.setEmpRole("점주");
+                employee.setWorkType(3); // 점주는 3
+                // 부서 설정 (점주는 부서 ID 1)
+                DepartmentEntity department = departmentRepository.findById(1).orElse(null);
+                if (department == null) {
+                    throw new RuntimeException("부서 정보를 찾을 수 없습니다.");
+                }
+                employee.setDepartment(department);
+            } else {
+                employee.setEmpRole("본사");
+                employee.setWorkType(1); // 본사는 1
+                // 부서 설정 (본사는 부서 ID 2)
+                DepartmentEntity department = departmentRepository.findById(2).orElse(null);
+                if (department == null) {
+                    throw new RuntimeException("부서 정보를 찾을 수 없습니다.");
+                }
+                employee.setDepartment(department);
+            }
+            
+            // 파일 업로드 처리
+            if (file != null && !file.isEmpty()) {
+                String fileName = saveFile(file);
+                employee.setEmpImg(fileName);
+            }
+            
+            // 기타 필수 필드 기본값 설정
+            employee.setEmpBank(0); // 기본 은행 코드 설정
+            employee.setEmpAcount("000000000000"); // 기본 계좌번호 설정
+            employee.setEmpStatus("미승인"); // 요구사항에 따라 상태값 "1"로 설정
+            employee.setHireDate(LocalDateTime.now()); // hire_date는 null이 될 수 없으므로 현재 날짜로 설정
+            employee.setEmailAuth(1); // 이메일 인증 완료 상태
+            
+            employeeRepository.save(employee);
+            
+            return ResponseEntity.ok(Map.of("message", "회원가입이 완료되었습니다."));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(Map.of("message", "회원가입 실패: " + e.getMessage()));
+        }
+    }
+    
+    // 파일 저장 메소드
+    private String saveFile(MultipartFile file) throws IOException {
+        // 업로드 디렉토리 생성
+        File directory = new File(uploadDir);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        
+        // 파일명 생성 (중복 방지를 위해 UUID 사용)
+        String originalFilename = file.getOriginalFilename();
+        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        String savedFileName = UUID.randomUUID().toString() + extension;
+        
+        // 파일 저장
+        Path targetPath = Paths.get(uploadDir + savedFileName);
+        Files.copy(file.getInputStream(), targetPath);
+        
+        return savedFileName;
+    }
+
     @Data
     public static class LoginRequest {
         private String loginId;
         private String loginPwd;
+    }
+    
+    @Data
+    public static class RegisterRequest {
+        private String loginId;
+        private String loginPwd;
+        private String name;
+        private String birthDate;
+        private String gender;
+        private String phoneNo;
+        private String address;
+        private String empRole;
     }
 }

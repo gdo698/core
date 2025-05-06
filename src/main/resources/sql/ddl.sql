@@ -361,7 +361,7 @@ CREATE TABLE `dashboard_layout` (
 );
 
 CREATE TABLE `tbl_board_posts` (
-                                   `post_id` INT NOT NULL COMMENT '게시글 고유 번호 (기본 키)',
+                                   `post_id` INT NOT NULL AUTO_INCREMENT COMMENT '게시글 고유 번호 (기본 키)',
                                    `emp_id` int NOT NULL COMMENT '사원 고유 번호',
                                    `board_type` INT NOT NULL COMMENT '공지시항 , 건의사항, 점포문의 분리코드',
                                    `board_title` VARCHAR(255) NOT NULL COMMENT '게시글 제목',
@@ -372,7 +372,7 @@ CREATE TABLE `tbl_board_posts` (
 );
 
 CREATE TABLE `tbl_board_comments` (
-                                      `comment_id` INT NOT NULL COMMENT '답변 고유 번호 (기본 키)',
+                                      `comment_id` INT NOT NULL AUTO_INCREMENT COMMENT '답변 고유 번호 (기본 키)',
                                       `post_id` INT NOT NULL COMMENT '게시글 고유 번호 (기본 키)',
                                       `com_content` VARCHAR(255) NOT NULL COMMENT '답변 본문 내용',
                                       `com_created_at` DATETIME NOT NULL COMMENT '답변 작성 시간',
