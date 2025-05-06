@@ -23,7 +23,14 @@ public class EmployeeManagementDTO {
     private String empEmail;
     private LocalDate hireDate;
     private String empImg;
+    private String empAddr;
     
     // 프론트엔드와 호환을 위한 추가 필드
     private String deptName;
+    
+    // 점주 관련 필드
+    private String empRole;  // 구분자 (HQ: 본사직원, STORE: 점주)
+    private String storeName; // 점포명
+    private String storeAddr; // 점포 주소
+    private String storeTel;  // 점포 전화번호
 } 

@@ -15,5 +15,11 @@ public class EmployeeListDTO {
     private String empEmail;
     private String empPhone;
     private String empExt;
+    private String empAddr;
+    // 매장 정보 필드 추가
+    private Long storeId;
+    private String storeName;
+    private String storeAddr;
+    private String storeTel;
     // 필요시 추가
 } 

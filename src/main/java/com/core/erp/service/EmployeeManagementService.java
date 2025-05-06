@@ -2,10 +2,12 @@ package com.core.erp.service;
 
 import com.core.erp.domain.DepartmentEntity;
 import com.core.erp.domain.EmployeeEntity;
+import com.core.erp.domain.StoreEntity;
 import com.core.erp.dto.EmployeeListDTO;
 import com.core.erp.dto.EmployeeManagementDTO;
 import com.core.erp.repository.DepartmentRepository;
 import com.core.erp.repository.EmployeeRepository;
+import com.core.erp.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 public class EmployeeManagementService {
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
+    private final StoreRepository storeRepository;
     private final EmployeeListService employeeListService;
 
     public EmployeeManagementDTO getEmployeeById(Integer empId) {
@@ -65,6 +68,12 @@ public class EmployeeManagementService {
         }
 
         EmployeeEntity entity = convertToEntity(dto);
+        
+        // 점주인 경우 매장 정보 처리
+        if ("STORE".equals(dto.getEmpRole()) || "점주".equals(dto.getEmpRole())) {
+            handleStoreInfo(entity, dto);
+        }
+        
         EmployeeEntity savedEmployee = employeeRepository.save(entity);
         return convertToDTO(savedEmployee);
     }
@@ -76,6 +85,11 @@ public class EmployeeManagementService {
 
         // 기존 엔티티에 DTO 값 업데이트
         updateEmployeeFromDTO(existingEmployee, dto);
+        
+        // 점주인 경우 매장 정보 처리
+        if ("STORE".equals(dto.getEmpRole()) || "점주".equals(dto.getEmpRole())) {
+            handleStoreInfo(existingEmployee, dto);
+        }
         
         EmployeeEntity updatedEmployee = employeeRepository.save(existingEmployee);
         return convertToDTO(updatedEmployee);
@@ -92,6 +106,11 @@ public class EmployeeManagementService {
         entity.setEmpStatus(dto.getEmpStatus());
         entity.setEmpPhone(dto.getEmpPhone());
         entity.setLoginId(dto.getEmpEmail()); // 이메일을 로그인 ID로 사용
+        
+        // 주소 설정
+        if (dto.getEmpAddr() != null) {
+            entity.setEmpAddr(dto.getEmpAddr());
+        }
         
         // 내선번호 설정
         if (dto.getEmpExt() != null && !dto.getEmpExt().isEmpty()) {
@@ -117,11 +136,26 @@ public class EmployeeManagementService {
             entity.setHireDate(hireDateTime);
         }
         
+        // 직원 역할 설정 (본사/점주)
+        if (dto.getEmpRole() != null && !dto.getEmpRole().isEmpty()) {
+            // 'STORE'는 DB에 '점주'로 저장
+            if ("STORE".equals(dto.getEmpRole())) {
+                entity.setEmpRole("점주");
+            } else if ("HQ".equals(dto.getEmpRole())) {
+                entity.setEmpRole("본사");
+            } else {
+                entity.setEmpRole(dto.getEmpRole());
+            }
+        } else {
+            entity.setEmpRole("본사"); // 기본값은 본사 직원
+        }
+        
         // 필수 필드 기본값 설정 (신규 생성 시)
         if (dto.getEmpId() == null) {
-            entity.setEmpRole("일반");
+            if (entity.getEmpRole() == null) {
+                entity.setEmpRole("본사");
+            }
             entity.setEmpGender(0); // 기본값
-            entity.setEmpAddr(""); // 기본값
             entity.setEmpBirth(""); // 기본값
             entity.setLoginPwd("defaultPassword"); // 기본 비밀번호
             entity.setEmpBank(0); // 기본값
@@ -149,6 +183,11 @@ public class EmployeeManagementService {
             entity.setLoginId(dto.getEmpEmail());
         }
         
+        // 주소 업데이트
+        if (dto.getEmpAddr() != null) {
+            entity.setEmpAddr(dto.getEmpAddr());
+        }
+        
         // 내선번호 업데이트
         if (dto.getEmpExt() != null) {
             try {
@@ -169,6 +208,57 @@ public class EmployeeManagementService {
             LocalDateTime hireDateTime = dto.getHireDate().atTime(LocalTime.MIDNIGHT);
             entity.setHireDate(hireDateTime);
         }
+        
+        // 직원 역할 업데이트 (본사/점주)
+        if (dto.getEmpRole() != null) {
+            // 'STORE'는 DB에 '점주'로 저장
+            if ("STORE".equals(dto.getEmpRole())) {
+                entity.setEmpRole("점주");
+            } else if ("HQ".equals(dto.getEmpRole())) {
+                entity.setEmpRole("본사");
+            } else {
+                entity.setEmpRole(dto.getEmpRole());
+            }
+        }
+    }
+
+    // 점주 매장 정보 처리 메서드
+    private void handleStoreInfo(EmployeeEntity employee, EmployeeManagementDTO dto) {
+        StoreEntity store = null;
+        
+        // 기존 매장 정보가 있는지 확인
+        if (employee.getStore() != null) {
+            store = employee.getStore();
+        } else {
+            // 새 매장 생성
+            store = new StoreEntity();
+            store.setStoreCreatedAt(LocalDateTime.now());
+            store.setStoreCert(""); // 기본값
+            store.setStoreAcc(""); // 기본값
+        }
+        
+        // 매장 정보 업데이트
+        if (dto.getStoreName() != null && !dto.getStoreName().isEmpty()) {
+            store.setStoreName(dto.getStoreName());
+        } else if (store.getStoreName() == null || store.getStoreName().isEmpty()) {
+            store.setStoreName(dto.getEmpName() + "의 매장");
+        }
+        
+        if (dto.getStoreAddr() != null && !dto.getStoreAddr().isEmpty()) {
+            store.setStoreAddr(dto.getStoreAddr());
+        } else if (store.getStoreAddr() == null || store.getStoreAddr().isEmpty()) {
+            store.setStoreAddr(dto.getEmpAddr());
+        }
+        
+        if (dto.getStoreTel() != null && !dto.getStoreTel().isEmpty()) {
+            store.setStoreTel(dto.getStoreTel());
+        } else if (store.getStoreTel() == null || store.getStoreTel().isEmpty()) {
+            store.setStoreTel("02-1234-5678");
+        }
+        
+        // 매장 저장 및 직원과 연결
+        StoreEntity savedStore = storeRepository.save(store);
+        employee.setStore(savedStore);
     }
 
     private EmployeeManagementDTO convertToDTO(EmployeeEntity entity) {
@@ -179,6 +269,11 @@ public class EmployeeManagementService {
         dto.setEmpStatus(entity.getEmpStatus());
         dto.setEmpPhone(entity.getEmpPhone());
         dto.setEmpEmail(entity.getLoginId());
+        
+        // 주소 설정
+        if (entity.getEmpAddr() != null) {
+            dto.setEmpAddr(entity.getEmpAddr());
+        }
         
         // 내선번호 설정
         if (entity.getEmpExt() != null) {
@@ -194,6 +289,25 @@ public class EmployeeManagementService {
         // 입사일 설정
         if (entity.getHireDate() != null) {
             dto.setHireDate(entity.getHireDate().toLocalDate());
+        }
+        
+        // 직원 역할 설정
+        if (entity.getEmpRole() != null) {
+            // DB의 '점주'는 프론트엔드의 'STORE'로 변환
+            if ("점주".equals(entity.getEmpRole())) {
+                dto.setEmpRole("STORE");
+            } else if ("본사".equals(entity.getEmpRole())) {
+                dto.setEmpRole("HQ");
+            } else {
+                dto.setEmpRole(entity.getEmpRole());
+            }
+        }
+        
+        // 매장 정보 설정 (점주인 경우)
+        if (entity.getStore() != null) {
+            dto.setStoreName(entity.getStore().getStoreName());
+            dto.setStoreAddr(entity.getStore().getStoreAddr());
+            dto.setStoreTel(entity.getStore().getStoreTel());
         }
         
         return dto;
@@ -214,6 +328,9 @@ public class EmployeeManagementService {
         dto.setEmpPhone(listDTO.getEmpPhone() != null ? listDTO.getEmpPhone() : "");
         dto.setEmpEmail(listDTO.getEmpEmail() != null ? listDTO.getEmpEmail() : "");
         dto.setEmpExt(listDTO.getEmpExt() != null ? listDTO.getEmpExt() : "");
+        
+        // 주소 정보 설정
+        dto.setEmpAddr(listDTO.getEmpAddr() != null ? listDTO.getEmpAddr() : "");
         
         // 부서 정보 설정
         // 5. 수정: 부서 코드와 부서명 분리
@@ -250,6 +367,27 @@ public class EmployeeManagementService {
                 // 변환 실패 시 현재 날짜 사용
                 dto.setHireDate(LocalDate.now());
             }
+        }
+        
+        // 직원 역할 설정
+        if (listDTO.getEmpRole() != null) {
+            // DB의 '점주'는 프론트엔드의 'STORE'로 변환
+            if ("점주".equals(listDTO.getEmpRole())) {
+                dto.setEmpRole("STORE");
+            } else if ("본사".equals(listDTO.getEmpRole())) {
+                dto.setEmpRole("HQ");
+            } else {
+                dto.setEmpRole(listDTO.getEmpRole());
+            }
+        } else {
+            dto.setEmpRole("HQ");
+        }
+        
+        // 점주 관련 정보 설정
+        if ("STORE".equals(dto.getEmpRole())) {
+            dto.setStoreName(listDTO.getStoreName() != null ? listDTO.getStoreName() : "");
+            dto.setStoreAddr(listDTO.getStoreAddr() != null ? listDTO.getStoreAddr() : "");
+            dto.setStoreTel(listDTO.getStoreTel() != null ? listDTO.getStoreTel() : "");
         }
         
         // 7. 수정: 디버깅 로그

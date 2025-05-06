@@ -120,10 +120,21 @@ public class EmployeeListService {
         }
     }
 
-    public List<EmployeeListDTO> getEmployeeLists(String deptName, String empName, String empId, String sort, String order) {
+    public List<EmployeeListDTO> getEmployeeLists(String deptName, String empName, String empId, String sort, String order, String empType) {
         List<EmployeeEntity> employees = employeeRepository.findAll(); // 실제 환경에서는 동적 쿼리로 교체
 
         return employees.stream()
+                .filter(e -> {
+                    // empType 필터링 (HQ = 본사 직원만, STORE = 점주만)
+                    if ("HQ".equals(empType)) {
+                        // 본사 직원: empRole이 '본사'인 경우만 포함
+                        return "본사".equals(e.getEmpRole());
+                    } else if ("STORE".equals(empType)) {
+                        // 점주: empRole이 '점주'인 경우만 포함
+                        return "점주".equals(e.getEmpRole());
+                    }
+                    return true; // empType이 지정되지 않으면 모든 직원 반환
+                })
                 .filter(e -> deptName == null || deptName.isEmpty() || (e.getDepartment() != null && e.getDepartment().getDeptName() != null && e.getDepartment().getDeptName().equals(deptName)))
                 .filter(e -> empName == null || empName.isEmpty() || e.getEmpName().contains(empName))
                 .filter(e -> empId == null || empId.isEmpty() || Integer.toString(e.getEmpId()).equals(empId))
@@ -172,6 +183,17 @@ public class EmployeeListService {
                     // 내선번호 설정
                     dto.setEmpExt(e.getEmpExt() != null ? e.getEmpExt().toString() : "");
                     
+                    // 주소 정보 설정
+                    dto.setEmpAddr(e.getEmpAddr() != null ? e.getEmpAddr() : "");
+                    
+                    // 매장 정보 설정 (점주의 경우)
+                    if (e.getStore() != null) {
+                        dto.setStoreId((long) e.getStore().getStoreId());
+                        dto.setStoreName(e.getStore().getStoreName());
+                        dto.setStoreAddr(e.getStore().getStoreAddr());
+                        dto.setStoreTel(e.getStore().getStoreTel());
+                    }
+                    
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -218,6 +240,17 @@ public class EmployeeListService {
             
             // 내선번호 설정
             dto.setEmpExt(e.getEmpExt() != null ? e.getEmpExt().toString() : "");
+            
+            // 주소 정보 설정
+            dto.setEmpAddr(e.getEmpAddr() != null ? e.getEmpAddr() : "");
+            
+            // 매장 정보 설정 (점주의 경우)
+            if (e.getStore() != null) {
+                dto.setStoreId((long) e.getStore().getStoreId());
+                dto.setStoreName(e.getStore().getStoreName());
+                dto.setStoreAddr(e.getStore().getStoreAddr());
+                dto.setStoreTel(e.getStore().getStoreTel());
+            }
         } catch (Exception ex) {
             // 예외 발생 시 기본값 설정
             if (dto.getEmpName() == null) dto.setEmpName("");
@@ -230,6 +263,7 @@ public class EmployeeListService {
             if (dto.getEmpEmail() == null) dto.setEmpEmail("");
             if (dto.getEmpPhone() == null) dto.setEmpPhone("");
             if (dto.getEmpExt() == null) dto.setEmpExt("");
+            if (dto.getEmpAddr() == null) dto.setEmpAddr("");
         }
         
         return dto;

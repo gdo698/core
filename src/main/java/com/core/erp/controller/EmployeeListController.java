@@ -27,9 +27,10 @@ public class EmployeeListController {
         @RequestParam(required = false) String empName,
         @RequestParam(required = false) String empId,
         @RequestParam(defaultValue = "empId") String sort,
-        @RequestParam(defaultValue = "asc") String order
+        @RequestParam(defaultValue = "asc") String order,
+        @RequestParam(defaultValue = "HQ") String empType
     ) {
-        return employeeListService.getEmployeeLists(deptName, empName, empId, sort, order);
+        return employeeListService.getEmployeeLists(deptName, empName, empId, sort, order, empType);
     }
 
     @GetMapping("/employees/{empId}")
