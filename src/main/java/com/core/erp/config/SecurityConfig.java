@@ -39,6 +39,8 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        System.out.println("==== SecurityConfig 설정 로드 중 ====");
+        
         http
             // CSRF 보호 기능 비활성화 (REST API에서는, JWT 같은 토큰 기반 인증을 사용할 때 일반적으로 비활성화함)
             .csrf(csrf -> csrf.disable())
@@ -91,6 +93,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/employee-management/**").hasAnyRole("HQ", "HQ_HRM", "HQ_PRO", "HQ_BR", "MASTER", "STORE") // 사원 관리 API
                 .requestMatchers("/api/stores/owners").hasAnyRole("HQ", "HQ_HRM", "HQ_PRO", "HQ_BR", "MASTER", "STORE") // 점주 목록 조회 API
                 
+                // 근태 관리 API - 본사 직원만 접근 가능 (점주는 제외)
+                .requestMatchers("/api/hr/**").hasAnyRole("HQ", "HQ_HRM", "HQ_HRM_M", "HQ_PRO", "HQ_PRO_M", "HQ_BR", "HQ_BR_M", "MASTER", "STORE")
+                
                 // 4.3 지점 관리 기능 
                 .requestMatchers("/api/headquarters/branches/**").hasAnyRole("HQ_BR_M", "MASTER") // 팀장급만 접근 가능
                 
@@ -132,10 +137,15 @@ public class SecurityConfig {
                 
                 // 7. 그 외 모든 요청은 인증 필요 (기본 설정)
                 .anyRequest().authenticated() // 명시되지 않은 모든 URL은 인증된 사용자만 접근 가능
-            )
-            // JWT 인증 필터 추가 - UsernamePasswordAuthenticationFilter 이전에 실행되도록 설정
-            // 모든 요청에서 JWT 토큰을 확인하고 인증 정보를 설정함
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            );
+            
+        // 디버깅 메시지 추가
+        System.out.println("==== 근태 관리 API 설정 완료: 본사 직원만 접근 가능 ====");
+            
+        // JWT 인증 필터 추가
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        
+        System.out.println("==== SecurityConfig 설정 완료 ====");
 
         return http.build();
     }

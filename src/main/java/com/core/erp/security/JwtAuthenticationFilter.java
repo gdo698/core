@@ -42,6 +42,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         System.out.println("요청 URI: " + uri);
         System.out.println("요청 메서드: " + method);
         
+        // 근태 관리 API 추가 로깅
+        boolean isHrApiRequest = uri.startsWith("/api/hr/");
+        if (isHrApiRequest) {
+            System.out.println("===== 근태 관리 API 요청 감지 =====");
+        }
+        
         // 인증이 필요하지 않은 경로인지 확인
         boolean isExcludedPath = excludedPaths.stream().anyMatch(uri::equals);
         
@@ -68,6 +74,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .collect(Collectors.joining(", ")));
                     System.out.println("Principal 타입: " + auth.getPrincipal().getClass().getName());
                     
+                    // 근태 관리 API 접근 시 권한 확인
+                    if (isHrApiRequest) {
+                        boolean hasHqRole = auth.getAuthorities().stream()
+                            .anyMatch(a -> a.getAuthority().startsWith("ROLE_HQ"));
+                        boolean hasMasterRole = auth.getAuthorities().stream()
+                            .anyMatch(a -> a.getAuthority().equals("ROLE_MASTER"));
+                        boolean hasStoreRole = auth.getAuthorities().stream()
+                            .anyMatch(a -> a.getAuthority().equals("ROLE_STORE"));
+                        
+                        System.out.println("근태 관리 API 접근: 본사 권한 보유 = " + hasHqRole);
+                        System.out.println("근태 관리 API 접근: 마스터 권한 보유 = " + hasMasterRole);
+                        System.out.println("근태 관리 API 접근: 점주 권한 보유 = " + hasStoreRole);
+                        
+                        if (!hasHqRole && !hasMasterRole && !hasStoreRole) {
+                            System.out.println("경고: 근태 관리 API 접근 권한 없음! 403 오류 예상됨");
+                        }
+                    }
+                    
                     // 게시판 관련 API 호출 시 추가 로깅
                     if (uri.contains("/api/headquarters/board/")) {
                         System.out.println("게시판 API 접근 감지 - 상세 권한 확인");
@@ -89,5 +113,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+        
+        // 요청 처리 후 결과 로깅
+        if (isHrApiRequest) {
+            System.out.println("===== 근태 관리 API 응답 코드: " + response.getStatus() + " =====");
+        }
     }
 }

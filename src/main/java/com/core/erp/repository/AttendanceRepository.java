@@ -6,8 +6,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AttendanceRepository extends JpaRepository<AttendanceEntity, Integer> {
@@ -31,5 +33,6 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
             @Param("end") LocalDateTime end
     );
 
+    Optional<AttendanceEntity> findByEmployee_EmpIdAndAttendDate(int i, LocalDate today);
 }
 

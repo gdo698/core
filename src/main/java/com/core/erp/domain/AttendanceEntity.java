@@ -4,6 +4,7 @@ import com.core.erp.dto.AttendanceDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -36,14 +37,23 @@ public class AttendanceEntity {
     @JoinColumn(name = "store_id")
     private StoreEntity store;
 
+    @Column(name = "attend_date", nullable = true)
+    private LocalDate attendDate;
+    
     @Column(name = "work_date", nullable = false)
     private LocalDateTime workDate;
 
     @Column(name = "in_time", nullable = false)
     private LocalDateTime inTime;
+    
+    @Column(name = "check_in_time")
+    private String checkInTime;
 
     @Column(name = "out_time")
     private LocalDateTime outTime;
+    
+    @Column(name = "check_out_time")
+    private String checkOutTime;
 
     @Column(name = "attend_status", nullable = false)
     private int attendStatus;
