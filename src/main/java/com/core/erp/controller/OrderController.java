@@ -113,6 +113,31 @@ public class OrderController {
         return ResponseEntity.ok(result);
     }
 
+    @PutMapping("/update/{orderId}")
+    public ResponseEntity<?> updateOrder(
+            @PathVariable Long orderId,
+            @RequestBody OrderRequestDTO dto,
+            @AuthenticationPrincipal CustomPrincipal user
+    ) {
+        try {
+            orderService.updateOrder(orderId, user.getStoreId(), user.getRole(), dto);
+            return ResponseEntity.ok("발주 수정 완료");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("서버 오류");
+        }
+    }
+
+    @PatchMapping("/cancel/{orderId}")
+    public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId, @AuthenticationPrincipal CustomPrincipal user) {
+        orderService.cancelOrder(orderId, user.getStoreId(), user.getRole());
+        return ResponseEntity.ok().build();
+    }
+
+
 
 
 }

@@ -20,4 +20,5 @@ WHERE i.purchaseOrder.store.storeId = :storeId
 """)
     List<PurchaseOrderItemEntity> findPendingItemsByStore(@Param("storeId") Integer storeId);
 
+    void deleteByPurchaseOrder_OrderId(Long orderId);
 }
