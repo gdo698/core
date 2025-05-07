@@ -13,5 +13,7 @@ import lombok.ToString;
 @ToString
 public class AnnualLeaveRequestDTO {
     private Integer empId;
+    // private String reason;
     private String reason;
+
 } 
