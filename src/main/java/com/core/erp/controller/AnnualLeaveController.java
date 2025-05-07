@@ -16,6 +16,10 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/hr/annual-leave")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:8080", "http://127.0.0.1:3000", "http://127.0.0.1:8080"}, 
+              allowCredentials = "true", 
+              allowedHeaders = "*", 
+              methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
 public class AnnualLeaveController {
 
     @Autowired
@@ -241,6 +245,78 @@ public class AnnualLeaveController {
             Map<String, String> error = new HashMap<>();
             error.put("message", e.getMessage());
             return ResponseEntity.badRequest().body(error);
+        }
+    }
+    
+    /**
+     * 연차 신청 상태 변경 API
+     * 이미 승인/반려된 연차 신청도 상태를 변경할 수 있음
+     */
+    @PostMapping("/change-status")
+    public ResponseEntity<Map<String, Object>> changeLeaveRequestStatus(
+            @RequestParam("reqId") int reqId,
+            @RequestParam("approverEmpId") int approverEmpId,
+            @RequestParam("newStatus") int newStatus,
+            @RequestParam(value = "note", required = false) String note) {
+        
+        logger.info("===== 연차 상태 변경 API 요청 감지 =====");
+        logger.info("요청 파라미터: reqId=" + reqId + ", approverEmpId=" + approverEmpId + ", newStatus=" + newStatus + ", note=" + note);
+        
+        Map<String, Object> result = annualLeaveService.changeLeaveRequestStatus(reqId, newStatus, approverEmpId, note);
+        
+        if ((boolean) result.get("success")) {
+            logger.info("연차 상태 변경 성공: " + result);
+            return ResponseEntity.ok(result);
+        } else {
+            logger.warning("연차 상태 변경 실패: " + result);
+            return ResponseEntity.badRequest().body(result);
+        }
+    }
+    
+    /**
+     * 연차 신청에 코멘트 추가 API
+     * 상태 변경 없이 코멘트만 추가
+     */
+    @PostMapping("/add-comment")
+    public ResponseEntity<Map<String, Object>> addLeaveRequestComment(
+            @RequestParam("reqId") int reqId,
+            @RequestParam("approverEmpId") int approverEmpId,
+            @RequestParam("note") String note) {
+        
+        logger.info("===== 연차 코멘트 추가 API 요청 감지 =====");
+        logger.info("요청 파라미터: reqId=" + reqId + ", approverEmpId=" + approverEmpId + ", note=" + note);
+        
+        // 현재 상태를 조회하여 동일한 상태로 설정 (상태 변경 없음)
+        try {
+            LeaveReqEntity leaveReq = annualLeaveService.getLeaveRequestById(reqId);
+            if (leaveReq == null) {
+                logger.warning("연차 신청 정보를 찾을 수 없습니다. (ID: " + reqId + ")");
+                Map<String, Object> error = new HashMap<>();
+                error.put("success", false);
+                error.put("message", "연차 신청 정보를 찾을 수 없습니다.");
+                return ResponseEntity.status(404).body(error);
+            }
+            
+            int currentStatus = leaveReq.getReqStatus();
+            logger.info("현재 상태: " + currentStatus + ", 코멘트 추가 진행");
+            
+            // 상태 변경 없이 코멘트만 추가 (기존 상태 그대로 유지)
+            Map<String, Object> result = annualLeaveService.changeLeaveRequestStatus(reqId, currentStatus, approverEmpId, note);
+            
+            if ((boolean) result.get("success")) {
+                logger.info("코멘트 추가 성공: " + result);
+                return ResponseEntity.ok(result);
+            } else {
+                logger.warning("코멘트 추가 실패: " + result.get("message"));
+                return ResponseEntity.badRequest().body(result);
+            }
+        } catch (Exception e) {
+            logger.severe("연차 신청 ID: " + reqId + "에 코멘트 추가 실패: " + e.getMessage());
+            e.printStackTrace();
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(500).body(error);
         }
     }
 } 

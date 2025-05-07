@@ -48,11 +48,18 @@ public class SecurityConfig {
             // CORS 설정 (Cross-Origin Resource Sharing)
             .cors(cors -> cors.configurationSource(request -> {
                 CorsConfiguration config = new CorsConfiguration();
-                config.setAllowedOriginPatterns(List.of("*")); // 모든 출처 허용 (실제 운영 환경에서는 구체적인 도메인으로 제한하는 것이 좋음)
+                // 명시적 도메인 목록 설정
+                config.setAllowedOrigins(List.of(
+                    "http://localhost:3000", 
+                    "http://localhost:8080", 
+                    "http://127.0.0.1:3000", 
+                    "http://127.0.0.1:8080"
+                )); // 특정 출처 허용
                 config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용할 HTTP 메서드
                 config.setAllowedHeaders(List.of("*")); // 모든 헤더 허용
                 config.setExposedHeaders(List.of("Authorization")); // 클라이언트에 노출할 헤더
                 config.setAllowCredentials(true); // 인증 정보 포함 허용
+                config.setMaxAge(3600L); // preflight 캐시 시간 (초)
                 return config;
             }))
             
