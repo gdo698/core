@@ -103,6 +103,9 @@ public class SecurityConfig {
                 // 근태 관리 API - 본사 직원만 접근 가능 (점주는 제외)
                 .requestMatchers("/api/hr/**").hasAnyRole("HQ", "HQ_HRM", "HQ_HRM_M", "HQ_PRO", "HQ_PRO_M", "HQ_BR", "HQ_BR_M", "MASTER", "STORE")
                 
+                // 본사 직원 급여 내역 조회 API
+                .requestMatchers("/api/hr/my-salary").hasAnyRole("HQ", "HQ_HRM", "HQ_HRM_M", "HQ_PRO", "HQ_PRO_M", "HQ_BR", "HQ_BR_M", "MASTER")
+                
                 // 4.3 지점 관리 기능 
                 .requestMatchers("/api/headquarters/branches/**").hasAnyRole("HQ_BR_M", "MASTER") // 팀장급만 접근 가능
                 

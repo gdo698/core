@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class CustomPrincipal {
     private final String loginId;
+    private final Integer empId;
     private final Integer deptId;
     private final Integer storeId;
     private final String role;

@@ -84,12 +84,13 @@ public class JwtTokenProvider {
                 .getBody();
 
         String loginId = claims.getSubject();
+        Integer empId = claims.get("empId", Integer.class);
         Integer deptId = claims.get("deptId", Integer.class);
         Integer storeId = claims.get("storeId", Integer.class);
         String mappedRole = mapDeptIdToRole(deptId);
         String authorityRole = "ROLE_" + mappedRole;
 
-        CustomPrincipal principal = new CustomPrincipal(loginId, deptId, storeId, mappedRole);
+        CustomPrincipal principal = new CustomPrincipal(loginId, empId, deptId, storeId, mappedRole);
 
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(authorityRole));
 

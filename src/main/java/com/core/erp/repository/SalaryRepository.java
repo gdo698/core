@@ -24,4 +24,7 @@ public interface SalaryRepository extends JpaRepository<SalaryEntity, Integer> {
     boolean existsByStore_StoreIdAndPayDateBetween(
             Integer storeId, LocalDateTime start, LocalDateTime end
     );
+
+    // 본사 직원의 급여 내역 조회
+    List<SalaryEntity> findByEmployee_EmpIdOrderByPayDateDesc(int empId);
 }
