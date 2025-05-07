@@ -81,7 +81,8 @@ public class SecurityConfig {
                     "/js/**", 
                     "/images/**",        // 정적 리소스
                     "/api/products/all", 
-                    "/api/categories/tree" // 상품 정보 조회 API
+                    "/api/categories/tree", // 상품 정보 조회 API
+                    "/api/barcode"
                 ).permitAll() // 모든 사용자 접근 허용
                 
                 // 2. 상품 관련 API - 여러 권한에 접근 허용

@@ -321,6 +321,7 @@ INSERT INTO `anomaly_detection` (`anomaly_id`, `store_id`, `anom_type`, `anom_de
 
 -- salary_type 정의
 
+
 -- 1: 시급
 -- 2: 월급
 
