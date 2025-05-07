@@ -100,6 +100,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/employee-management/**").hasAnyRole("HQ", "HQ_HRM", "HQ_PRO", "HQ_BR", "MASTER", "STORE") // 사원 관리 API
                 .requestMatchers("/api/stores/owners").hasAnyRole("HQ", "HQ_HRM", "HQ_PRO", "HQ_BR", "MASTER", "STORE") // 점주 목록 조회 API
                 
+                // 연차 관련 API - 명시적으로 권한 부여
+                .requestMatchers("/api/hr/annual-leave/**").hasAnyRole("HQ", "HQ_HRM", "HQ_HRM_M", "HQ_PRO", "HQ_PRO_M", "HQ_BR", "HQ_BR_M", "MASTER", "STORE")
+                .requestMatchers("/api/hr/attendance/**").hasAnyRole("HQ", "HQ_HRM", "HQ_HRM_M", "HQ_PRO", "HQ_PRO_M", "HQ_BR", "HQ_BR_M", "MASTER", "STORE")
+                
                 // 근태 관리 API - 본사 직원만 접근 가능 (점주는 제외)
                 .requestMatchers("/api/hr/**").hasAnyRole("HQ", "HQ_HRM", "HQ_HRM_M", "HQ_PRO", "HQ_PRO_M", "HQ_BR", "HQ_BR_M", "MASTER", "STORE")
                 
