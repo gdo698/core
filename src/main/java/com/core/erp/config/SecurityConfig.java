@@ -65,9 +65,16 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // 1. 인증 없이 접근 가능한 경로 설정 (로그인, 등록, 정적 리소스 등)
                 .requestMatchers(
-                    "/api/auth/login", "/api/auth/register", "/api/auth/check-email",  // 인증 관련 API
-                    "/css/**", "/js/**", "/images/**",        // 정적 리소스
-                    "/api/products/all", "/api/categories/tree" // 상품 정보 조회 API
+                    "/api/auth/login", 
+                    "/api/auth/register", 
+                    "/api/auth/check-email",
+                    "/api/auth/send-verification-email",  // 이메일 인증 코드 발송
+                    "/api/auth/verify-email",            // 이메일 인증 코드 확인
+                    "/css/**", 
+                    "/js/**", 
+                    "/images/**",        // 정적 리소스
+                    "/api/products/all", 
+                    "/api/categories/tree" // 상품 정보 조회 API
                 ).permitAll() // 모든 사용자 접근 허용
                 
                 // 2. 상품 관련 API - 여러 권한에 접근 허용

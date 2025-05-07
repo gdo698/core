@@ -5,8 +5,11 @@ import com.core.erp.domain.EmployeeEntity;
 import com.core.erp.repository.DepartmentRepository;
 import com.core.erp.repository.EmployeeRepository;
 import com.core.erp.security.JwtTokenProvider;
+import com.core.erp.service.EmailService;
+import com.core.erp.repository.EmailVerificationRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +32,11 @@ public class AuthController {
 
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
+    private final EmailVerificationRepository emailVerificationRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private EmailService emailService;
     
     // 파일 업로드 경로 설정
     private final String uploadDir = "uploads/";
@@ -72,6 +78,11 @@ public class AuthController {
         // 이미 존재하는 아이디인지 확인
         if (employeeRepository.findByLoginId(request.getLoginId()).isPresent()) {
             return ResponseEntity.badRequest().body(Map.of("message", "이미 사용 중인 아이디입니다."));
+        }
+        
+        // 이메일 인증 확인
+        if (!emailService.isEmailVerified(request.getLoginId())) {
+            return ResponseEntity.badRequest().body(Map.of("message", "이메일 인증이 완료되지 않았습니다."));
         }
 
         try {
@@ -161,6 +172,14 @@ public class AuthController {
             
             employeeRepository.save(employee);
             
+            // 회원가입 완료 후 인증 정보 삭제 시도 - 실패해도 회원가입은 성공으로 처리
+            try {
+                emailVerificationRepository.deleteByEmail(request.getLoginId());
+            } catch (Exception ex) {
+                // 이메일 인증 정보 삭제 실패해도 회원가입은 계속 진행
+                System.err.println("이메일 인증 정보 삭제 실패: " + ex.getMessage());
+            }
+            
             return ResponseEntity.ok(Map.of("message", "회원가입이 완료되었습니다."));
         } catch (Exception e) {
             e.printStackTrace();
@@ -219,6 +238,65 @@ public class AuthController {
             return ResponseEntity.ok(Map.of(
                 "available", true,
                 "message", "사용 가능한 이메일입니다."
+            ));
+        }
+    }
+
+    // 이메일 인증 코드 발송 API
+    @PostMapping("/send-verification-email")
+    public ResponseEntity<?> sendVerificationEmail(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        if (email == null || !email.contains("@")) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "유효한 이메일 주소를 입력해주세요."
+            ));
+        }
+        
+        try {
+            emailService.createAndSendVerificationCode(email);
+            
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "인증 이메일이 발송되었습니다. 이메일을 확인해주세요."
+            ));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "인증 이메일 발송 실패: " + e.getMessage()
+            ));
+        }
+    }
+
+    // 이메일 인증 코드 확인 API
+    @PostMapping("/verify-email")
+    public ResponseEntity<?> verifyEmail(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String code = request.get("code");
+        
+        if (email == null || code == null) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "이메일과 인증 코드를 모두 입력해주세요."
+            ));
+        }
+        
+        boolean verified = emailService.verifyEmail(email, code);
+        
+        if (verified) {
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "이메일 인증이 완료되었습니다."
+            ));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "인증 코드가 일치하지 않거나 만료되었습니다."
             ));
         }
     }

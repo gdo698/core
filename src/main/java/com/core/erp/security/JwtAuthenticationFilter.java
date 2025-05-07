@@ -27,7 +27,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final List<String> excludedPaths = Arrays.asList(
             "/api/auth/login", 
             "/api/auth/register",
-            "/api/auth/check-email"
+            "/api/auth/check-email",
+            "/api/auth/send-verification-email",  // 이메일 인증 코드 발송
+            "/api/auth/verify-email"             // 이메일 인증 코드 확인
     );
 
     @Override
@@ -42,6 +44,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         System.out.println("요청 URI: " + uri);
         System.out.println("요청 메서드: " + method);
         
+        // 이메일 인증 API 요청 로깅
+        boolean isEmailVerificationRequest = uri.equals("/api/auth/send-verification-email") || 
+                                           uri.equals("/api/auth/verify-email");
+        if (isEmailVerificationRequest) {
+            System.out.println("===== 이메일 인증 API 요청 감지 =====");
+        }
+        
         // 근태 관리 API 추가 로깅
         boolean isHrApiRequest = uri.startsWith("/api/hr/");
         if (isHrApiRequest) {
@@ -53,6 +62,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         if (isExcludedPath) {
             System.out.println("인증이 필요 없는 경로: " + uri + " - JWT 필터 건너뜀");
+            if (isEmailVerificationRequest) {
+                System.out.println("이메일 인증 API 요청 처리 중 - 인증 없이 진행");
+            }
             filterChain.doFilter(request, response);
             return;
         }
@@ -117,6 +129,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 요청 처리 후 결과 로깅
         if (isHrApiRequest) {
             System.out.println("===== 근태 관리 API 응답 코드: " + response.getStatus() + " =====");
+        }
+        if (isEmailVerificationRequest) {
+            System.out.println("===== 이메일 인증 API 응답 코드: " + response.getStatus() + " =====");
         }
     }
 }
