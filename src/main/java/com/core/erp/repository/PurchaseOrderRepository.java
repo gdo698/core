@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrderEntity, Long> {
-    Page<PurchaseOrderEntity> findByStore_StoreIdOrderByOrderDateDesc(Integer storeId, Pageable pageable);
+    Page<PurchaseOrderEntity> findByStore_StoreIdOrderByOrderIdDesc(Integer storeId, Pageable pageable);
 }

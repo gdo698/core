@@ -44,8 +44,8 @@ public class PurchaseOrderItemEntity {
     @Column(name = "is_fully_received", nullable = false)
     private int isFullyReceived;
 
-    @Column(name = "received_quantity")
-    private Integer receivedQuantity;
+    @Column(name = "received_quantity", nullable = false)
+    private Integer receivedQuantity = 0;
 
     // DTO → Entity 변환 생성자
     public PurchaseOrderItemEntity(PurchaseOrderItemDTO dto) {

@@ -24,13 +24,13 @@ public class PartTimeController {
 
     private final PartTimeService partTimerService;
 
-    // ✅ 현재 로그인한 사용자 정보 추출
+    // 현재 로그인한 사용자 정보 추출
     private CustomPrincipal getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return (CustomPrincipal) auth.getPrincipal();
     }
 
-    // 🔍 (1) 검색 조회
+    // (1) 검색 조회
     @GetMapping("/search")
     public ResponseEntity<List<PartTimerDTO>> searchPartTimers(
             @ModelAttribute PartTimerSearchDTO searchDTO) {
@@ -40,7 +40,7 @@ public class PartTimeController {
         return ResponseEntity.ok(list);
     }
 
-    // 📄 (2) 전체 조회
+    // (2) 전체 조회
     @GetMapping("/list")
     public ResponseEntity<Page<PartTimerDTO>> findAllPartTimers(
             @RequestParam(defaultValue = "0") int page,
@@ -52,7 +52,7 @@ public class PartTimeController {
         return ResponseEntity.ok(list);
     }
 
-    // 📄 (3) 단일 조회
+    // (3) 단일 조회
     @GetMapping("/{id}")
     public ResponseEntity<PartTimerDTO> findPartTimerById(@PathVariable("id") Integer partTimerId) {
         CustomPrincipal user = getCurrentUser();
@@ -60,26 +60,27 @@ public class PartTimeController {
         return ResponseEntity.ok(dto);
     }
 
-    // ✏️ (4) 등록
-    @PostMapping
-    public ResponseEntity<String> registerPartTimer(@RequestBody PartTimerDTO partTimerDTO) {
+    // (4) 등록 - FormData용
+    @PostMapping(consumes = "multipart/form-data")
+    public ResponseEntity<String> registerPartTimer(@ModelAttribute PartTimerDTO partTimerDTO) {
         CustomPrincipal user = getCurrentUser();
         partTimerService.registerPartTimer(user.getStoreId(), partTimerDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body("등록 완료");
     }
 
-    // ✏️ (5) 수정
-    @PutMapping("/{id}")
+    // (5) 수정
+    @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     public ResponseEntity<String> updatePartTimer(
             @PathVariable("id") Integer partTimerId,
-            @RequestBody PartTimerDTO partTimerDTO) {
+            @ModelAttribute PartTimerDTO partTimerDTO) {
 
         CustomPrincipal user = getCurrentUser();
         partTimerService.updatePartTimer(user.getRole(), user.getStoreId(), partTimerId, partTimerDTO);
         return ResponseEntity.ok("수정 완료");
     }
 
-    // 🗑 (6) 삭제
+
+    // (6) 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePartTimer(@PathVariable("id") Integer partTimerId) {
         CustomPrincipal user = getCurrentUser();

@@ -71,25 +71,32 @@ public class OrderController {
     @PostMapping("/{orderId}/complete")
     public ResponseEntity<String> completeOrder(
             @PathVariable Long orderId,
+            @RequestParam Integer partTimerId,
             @AuthenticationPrincipal CustomPrincipal userDetails
     ) {
         Integer storeId = userDetails.getStoreId();
         String role = userDetails.getRole();
 
-        orderService.completeOrder(orderId, storeId, role);
-        return ResponseEntity.ok("입고 완료 처리되었습니다.");
+        orderService.completeOrder(orderId, storeId, role, partTimerId);
+
+        return ResponseEntity.ok("전체 입고 완료");
     }
+
 
     @PostMapping("/{orderId}/partial-complete")
-    public ResponseEntity<?> partialComplete(
+    public ResponseEntity<String> partialComplete(
             @PathVariable Long orderId,
+            @RequestParam Integer partTimerId,
             @RequestBody List<PartialItemDTO> itemList,
-            @AuthenticationPrincipal CustomPrincipal principal
+            @AuthenticationPrincipal CustomPrincipal userDetails
     ) {
-        orderService.partialComplete(orderId, itemList, principal.getStoreId(), principal.getRole());
+        Integer storeId = userDetails.getStoreId();
+        String role = userDetails.getRole();
+
+        orderService.partialComplete(orderId, itemList, storeId, role, partTimerId);
+
         return ResponseEntity.ok("부분 입고 완료");
     }
-
 
 
 

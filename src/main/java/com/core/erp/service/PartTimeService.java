@@ -33,7 +33,7 @@ public class PartTimeService {
     private final PartTimerRepository partTimerRepository;
     private final StoreRepository storeRepository;
 
-    private final String uploadDir = "/upload/parttimer/";
+    private final String uploadDir = System.getProperty("user.dir") + "/uploads/parttimer/";
 
     // 역할 헬퍼 메서드
     private boolean isStore(String role) {
@@ -176,7 +176,7 @@ public class PartTimeService {
             String savedFilename = UUID.randomUUID().toString() + ext;
             file.transferTo(new File(uploadDir + savedFilename));
 
-            return "/upload/parttimer/" + savedFilename;
+            return "/uploads/parttimer/" + savedFilename;
         } catch (IOException e) {
             throw new RuntimeException("파일 업로드 실패", e);
         }
@@ -197,4 +197,5 @@ public class PartTimeService {
                 .map(PartTimerEntity::toDTO)
                 .collect(Collectors.toList());
     }
+
 }

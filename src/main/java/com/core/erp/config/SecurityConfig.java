@@ -147,10 +147,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/store/notifications/**").hasAnyRole("STORE", "MASTER")
                             .requestMatchers("/api/salary/**").hasAnyRole("STORE", "MASTER", "HQ")
                             .requestMatchers("/api/parttimer-schedule/**").hasAnyRole("HQ", "OWNER", "STORE")
-                .requestMatchers("/api/store/parttimer/**").hasAnyRole("STORE", "MASTER")
+                .requestMatchers("/api/store/parttimer/**").permitAll()
                 .requestMatchers("/api/purchase-orders/**").hasAnyRole("STORE", "MASTER")
                 .requestMatchers("/api/shift-schedules/**").hasAnyRole("STORE", "MASTER")
-                .requestMatchers("/api/store/**").hasAnyRole("STORE", "MASTER")
+                .requestMatchers("/api/store/**").permitAll()
                 
                 // 6. MASTER 권한 모든 API 접근 설정 (전체 경로 설정)
                 // ⚠️ 주의: 이 설정을 활성화하면 위의 모든 설정보다 우선 적용되어 MASTER 외 다른 역할은 접근이 제한됩니다.

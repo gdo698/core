@@ -73,6 +73,9 @@ public class PartTimerEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "part_img", length = 200)
+    private String partImg;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -109,6 +112,4 @@ public class PartTimerEntity {
         return new PartTimerDTO(this);
     }
 
-    public void setPartImg(String uploadedPath) {
-    }
 }

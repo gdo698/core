@@ -39,26 +39,26 @@ public class AuthService {
 
         // 4. 부서 이름을 직접 권한으로 사용 (SecurityConfig와 일치)
         String role = "ROLE_" + user.getDepartment().getDeptName();
-        
+
         // 5. 사용자 타입 결정 (부서명으로 구분)
         String userType = determineUserType(user.getDepartment().getDeptName());
-        
+
         // 6. 지점명 가져오기
         String branchName = user.getStore() != null ? user.getStore().getStoreName() : null;
-        
+
         // 7. 지점 ID 가져오기
         Integer storeId = user.getStore() != null ? user.getStore().getStoreId() : null;
-        
+
         // 8. 사용자 이름 가져오기
         String name = user.getEmpName();
-        
+
         // 9. JWT 토큰 생성
         String token = jwtProvider.createToken(loginId, role, userType, storeId, name, branchName);
-        
+
         // 10. 인증 응답 객체 반환
         return new AuthResponse(token, branchName, user.getWorkType(), name, storeId);
     }
-    
+
     /**
      * 부서명에 따른 사용자 타입 결정
      */
@@ -73,4 +73,5 @@ public class AuthService {
             return "USER"; // 기본값
         }
     }
+
 }

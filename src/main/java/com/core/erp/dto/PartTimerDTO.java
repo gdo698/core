@@ -28,6 +28,7 @@ public class PartTimerDTO {
     private String accountNumber;
     private int partStatus;
     private LocalDateTime createdAt;
+    private String partImg;
 
     private MultipartFile file;
 
@@ -53,6 +54,7 @@ public class PartTimerDTO {
         this.createdAt = entity.getCreatedAt();
         this.position = entity.getPosition();
         this.workType = entity.getWorkType();
+        this.partImg = entity.getPartImg();
 
     }
 }

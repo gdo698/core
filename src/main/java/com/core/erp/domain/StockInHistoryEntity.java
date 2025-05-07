@@ -51,7 +51,6 @@ public class StockInHistoryEntity {
     // DTO → Entity 변환 생성자
     public StockInHistoryEntity(StockInHistoryDTO dto) {
         this.historyId = dto.getHistoryId();
-        // store, partTimer, product, order는 별도 매핑 필요
         this.inQuantity = dto.getInQuantity();
         this.inDate = dto.getInDate();
         this.expireDate = dto.getExpireDate();

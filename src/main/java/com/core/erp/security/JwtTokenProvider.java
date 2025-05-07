@@ -17,7 +17,7 @@ import java.util.*;
 public class JwtTokenProvider {
 
     private final String secretKey = "your-very-secret-key-should-be-long-enough-1234567890";
-    private final long validityInMilliseconds = 60 * 60 * 1000; // 1시간
+    private final long validityInMilliseconds = 24 * 60 * 60 * 1000; // 1시간
 
     public String createToken(EmployeeEntity employee) {
         Claims claims = Jwts.claims().setSubject(employee.getLoginId());

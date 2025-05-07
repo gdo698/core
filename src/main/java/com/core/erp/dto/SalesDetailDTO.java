@@ -19,7 +19,7 @@ public class SalesDetailDTO {
     private Integer  finalAmount;
     private Integer  costPrice;
     private Integer  realIncome;
-    private Integer isPromo;
+    private Integer  isPromo;
 
     // Entity → DTO 변환 생성자
     public SalesDetailDTO(SalesDetailEntity entity) {

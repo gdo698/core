@@ -45,4 +45,5 @@ public class StoreStockEntity {
         this.lastInDate = dto.getLastInDate();
         this.stockStatus = dto.getStockStatus();
     }
+
 }
