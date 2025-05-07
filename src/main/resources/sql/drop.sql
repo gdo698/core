@@ -37,3 +37,4 @@ DROP TABLE IF EXISTS `shift_schedule`;
 DROP TABLE IF EXISTS `part_timer`;
 DROP TABLE IF EXISTS `store`;
 DROP TABLE IF EXISTS `flyway_schema_history`;
+DROP TABLE IF EXISTS `email_verification`;
