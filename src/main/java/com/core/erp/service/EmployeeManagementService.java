@@ -358,9 +358,18 @@ public class EmployeeManagementService {
         
         // 매장 정보 설정 (점주인 경우)
         if (entity.getStore() != null) {
+            // 매장 정보를 DTO에 설정
+            dto.setStoreId(entity.getStore().getStoreId());
             dto.setStoreName(entity.getStore().getStoreName());
             dto.setStoreAddr(entity.getStore().getStoreAddr());
             dto.setStoreTel(entity.getStore().getStoreTel());
+            
+            // 디버깅 로그 추가
+            System.out.println("매장 정보 설정: 매장ID=" + entity.getStore().getStoreId() + 
+                              ", 매장명=" + entity.getStore().getStoreName());
+        } else {
+            // 매장이 없는 경우 매장 관련 필드는 설정하지 않음 (기본값 유지)
+            System.out.println("매장 정보 없음: 직원ID=" + entity.getEmpId());
         }
         
         return dto;
@@ -438,6 +447,12 @@ public class EmployeeManagementService {
         
         // 점주 관련 정보 설정
         if ("STORE".equals(dto.getEmpRole())) {
+            // 매장 ID 설정 (EmployeeListDTO에서 가져오기)
+            if (listDTO.getStoreId() != null) {
+                dto.setStoreId(listDTO.getStoreId().intValue());
+                System.out.println("매장 ID 설정: " + listDTO.getStoreId());
+            }
+            
             dto.setStoreName(listDTO.getStoreName() != null ? listDTO.getStoreName() : "");
             dto.setStoreAddr(listDTO.getStoreAddr() != null ? listDTO.getStoreAddr() : "");
             dto.setStoreTel(listDTO.getStoreTel() != null ? listDTO.getStoreTel() : "");
