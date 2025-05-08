@@ -18,8 +18,6 @@ public class StoreDTO {
     private String storeAddr;
     private String storeTel;
     private LocalDateTime storeCreatedAt;
-    private String storeCert;
-    private String storeAcc;
 
     private MultipartFile file;
 
@@ -30,7 +28,5 @@ public class StoreDTO {
         this.storeAddr = entity.getStoreAddr();
         this.storeTel = entity.getStoreTel();
         this.storeCreatedAt = entity.getStoreCreatedAt();
-        this.storeCert = entity.getStoreCert();
-        this.storeAcc = entity.getStoreAcc();
     }
 }

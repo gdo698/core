@@ -32,11 +32,6 @@ public class StoreEntity {
     @Column(name = "store_created_at", nullable = false)
     private LocalDateTime storeCreatedAt;
 
-    @Column(name = "store_cert", nullable = false, length = 255)
-    private String storeCert;
-
-    @Column(name = "store_acc", nullable = false, length = 255)
-    private String storeAcc;
 
     // DTO → Entity 변환 생성자
     public StoreEntity(StoreDTO dto) {
@@ -44,7 +39,5 @@ public class StoreEntity {
         this.storeName = dto.getStoreName();
         this.storeAddr = dto.getStoreAddr();
         this.storeTel = dto.getStoreTel();
-        this.storeCert = dto.getStoreCert();
-        this.storeAcc = dto.getStoreAcc();
     }
 }

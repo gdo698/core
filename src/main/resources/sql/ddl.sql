@@ -11,8 +11,6 @@ CREATE TABLE `store` (
                          `store_addr` varchar(225) NOT NULL COMMENT '지점 주소',
                          `store_tel` varchar(30) NOT NULL COMMENT '지점 연락처',
                          `store_created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '지점 등록 시간',
-                         `store_cert` varchar(255) NOT NULL COMMENT '사업자등록증 이미지 url',
-                         `store_acc` varchar(255) NOT NULL COMMENT '통장 사본 이미지 url',
                          PRIMARY KEY (`store_id`)
 );
 
