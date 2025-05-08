@@ -20,8 +20,6 @@ public class StockService {
     private final StockAdjustLogRepository stockAdjustLogRepository;
     private final PartTimerRepository partTimerRepository;
     private final PurchaseOrderItemRepository purchaseOrderItemRepository;
-    private final PurchaseOrderRepository purchaseOrderRepository;
-    private final ProductRepository productRepository;
 
     public Page<StockInHistoryDTO> getStockInHistory(Integer storeId, String role, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("inDate").descending());
