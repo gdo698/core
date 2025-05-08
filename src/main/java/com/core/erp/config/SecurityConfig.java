@@ -55,7 +55,7 @@ public class SecurityConfig {
                     "http://127.0.0.1:3000", 
                     "http://127.0.0.1:8080"
                 )); // 특정 출처 허용
-                config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용할 HTTP 메서드
+                config.setAllowedMethods(List.of("GET","PATCH" ,"POST", "PUT", "DELETE", "OPTIONS")); // 허용할 HTTP 메서드
                 config.setAllowedHeaders(List.of("*")); // 모든 헤더 허용
                 config.setExposedHeaders(List.of("Authorization")); // 클라이언트에 노출할 헤더
                 config.setAllowCredentials(true); // 인증 정보 포함 허용

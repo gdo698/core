@@ -20,7 +20,6 @@ public class OrderController {
     private final OrderService orderService;
     private final StockService stockService;
 
-    // 상품 + 재고 조회 + 검색 + 페이징 + 제약 조건
     @GetMapping("/products")
     public ResponseEntity<Page<OrderProductResponseDTO>> getOrderProductList(
             @AuthenticationPrincipal CustomPrincipal userDetails,
@@ -132,12 +131,20 @@ public class OrderController {
     }
 
     @PatchMapping("/cancel/{orderId}")
-    public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId, @AuthenticationPrincipal CustomPrincipal user) {
+    public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId,
+                                            @AuthenticationPrincipal CustomPrincipal user) {
         orderService.cancelOrder(orderId, user.getStoreId(), user.getRole());
         return ResponseEntity.ok().build();
     }
 
-
+    @DeleteMapping("/{orderId}")
+    public ResponseEntity<Void> deleteOrder(
+            @PathVariable Long orderId,
+            @AuthenticationPrincipal CustomPrincipal user
+    ) {
+        orderService.deleteOrder(orderId, user.getStoreId(), user.getRole());
+        return ResponseEntity.ok().build();
+    }
 
 
 }

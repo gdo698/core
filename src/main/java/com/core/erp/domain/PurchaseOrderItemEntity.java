@@ -47,10 +47,13 @@ public class PurchaseOrderItemEntity {
     @Column(name = "received_quantity", nullable = false)
     private Integer receivedQuantity = 0;
 
+    @Column(name = "product_name", nullable = false)
+    private String productName;
+
+
     // DTO → Entity 변환 생성자
     public PurchaseOrderItemEntity(PurchaseOrderItemDTO dto) {
         this.itemId = dto.getItemId();
-        // purchaseOrder, product는 별도 매핑 필요
         this.orderQuantity = dto.getOrderQuantity();
         this.unitPrice = dto.getUnitPrice();
         this.totalPrice = dto.getTotalPrice();
@@ -58,5 +61,6 @@ public class PurchaseOrderItemEntity {
         this.isAbnormal = dto.getIsAbnormal();
         this.isFullyReceived = dto.getIsFullyReceived();
         this.receivedQuantity = dto.getReceivedQuantity();
+        this.productName = dto.getProductName();
     }
 }

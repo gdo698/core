@@ -5,6 +5,7 @@ import com.core.erp.dto.*;
 import com.core.erp.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -15,10 +16,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -95,7 +95,7 @@ public class OrderService {
         PurchaseOrderEntity order = new PurchaseOrderEntity();
         order.setStore(store);
         order.setOrderDate(LocalDateTime.now());
-        order.setOrderStatus(0); // 대기
+        order.setOrderStatus(0);
         order.setTotalQuantity(totalQuantity);
         order.setTotalAmount(totalAmount);
         purchaseOrderRepository.save(order);
@@ -108,6 +108,7 @@ public class OrderService {
             PurchaseOrderItemEntity orderItem = new PurchaseOrderItemEntity();
             orderItem.setPurchaseOrder(order);
             orderItem.setProduct(product);
+            orderItem.setProductName(product.getProName());
             orderItem.setOrderQuantity(item.getQuantity());
             orderItem.setUnitPrice(item.getUnitPrice());
             orderItem.setTotalPrice(item.getQuantity() * item.getUnitPrice());
@@ -196,7 +197,7 @@ public class OrderService {
         for (PurchaseOrderItemEntity item : items) {
             item.setReceivedQuantity(item.getOrderQuantity());
             item.setIsFullyReceived(1);
-            item.setOrderState(1); // 전체 입고 완료 상태
+            item.setOrderState(2);
             purchaseOrderItemRepository.save(item);
 
             StockInHistoryEntity history = new StockInHistoryEntity();
@@ -280,10 +281,10 @@ public class OrderService {
 
         if (newReceivedQty >= item.getOrderQuantity()) {
             item.setIsFullyReceived(1);
-            item.setOrderState(1); // 전체 입고 완료
+            item.setOrderState(2); // 전체 입고 완료
         } else {
             item.setIsFullyReceived(0);
-            item.setOrderState(2); // 부분 입고
+            item.setOrderState(1); // 부분 입고
         }
     }
 
@@ -357,6 +358,14 @@ public class OrderService {
 
     @Transactional
     public void updateOrder(Long orderId, Integer loginStoreId, String role, OrderRequestDTO dto) {
+        log.info("업데이트 요청 - orderId: {}, storeId: {}, role: {}", orderId, loginStoreId, role);
+        log.info("요청 데이터 DTO 존재 여부: {}", dto != null);
+        log.info("DTO 내부 items: {}", dto.getItems());
+
+        if (dto == null || dto.getItems() == null || dto.getItems().isEmpty()) {
+            throw new IllegalArgumentException("수정할 항목이 없습니다.");
+        }
+
         PurchaseOrderEntity order = purchaseOrderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("발주서가 존재하지 않습니다."));
 
@@ -365,8 +374,9 @@ public class OrderService {
             if (order.getStore().getStoreId() != (loginStoreId)) {
                 throw new SecurityException("해당 발주에 대한 수정 권한이 없습니다.");
             }
-            if (order.getOrderStatus() == 1) {
-                throw new IllegalStateException("입고 완료된 발주는 수정할 수 없습니다.");
+
+            if (order.getOrderStatus() != 0) {
+                throw new IllegalStateException("입고 중이거나 완료된 발주는 할 수 없습니다.");
             }
 
             if (!isSameOrderTimeSlot(order.getOrderDate(), LocalDateTime.now())) {
@@ -382,15 +392,8 @@ public class OrderService {
             ProductEntity product = productRepository.findById(Long.valueOf(itemDto.getProductId()))
                     .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다."));
 
-            StoreStockEntity stock = storeStockRepository
-                    .findByStore_StoreIdAndProduct_ProductId(order.getStore().getStoreId(), product.getProductId())
-                    .orElse(null);
-
-            int currentQty = (stock != null) ? stock.getQuantity() : 0;
-            int expectedQty = currentQty + itemDto.getQuantity();
-
-            if (expectedQty > product.getProStockLimit()) {
-                throw new IllegalArgumentException("[" + product.getProName() + "]의 예상 재고(" + expectedQty + ")가 임계치(" + product.getProStockLimit() + ")를 초과합니다.");
+            if (itemDto.getQuantity() > product.getProStockLimit()) {
+                throw new IllegalArgumentException("[" + product.getProName() + "]의 발주 수량(" + itemDto.getQuantity() + ")이 임계치(" + product.getProStockLimit() + ")를 초과합니다.");
             }
         }
 
@@ -411,6 +414,7 @@ public class OrderService {
             PurchaseOrderItemEntity item = new PurchaseOrderItemEntity();
             item.setPurchaseOrder(order);
             item.setProduct(product);
+            item.setProductName(product.getProName());
             item.setOrderQuantity(qty);
             item.setUnitPrice(price);
             item.setTotalPrice(qty * price);
@@ -440,12 +444,33 @@ public class OrderService {
             throw new SecurityException("해당 발주서에 대한 취소 권한이 없습니다.");
         }
 
-        if (order.getOrderStatus() == 1) {
-            throw new IllegalStateException("입고 완료된 발주는 취소할 수 없습니다.");
-        }
-
         order.setOrderStatus(9); // 9 = 취소
         purchaseOrderRepository.save(order);
     }
 
+    @Transactional
+    public void deleteOrder(Long orderId, Integer loginStoreId, String role) {
+        // HQ는 삭제 금지
+        if ("ROLE_HQ".equals(role)) {
+            throw new SecurityException("본사는 발주 삭제 권한이 없습니다.");
+        }
+
+        PurchaseOrderEntity order = purchaseOrderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("발주서가 존재하지 않습니다."));
+
+        // 자신의 매장인지 확인
+        if (order.getStore().getStoreId() != (loginStoreId)) {
+            throw new SecurityException("삭제 권한이 없습니다.");
+        }
+
+        // 상태 체크: 대기중(0)만 삭제 허용
+        if (order.getOrderStatus() != 0) {
+            throw new IllegalStateException("입고 중이거나 완료된 발주는 삭제할 수 없습니다.");
+        }
+
+        // 먼저 항목부터 삭제
+        purchaseOrderItemRepository.deleteByPurchaseOrder_OrderId(orderId);
+        // 그 다음 발주서 삭제
+        purchaseOrderRepository.delete(order);
+    }
 }
