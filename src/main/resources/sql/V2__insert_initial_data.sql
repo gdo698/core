@@ -102,11 +102,11 @@ INSERT INTO `weather_data` (`weather_id`, `wt_location`, `wt_date`, `wt_temperat
 -- 5. product(상품) 데이터 추가 (카테고리 체계 변경에 맞게 수정)
 INSERT INTO `product` (`product_id`, `category_id`, `pro_name`, `pro_barcode`, `pro_cost`, `pro_sell_cost`, `pro_created_at`, `pro_update_at`, `pro_image`, `is_promo`,`pro_stock_limit`) VALUES
 -- 냉장식품(7) 카테고리의 상품들
-(1, 7,  '삼각김밥 참치', 8801234567890, 450, 1200, '2023-01-15 08:00:00', '2023-01-15 08:00:00', 'https://example.com/images/samgak_tuna.jpg', 0,10),
+(1, 7,  '삼각김밥 참치', 8801234567890, 450, 100, '2023-01-15 08:00:00', '2023-01-15 08:00:00', 'https://example.com/images/samgak_tuna.jpg', 0,10),
 (2, 7, '삼각김밥 불고기', 8801234567891, 500, 1300, '2023-01-15 08:10:00', '2023-01-15 08:10:00', 'https://example.com/images/samgak_bulgogi.jpg', 0,10),
 
 -- 탄산음료(13) 카테고리의 상품들
-(3, 13,  '콜라 500ml', 8801234567892, 700, 1500, '2023-01-15 09:00:00', '2023-01-15 09:00:00', 'https://example.com/images/cola_500.jpg', 0,10),
+(3, 13,  '콜라 500ml', 8801234567892, 700, 100, '2023-01-15 09:00:00', '2023-01-15 09:00:00', 'https://example.com/images/cola_500.jpg', 0,10),
 (4, 13,  '사이다 500ml', 8801234567893, 650, 1500, '2023-01-15 09:05:00', '2023-01-15 09:05:00', 'https://example.com/images/cider_500.jpg', 0,10),
 
 -- 화장지/물티슈(15) 카테고리의 상품

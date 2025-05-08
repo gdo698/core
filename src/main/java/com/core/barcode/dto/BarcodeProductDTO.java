@@ -23,4 +23,8 @@ public class BarcodeProductDTO {
     @JsonProperty("POG_DAYCNT")
     private String expirationInfo;
 
+    private Integer price;
+
+    private Integer productId;
+
 }

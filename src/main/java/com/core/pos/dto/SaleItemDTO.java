@@ -11,7 +11,8 @@ public class SaleItemDTO {
 
     private Integer productId;
     private Integer salesQuantity;
-    private Integer  unitPrice;
-    private Integer  discountPrince;
-    private Integer  isPromo;
+    private Integer unitPrice;
+    private Integer discountPrice;
+    private Integer finalAmount;
+    private Integer isPromo;
 }

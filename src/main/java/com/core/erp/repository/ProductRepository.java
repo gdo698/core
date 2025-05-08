@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
@@ -52,4 +53,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             @Param("storeId") Integer storeId,
             @Param("keyword") String keyword
     );
+
+    /* 바코드로 상품 조회 (POS 바코드 기능용) */
+    Optional<ProductEntity> findByProBarcode(Long proBarcode);
 }

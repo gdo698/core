@@ -157,7 +157,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/purchase-orders/**").hasAnyRole("STORE", "MASTER")
                 .requestMatchers("/api/shift-schedules/**").hasAnyRole("STORE", "MASTER")
                 .requestMatchers("/api/store/**").permitAll()
-                
+
+                // POS API 보호 - 점주와 마스터만 접근 가능
+                .requestMatchers("/api/pos/**").hasAnyRole("STORE", "MASTER")
+
                 // 6. MASTER 권한 모든 API 접근 설정 (전체 경로 설정)
                 // ⚠️ 주의: 이 설정을 활성화하면 위의 모든 설정보다 우선 적용되어 MASTER 외 다른 역할은 접근이 제한됩니다.
                 // 만약 활성화하려면 이 설정을 맨 마지막(authenticated 위)에 위치시켜야 합니다.

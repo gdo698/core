@@ -11,8 +11,6 @@ import java.util.List;
 @ToString
 public class SaleRequestDTO {
 
-    private Integer storeId;
-    private Integer empId;
     private String paymentMethod;
     private List<SaleItemDTO> itemList;
 }
