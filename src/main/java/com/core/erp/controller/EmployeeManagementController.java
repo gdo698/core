@@ -58,34 +58,10 @@ public class EmployeeManagementController {
             @RequestParam String status,
             @RequestParam(required = false) Integer storeId,
             @RequestParam(required = false, defaultValue = "3") Integer departId) {
-        System.out.println("===================================================");
-        System.out.println("점주 승인 API 호출: empId=" + empId + ", status=" + status + ", storeId=" + storeId + ", departId=" + departId);
-        System.out.println("===================================================");
-        
-        // 디버깅: 모든 부서 목록 출력
-        System.out.println("\n=== 부서 목록 조회 시작 ===");
-        List<DepartmentEntity> allDepartments = departmentRepository.findAll();
-        System.out.println("전체 부서 수: " + allDepartments.size());
-        for (DepartmentEntity dept : allDepartments) {
-            System.out.println("부서: ID=" + dept.getDeptId() + ", 이름=" + dept.getDeptName());
-        }
-        System.out.println("=== 부서 목록 조회 종료 ===\n");
         
         // 직원 정보 조회
         EmployeeEntity employee = employeeRepository.findById(empId)
                 .orElseThrow(() -> new RuntimeException("직원 정보를 찾을 수 없습니다. ID: " + empId));
-        
-        System.out.println("\n=== 업데이트 전 직원 정보 ===");
-        System.out.println("empId: " + employee.getEmpId());
-        System.out.println("empName: " + employee.getEmpName());
-        System.out.println("empRole: " + employee.getEmpRole());
-        System.out.println("empStatus: " + employee.getEmpStatus());
-        System.out.println("workType: " + employee.getWorkType());
-        System.out.println("department: " + (employee.getDepartment() != null ? 
-                          employee.getDepartment().getDeptId() + "-" + employee.getDepartment().getDeptName() : "null"));
-        System.out.println("store: " + (employee.getStore() != null ? 
-                          employee.getStore().getStoreId() + "-" + employee.getStore().getStoreName() : "null"));
-        System.out.println("=== 업데이트 전 직원 정보 종료 ===\n");
         
         // 직원 상태 업데이트
         employee.setEmpStatus(status);
@@ -103,7 +79,6 @@ public class EmployeeManagementController {
             
             // 직원과 매장 연결
             employee.setStore(store);
-            System.out.println("점주에게 매장 할당: " + store.getStoreId() + " - " + store.getStoreName());
         }
         
         // 점주 부서 설정 (departId = 3, 점주 부서)
@@ -115,39 +90,16 @@ public class EmployeeManagementController {
             DepartmentEntity storeDepartment = departmentRepository.findById(storeOwnerDeptId)
                     .orElseThrow(() -> new RuntimeException("점주 부서(ID=" + storeOwnerDeptId + ")를 찾을 수 없습니다."));
             
-            // 직접 값을 출력하여 확인
-            System.out.println("\n=== 점주 부서 설정 시작 ===");
-            System.out.println("storeDepartment.getDeptId(): " + storeDepartment.getDeptId());
-            System.out.println("storeDepartment.getDeptName(): " + storeDepartment.getDeptName());
-            
             // 직원과 부서 연결 - 명시적 할당
             employee.setDepartment(storeDepartment);
             
-            // 디버깅을 위해 할당 후 바로 다시 출력
-            System.out.println("할당 후 부서 ID: " + employee.getDepartment().getDeptId());
-            System.out.println("할당 후 부서 이름: " + employee.getDepartment().getDeptName());
-            System.out.println("=== 점주 부서 설정 종료 ===\n");
-            
         } catch (Exception e) {
             System.err.println("점주 부서 설정 오류: " + e.getMessage());
-            e.printStackTrace();
             // 부서 설정 실패시 롤백되지 않도록 예외 처리만 하고 진행
         }
         
         // 변경사항 저장
         EmployeeEntity updatedEmployee = employeeRepository.save(employee);
-        
-        System.out.println("\n=== 업데이트 후 직원 정보 ===");
-        System.out.println("empId: " + updatedEmployee.getEmpId());
-        System.out.println("empName: " + updatedEmployee.getEmpName());
-        System.out.println("empRole: " + updatedEmployee.getEmpRole());
-        System.out.println("empStatus: " + updatedEmployee.getEmpStatus());
-        System.out.println("workType: " + updatedEmployee.getWorkType());
-        System.out.println("department: " + (updatedEmployee.getDepartment() != null ? 
-                          updatedEmployee.getDepartment().getDeptId() + "-" + updatedEmployee.getDepartment().getDeptName() : "null"));
-        System.out.println("store: " + (updatedEmployee.getStore() != null ? 
-                          updatedEmployee.getStore().getStoreId() + "-" + updatedEmployee.getStore().getStoreName() : "null"));
-        System.out.println("=== 업데이트 후 직원 정보 종료 ===\n");
         
         // DTO로 변환하여 반환
         EmployeeManagementDTO resultDTO = new EmployeeManagementDTO();
@@ -167,7 +119,6 @@ public class EmployeeManagementController {
             resultDTO.setDeptName(updatedEmployee.getDepartment().getDeptName());
         }
         
-        System.out.println("점주 승인 완료: " + resultDTO);
         return ResponseEntity.ok(resultDTO);
     }
     

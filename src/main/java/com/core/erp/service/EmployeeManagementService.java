@@ -282,34 +282,20 @@ public class EmployeeManagementService {
         StoreEntity savedStore = storeRepository.save(store);
         employee.setStore(savedStore);
         
-        // 점주(STORE)인 경우 부서 ID를 강제로 3으로 설정
+        // 점주(STORE)인 경우 부서 ID를 3으로 설정
         if ("점주".equals(employee.getEmpRole()) || "STORE".equals(dto.getEmpRole())) {
             try {
-                System.out.println("점주 부서 ID 설정 시작 (handleStoreInfo): 직원ID=" + employee.getEmpId());
-                
                 // 부서 ID 3(STORE) 조회
                 DepartmentEntity storeDepartment = departmentRepository.findById(3)
-                        .orElseGet(() -> {
-                            System.out.println("부서 ID 3을 찾을 수 없어 STORE 이름으로 조회 시도");
-                            return departmentRepository.findByDeptName("STORE");
-                        });
+                        .orElseGet(() -> departmentRepository.findByDeptName("STORE"));
                 
                 if (storeDepartment != null) {
-                    // 현재 부서 정보 출력
-                    System.out.println("현재 부서 정보: ID=" + 
-                        (employee.getDepartment() != null ? employee.getDepartment().getDeptId() : "null"));
-                    
                     // 부서 설정
                     employee.setDepartment(storeDepartment);
                     employee.setWorkType(3); // 점주 workType = 3
-                    
-                    System.out.println("점주 부서 설정 완료: 부서ID=" + storeDepartment.getDeptId());
-                } else {
-                    System.err.println("STORE 부서를 찾을 수 없습니다. 부서 설정 실패.");
                 }
             } catch (Exception e) {
                 System.err.println("점주 부서 설정 중 오류 발생: " + e.getMessage());
-                e.printStackTrace();
             }
         }
     }
@@ -363,13 +349,6 @@ public class EmployeeManagementService {
             dto.setStoreName(entity.getStore().getStoreName());
             dto.setStoreAddr(entity.getStore().getStoreAddr());
             dto.setStoreTel(entity.getStore().getStoreTel());
-            
-            // 디버깅 로그 추가
-            System.out.println("매장 정보 설정: 매장ID=" + entity.getStore().getStoreId() + 
-                              ", 매장명=" + entity.getStore().getStoreName());
-        } else {
-            // 매장이 없는 경우 매장 관련 필드는 설정하지 않음 (기본값 유지)
-            System.out.println("매장 정보 없음: 직원ID=" + entity.getEmpId());
         }
         
         return dto;
