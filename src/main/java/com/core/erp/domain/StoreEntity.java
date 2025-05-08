@@ -32,6 +32,8 @@ public class StoreEntity {
     @Column(name = "store_created_at", nullable = false)
     private LocalDateTime storeCreatedAt;
 
+    @Column(name = "store_status", nullable = false)
+    private int storeStatus; // 1: 영업중, 2: 휴업, 3: 폐업
 
     // DTO → Entity 변환 생성자
     public StoreEntity(StoreDTO dto) {
@@ -39,5 +41,6 @@ public class StoreEntity {
         this.storeName = dto.getStoreName();
         this.storeAddr = dto.getStoreAddr();
         this.storeTel = dto.getStoreTel();
+        this.storeStatus = dto.getStoreStatus();
     }
 }

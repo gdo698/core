@@ -18,6 +18,9 @@ public class StoreDTO {
     private String storeAddr;
     private String storeTel;
     private LocalDateTime storeCreatedAt;
+    private int storeStatus;
+    private String ownerName;
+    private String ownerPhone;
 
     private MultipartFile file;
 

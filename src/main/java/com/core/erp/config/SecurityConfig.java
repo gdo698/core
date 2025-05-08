@@ -119,7 +119,13 @@ public class SecurityConfig {
                 .requestMatchers("/api/hr/my-salary").hasAnyRole("HQ", "HQ_HRM", "HQ_HRM_M", "HQ_PRO", "HQ_PRO_M", "HQ_BR", "HQ_BR_M", "MASTER")
                 
                 // 4.3 지점 관리 기능 
-                .requestMatchers("/api/headquarters/branches/**").hasAnyRole("HQ_BR_M", "MASTER") // 팀장급만 접근 가능
+                // GET 요청은 모든 인증된 사용자에게 허용
+                .requestMatchers(HttpMethod.GET, "/api/headquarters/branches/**")
+                    .hasAnyRole("HQ", "HQ_HRM", "HQ_HRM_M", "HQ_PRO", "HQ_PRO_M", "HQ_BR", "HQ_BR_M", "MASTER", "STORE")
+                // POST, PUT, DELETE는 지점관리팀과 마스터만 가능
+                .requestMatchers(HttpMethod.POST, "/api/headquarters/branches/**").hasAnyRole("HQ_BR", "HQ_BR_M", "MASTER")
+                .requestMatchers(HttpMethod.PUT, "/api/headquarters/branches/**").hasAnyRole("HQ_BR", "HQ_BR_M", "MASTER")
+                .requestMatchers(HttpMethod.DELETE, "/api/headquarters/branches/**").hasAnyRole("HQ_BR", "HQ_BR_M", "MASTER")
                 
                 // 4.4 게시판 기능 - 모든 역할 명시적 허용
                 // 게시글 GET 조회는 모든 인증된 사용자(본사 및 점주) 허용
