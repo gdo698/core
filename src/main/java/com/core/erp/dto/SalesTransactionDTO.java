@@ -4,6 +4,7 @@ import com.core.erp.domain.SalesTransactionEntity;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -24,6 +25,7 @@ public class SalesTransactionDTO {
     private LocalDateTime paidAt;
     private LocalDateTime refundedAt;
     private LocalDateTime createdAt;
+    private List<SalesDetailDTO> details;
 
     // Entity → DTO 변환 생성자
     public SalesTransactionDTO(SalesTransactionEntity entity) {
@@ -41,4 +43,6 @@ public class SalesTransactionDTO {
         this.createdAt = entity.getCreatedAt();
 
     }
+
+
 }

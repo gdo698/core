@@ -21,6 +21,11 @@ public class SalesDetailDTO {
     private Integer  realIncome;
     private Integer  isPromo;
 
+    private ProductDTO product;
+    private String productName;
+    private String category;
+
+
     // Entity → DTO 변환 생성자
     public SalesDetailDTO(SalesDetailEntity entity) {
         this.salesDetailId = entity.getSalesDetailId();
@@ -33,6 +38,15 @@ public class SalesDetailDTO {
         this.costPrice = entity.getCostPrice();
         this.realIncome = entity.getRealIncome();
         this.isPromo = entity.getIsPromo();
+
+        if (entity.getProduct() != null) {
+            this.productName = entity.getProduct().getProName();  // 상품명 세팅
+            this.product = new ProductDTO(entity.getProduct());
+
+            if (entity.getProduct().getCategory() != null) {
+                this.category = entity.getProduct().getCategory().getCategoryName();  // 카테고리명 세팅
+            }
+        }
     }
 
 }
