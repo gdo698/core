@@ -101,7 +101,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/headquarters/products/**").hasAnyRole("HQ_PRO", "HQ_PRO_M", "MASTER")
                 
                 // 4.2 인사팀 - 팀장은 추가 승인 권한 보유
-                .requestMatchers("/api/headquarters/hr/approve/**").hasAnyRole("HQ_HRM_M", "MASTER") // 팀장급만 접근 가능
+                .requestMatchers("/api/headquarters/hr/approve/**").hasAnyRole("HQ_HRM", "HQ_HRM_M", "MASTER") // Allow both HR staff and managers for approval
                 .requestMatchers("/api/headquarters/hr/**").hasAnyRole("HQ_HRM", "HQ_HRM_M", "MASTER") // 인사팀 전체 접근 가능
                 .requestMatchers("/api/departments").hasAnyRole("HQ", "HQ_HRM", "HQ_PRO", "HQ_BR", "MASTER", "STORE") // 부서 정보 조회
                 .requestMatchers("/api/employees/**").hasAnyRole("HQ", "HQ_HRM", "HQ_PRO", "HQ_BR", "MASTER", "STORE") // 사원 정보 조회

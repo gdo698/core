@@ -141,6 +141,18 @@ public class EmployeeManagementService {
             // 'STORE'는 DB에 '점주'로 저장
             if ("STORE".equals(dto.getEmpRole())) {
                 entity.setEmpRole("점주");
+                entity.setWorkType(3); // 점주 workType = 3
+                
+                // 점주인 경우 부서 ID를 항상 3으로 설정
+                try {
+                    DepartmentEntity storeDepartment = departmentRepository.findById(3)
+                            .orElseGet(() -> departmentRepository.findByDeptName("STORE"));
+                    entity.setDepartment(storeDepartment);
+                    System.out.println("신규 점주 부서 설정: " + (storeDepartment != null ? 
+                            storeDepartment.getDeptId() + "-" + storeDepartment.getDeptName() : "null"));
+                } catch (Exception e) {
+                    System.err.println("점주 부서 설정 오류: " + e.getMessage());
+                }
             } else if ("HQ".equals(dto.getEmpRole())) {
                 entity.setEmpRole("본사");
             } else {
@@ -214,6 +226,18 @@ public class EmployeeManagementService {
             // 'STORE'는 DB에 '점주'로 저장
             if ("STORE".equals(dto.getEmpRole())) {
                 entity.setEmpRole("점주");
+                entity.setWorkType(3); // 점주 workType = 3
+                
+                // 점주인 경우 부서 ID를 항상 3으로 설정
+                try {
+                    DepartmentEntity storeDepartment = departmentRepository.findById(3)
+                            .orElseGet(() -> departmentRepository.findByDeptName("STORE"));
+                    entity.setDepartment(storeDepartment);
+                    System.out.println("점주 부서 업데이트: " + (storeDepartment != null ? 
+                            storeDepartment.getDeptId() + "-" + storeDepartment.getDeptName() : "null"));
+                } catch (Exception e) {
+                    System.err.println("점주 부서 업데이트 오류: " + e.getMessage());
+                }
             } else if ("HQ".equals(dto.getEmpRole())) {
                 entity.setEmpRole("본사");
             } else {
@@ -233,8 +257,6 @@ public class EmployeeManagementService {
             // 새 매장 생성
             store = new StoreEntity();
             store.setStoreCreatedAt(LocalDateTime.now());
-            store.setStoreCert(""); // 기본값
-            store.setStoreAcc(""); // 기본값
         }
         
         // 매장 정보 업데이트
@@ -259,6 +281,37 @@ public class EmployeeManagementService {
         // 매장 저장 및 직원과 연결
         StoreEntity savedStore = storeRepository.save(store);
         employee.setStore(savedStore);
+        
+        // 점주(STORE)인 경우 부서 ID를 강제로 3으로 설정
+        if ("점주".equals(employee.getEmpRole()) || "STORE".equals(dto.getEmpRole())) {
+            try {
+                System.out.println("점주 부서 ID 설정 시작 (handleStoreInfo): 직원ID=" + employee.getEmpId());
+                
+                // 부서 ID 3(STORE) 조회
+                DepartmentEntity storeDepartment = departmentRepository.findById(3)
+                        .orElseGet(() -> {
+                            System.out.println("부서 ID 3을 찾을 수 없어 STORE 이름으로 조회 시도");
+                            return departmentRepository.findByDeptName("STORE");
+                        });
+                
+                if (storeDepartment != null) {
+                    // 현재 부서 정보 출력
+                    System.out.println("현재 부서 정보: ID=" + 
+                        (employee.getDepartment() != null ? employee.getDepartment().getDeptId() : "null"));
+                    
+                    // 부서 설정
+                    employee.setDepartment(storeDepartment);
+                    employee.setWorkType(3); // 점주 workType = 3
+                    
+                    System.out.println("점주 부서 설정 완료: 부서ID=" + storeDepartment.getDeptId());
+                } else {
+                    System.err.println("STORE 부서를 찾을 수 없습니다. 부서 설정 실패.");
+                }
+            } catch (Exception e) {
+                System.err.println("점주 부서 설정 중 오류 발생: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
     }
 
     private EmployeeManagementDTO convertToDTO(EmployeeEntity entity) {
