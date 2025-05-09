@@ -20,6 +20,7 @@ public class StoreInquiryDTO {
     private int inqType; // 1: 컴플레인, 2: 칭찬, 3: 건의/문의
     private int inqStatus; // 1: 완료, 2: 대기, 3: 취소/반려
     private LocalDateTime inqCreatedAt;
+    private Integer inqLevel; // 문의 평가 등급 (1~5)
 
     // 프론트엔드와 호환을 위한 추가 필드
     private String storeName;
@@ -36,6 +37,7 @@ public class StoreInquiryDTO {
         this.inqType = entity.getInqType();
         this.inqStatus = entity.getInqStatus();
         this.inqCreatedAt = entity.getInqCreatedAt();
+        this.inqLevel = entity.getInqLevel();
 
         // 가게 정보 추가
         if (entity.getStore() != null) {

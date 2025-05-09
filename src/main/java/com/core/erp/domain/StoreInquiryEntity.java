@@ -1,5 +1,6 @@
 package com.core.erp.domain;
 
+import com.core.erp.dto.StoreInquiryDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,5 +40,16 @@ public class StoreInquiryEntity {
     private LocalDateTime inqCreatedAt;
 
     @Column(name = "inq_level")
-    private int inqLevel;
+    private Integer inqLevel;
+
+    // DTO → Entity 변환 생성자
+    public StoreInquiryEntity(StoreInquiryDTO dto, StoreEntity store) {
+        this.inquiryId = dto.getInquiryId();
+        this.store = store;
+        this.inqPhone = dto.getInqPhone();
+        this.inqContent = dto.getInqContent();
+        this.inqType = dto.getInqType();
+        this.inqStatus = dto.getInqStatus();
+        this.inqCreatedAt = dto.getInqCreatedAt() != null ? dto.getInqCreatedAt() : LocalDateTime.now();
+    }
 }
