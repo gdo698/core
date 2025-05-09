@@ -28,12 +28,21 @@ public class AttendanceInfoController {
     public Map<String, Object> getMyAttendanceInfo(Authentication authentication) {
         CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
         String loginId = principal.getLoginId();
+        
+        System.out.println("마이페이지 API 호출: 로그인ID = " + loginId);
 
         EmployeeEntity emp = employeeRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new RuntimeException("사원 정보 없음"));
+        
+        System.out.println("사원 정보 조회 성공: 사원ID = " + emp.getEmpId() + ", 이름 = " + emp.getEmpName());
 
         // 근태 정보 조회
         AttendanceInfoDTO attendanceInfo = attendanceInfoService.getEmployeeAttendanceInfo(emp.getEmpId());
+        
+        System.out.println("근태 정보 조회 결과:");
+        System.out.println("- 근무일수: " + (attendanceInfo != null ? attendanceInfo.getAttendanceDays() : "null"));
+        System.out.println("- 지각횟수: " + (attendanceInfo != null ? attendanceInfo.getLateCount() : "null"));
+        System.out.println("- 결근횟수: " + (attendanceInfo != null ? attendanceInfo.getAbsentCount() : "null"));
 
         // 사원 정보 DTO 변환
         EmployeeDTO employeeDTO = new EmployeeDTO(emp);
@@ -53,12 +62,17 @@ public class AttendanceInfoController {
 
         // 근태 정보 필드명 수정 - 프론트엔드 컴포넌트와 일치시킴
         if (attendanceInfo != null) {
-            response.put("attendanceDays", attendanceInfo.getAttendanceDays());
-            response.put("lateCount", attendanceInfo.getLateCount());
-            response.put("absentCount", attendanceInfo.getAbsentCount());
-            response.put("annualLeaveRemain", attendanceInfo.getAnnualLeaveRemain());
-            response.put("annualLeaveTotal", attendanceInfo.getAnnualLeaveTotal());
+            // 명시적으로 정수형으로 변환하여 저장
+            response.put("attendanceDays", Integer.valueOf(attendanceInfo.getAttendanceDays()));
+            response.put("lateCount", Integer.valueOf(attendanceInfo.getLateCount()));
+            response.put("absentCount", Integer.valueOf(attendanceInfo.getAbsentCount()));
+            response.put("annualLeaveRemain", Integer.valueOf(attendanceInfo.getAnnualLeaveRemain()));
+            response.put("annualLeaveTotal", Integer.valueOf(attendanceInfo.getAnnualLeaveTotal()));
             response.put("salaryDay", attendanceInfo.getSalaryDay());
+            
+            // 디버깅: 변환 후 값과 타입 확인
+            System.out.println("변환 후 근무일수: " + response.get("attendanceDays") + 
+                               ", 타입: " + response.get("attendanceDays").getClass().getName());
         } else {
             // 기본값 설정
             response.put("attendanceDays", 0);
@@ -93,6 +107,8 @@ public class AttendanceInfoController {
             response.put("storeId", emp.getStore().getStoreId());
             response.put("storeName", emp.getStore().getStoreName());
         }
+        
+        System.out.println("응답 데이터 준비 완료: " + response);
 
         return response;
     }

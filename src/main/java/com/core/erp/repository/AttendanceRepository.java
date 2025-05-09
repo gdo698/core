@@ -34,5 +34,8 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, In
     );
 
     Optional<AttendanceEntity> findByEmployee_EmpIdAndAttendDate(int i, LocalDate today);
+    
+    // 특정 직원의 특정 날짜 최신 출근 기록 조회 (in_time 기준 내림차순)
+    Optional<AttendanceEntity> findTopByEmployee_EmpIdAndAttendDateOrderByInTimeDesc(int empId, LocalDate attendDate);
 }
 

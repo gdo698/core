@@ -7,9 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,15 +28,66 @@ public class AttendanceInfoService {
     private AnnualLeaveRepository annualLeaveRepository;
     @Autowired
     private SalaryRepository salaryRepository;
+    
+    // 매장 직원이나 점주에 해당하는 역할 코드 목록
+    private static final List<String> STORE_ROLES = Arrays.asList("STORE", "점주", "MANAGER", "STAFF");
 
     public AttendanceInfoDTO getEmployeeAttendanceInfo(int empId) {
         EmployeeEntity empEntity = employeeRepository.findById(empId)
             .orElseThrow(() -> new RuntimeException("사원 정보 없음"));
         EmployeeDTO emp = new EmployeeDTO(empEntity);
 
+        // 입사일부터 오늘까지의 총 근무 가능 일수 계산 (주말 제외)
+        int totalWorkingDays = 0;
+        LocalDate hireDate = null;
+        
+        if (empEntity.getHireDate() != null) {
+            hireDate = empEntity.getHireDate().toLocalDate();
+            LocalDate today = LocalDate.now();
+            
+            // 입사일부터 오늘까지 날짜를 순회하면서 주말 제외한 근무일수 계산
+            for (LocalDate date = hireDate; !date.isAfter(today); date = date.plusDays(1)) {
+                DayOfWeek dayOfWeek = date.getDayOfWeek();
+                if (dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY) {
+                    totalWorkingDays++;
+                }
+            }
+            
+            System.out.println("입사일(" + hireDate + ")부터 오늘까지 총 근무일수(주말 제외): " + totalWorkingDays);
+        } else {
+            System.out.println("입사일이 null입니다. 사원ID: " + empId);
+            // 입사일이 없는 경우 기본값으로 6개월(약 130일)의 근무일 가정
+            totalWorkingDays = 130;
+        }
+
+        // 실제 출근-퇴근 완료된 날짜 수 계산
         List<AttendanceEntity> attendanceEntities = attendanceRepository.findByEmployee_EmpId(empId);
+        System.out.println("사원ID: " + empId + ", 총 출퇴근 기록 수: " + attendanceEntities.size());
+        
+        // 디버깅: 모든 출퇴근 기록 출력
+        for (AttendanceEntity attend : attendanceEntities) {
+            System.out.println("기록ID: " + attend.getAttendId() 
+                + ", 날짜: " + attend.getAttendDate() 
+                + ", 출근시간: " + attend.getInTime() 
+                + ", 퇴근시간: " + attend.getOutTime() 
+                + ", 상태: " + attend.getAttendStatus());
+        }
+        
+        int actualAttendanceDays = (int) attendanceEntities.stream()
+            .filter(a -> a.getInTime() != null && a.getOutTime() != null)
+            .map(a -> a.getAttendDate())
+            .distinct()
+            .count();
+        
+        System.out.println("사원ID: " + empId + ", 출퇴근 완료된 실제 근무일수: " + actualAttendanceDays);
+        
+        // 출퇴근 기록이 없거나 적을 경우 입사일 기준 근무일수 사용
+        if (actualAttendanceDays < 5 && totalWorkingDays > 0) {
+            System.out.println("출퇴근 기록이 적어 입사일 기준 근무일수를 사용합니다: " + totalWorkingDays);
+            actualAttendanceDays = totalWorkingDays;
+        }
+
         List<AttendanceDTO> attendances = attendanceEntities.stream().map(AttendanceDTO::new).collect(Collectors.toList());
-        int attendanceDays = attendances.size();
         int lateCount = (int) attendances.stream().filter(a -> a.getAttendStatus() == 2).count();
         int absentCount = (int) attendances.stream().filter(a -> a.getAttendStatus() == 3).count();
 
@@ -49,7 +103,8 @@ public class AttendanceInfoService {
 
         AttendanceInfoDTO attendInfoDto = new AttendanceInfoDTO();
         attendInfoDto.setEmployee(emp);
-        attendInfoDto.setAttendanceDays(attendanceDays);
+        // 마이페이지에는 실제 출퇴근 완료 일수를 표시
+        attendInfoDto.setAttendanceDays(actualAttendanceDays);
         attendInfoDto.setLateCount(lateCount);
         attendInfoDto.setAbsentCount(absentCount);
         attendInfoDto.setAnnualLeaveUsed(annualLeaveUsed);
@@ -61,74 +116,88 @@ public class AttendanceInfoService {
     }
     
     /**
-     * 출근 기록 저장
+     * 직원이 본사 직원인지 확인
+     * STORE, 점주 역할을 가진 직원이 아닌 경우 본사 직원으로 간주
+     */
+    private boolean isHeadquartersEmployee(EmployeeEntity employee) {
+        // 역할 코드가 없는 경우 기본값 설정
+        String empRole = employee.getEmpRole() != null ? employee.getEmpRole() : "";
+        
+        // 매장 직원/점주 역할을 가진 경우 본사 직원이 아님
+        for (String storeRole : STORE_ROLES) {
+            if (empRole.contains(storeRole)) {
+                return false;
+            }
+        }
+        
+        // 그 외 모든 경우는 본사 직원으로 간주
+        return true;
+    }
+    
+    /**
+     * 출근 기록 저장 - 누적 방식으로 새 레코드 생성
      */
     @Transactional
     public void recordCheckIn(Long empId, String date, String checkInTime, boolean isLate) {
         EmployeeEntity employee = employeeRepository.findById(empId.intValue())
             .orElseThrow(() -> new RuntimeException("사원 정보 없음"));
         
-        // 이미 오늘 출근 기록이 있는지 확인
-        LocalDate today = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        Optional<AttendanceEntity> existingAttendance = attendanceRepository.findByEmployee_EmpIdAndAttendDate(
-            empId.intValue(), today);
-        
-        if (existingAttendance.isPresent()) {
-            // 기존 출근 기록 업데이트
-            AttendanceEntity attendance = existingAttendance.get();
-            attendance.setCheckInTime(checkInTime);
-            attendance.setAttendStatus(isLate ? 2 : 1); // 1: 정상출근, 2: 지각
-            attendanceRepository.save(attendance);
-        } else {
-            // 새 출근 기록 생성
-            AttendanceEntity attendance = new AttendanceEntity();
-            attendance.setEmployee(employee);
-            attendance.setAttendDate(today);
-            
-            // 현재 시간 정보 설정
-            LocalDateTime now = LocalDateTime.now();
-            
-            // 체크인 시간을 파싱 (예: "09:30" 형식)
-            String[] timeParts = checkInTime.split(":");
-            LocalDateTime inTimeValue = now.withHour(Integer.parseInt(timeParts[0]))
-                .withMinute(Integer.parseInt(timeParts[1]))
-                .withSecond(0)
-                .withNano(0);
-            
-            // 필수 필드 설정
-            attendance.setWorkDate(now); // 작업 날짜 설정
-            attendance.setInTime(inTimeValue); // in_time 필드 설정 (nullable=false)
-            attendance.setCheckInTime(checkInTime);
-            attendance.setAttendStatus(isLate ? 2 : 1); // 1: 정상출근, 2: 지각
-            attendanceRepository.save(attendance);
+        // 본사 직원인지 확인
+        if (!isHeadquartersEmployee(employee)) {
+            return; // 본사 직원이 아니면 처리하지 않음
         }
+        
+        LocalDate today = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalDateTime now = LocalDateTime.now();
+        
+        // 출근 시간 파싱 (예: "09:30" 형식)
+        String[] timeParts = checkInTime.split(":");
+        LocalDateTime inTimeValue = now.withHour(Integer.parseInt(timeParts[0]))
+            .withMinute(Integer.parseInt(timeParts[1]))
+            .withSecond(0)
+            .withNano(0);
+        
+        // 항상 새 레코드 생성 (누적 방식)
+        AttendanceEntity attendance = new AttendanceEntity();
+        attendance.setEmployee(employee);
+        attendance.setAttendDate(today);
+        attendance.setWorkDate(now);
+        attendance.setInTime(inTimeValue);
+        attendance.setAttendStatus(isLate ? 2 : 1); // 1: 정상출근, 2: 지각
+        attendanceRepository.save(attendance);
     }
     
     /**
-     * 퇴근 기록 저장
+     * 퇴근 기록 저장 - 오늘의 최신 출근 기록에 퇴근 시간 추가
      */
     @Transactional
     public void recordCheckOut(Long empId, String date, String checkOutTime, boolean isEarlyLeave) {
-        // 오늘 출근 기록 조회
+        EmployeeEntity employee = employeeRepository.findById(empId.intValue())
+            .orElseThrow(() -> new RuntimeException("사원 정보 없음"));
+        
+        // 본사 직원인지 확인
+        if (!isHeadquartersEmployee(employee)) {
+            return; // 본사 직원이 아니면 처리하지 않음
+        }
+        
         LocalDate today = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        Optional<AttendanceEntity> existingAttendance = attendanceRepository.findByEmployee_EmpIdAndAttendDate(
+        LocalDateTime now = LocalDateTime.now();
+        
+        // 퇴근 시간 파싱 (예: "18:30" 형식)
+        String[] timeParts = checkOutTime.split(":");
+        LocalDateTime outTimeValue = now.withHour(Integer.parseInt(timeParts[0]))
+            .withMinute(Integer.parseInt(timeParts[1]))
+            .withSecond(0)
+            .withNano(0);
+        
+        // 오늘 최신 출근 기록 조회
+        Optional<AttendanceEntity> latestCheckIn = attendanceRepository.findTopByEmployee_EmpIdAndAttendDateOrderByInTimeDesc(
             empId.intValue(), today);
         
-        if (existingAttendance.isPresent()) {
-            // 기존 출근 기록이 있는 경우
-            AttendanceEntity attendance = existingAttendance.get();
-            
-            // 퇴근 시간 파싱 (예: "18:30" 형식)
-            LocalDateTime now = LocalDateTime.now();
-            String[] timeParts = checkOutTime.split(":");
-            LocalDateTime outTimeValue = now.withHour(Integer.parseInt(timeParts[0]))
-                .withMinute(Integer.parseInt(timeParts[1]))
-                .withSecond(0)
-                .withNano(0);
-            
-            // 퇴근 시간 업데이트
-            attendance.setOutTime(outTimeValue); // out_time 필드 설정
-            attendance.setCheckOutTime(checkOutTime);
+        if (latestCheckIn.isPresent()) {
+            // 최신 출근 기록에 퇴근 시간 추가
+            AttendanceEntity attendance = latestCheckIn.get();
+            attendance.setOutTime(outTimeValue);
             
             // 조퇴인 경우 상태 업데이트 (이미 지각인 경우 상태 유지)
             if (isEarlyLeave && attendance.getAttendStatus() == 1) {
@@ -137,33 +206,15 @@ public class AttendanceInfoService {
             
             attendanceRepository.save(attendance);
         } else {
-            // 출근 기록이 없는 경우, 자동으로 출근 기록 생성 후 퇴근 처리
-            EmployeeEntity employee = employeeRepository.findById(empId.intValue())
-                .orElseThrow(() -> new RuntimeException("사원 정보 없음"));
-            
-            // 현재 시간 정보
-            LocalDateTime now = LocalDateTime.now();
-            
-            // 기본 출근 시간 (09:00) 설정
-            LocalDateTime inTimeValue = now.withHour(9).withMinute(0).withSecond(0).withNano(0);
-            
-            // 퇴근 시간 파싱
-            String[] timeParts = checkOutTime.split(":");
-            LocalDateTime outTimeValue = now.withHour(Integer.parseInt(timeParts[0]))
-                .withMinute(Integer.parseInt(timeParts[1]))
-                .withSecond(0)
-                .withNano(0);
-            
+            // 출근 기록이 없는 경우, 새로운 레코드 생성
             AttendanceEntity attendance = new AttendanceEntity();
             attendance.setEmployee(employee);
             attendance.setAttendDate(today);
-            attendance.setWorkDate(now); // workDate 필드 설정
-            attendance.setInTime(inTimeValue); // in_time 필드 설정 (nullable=false)
-            attendance.setOutTime(outTimeValue); // out_time 필드 설정
-            attendance.setCheckInTime("09:00"); // 기본 출근 시간 설정
-            attendance.setCheckOutTime(checkOutTime);
-            attendance.setAttendStatus(isEarlyLeave ? 4 : 1); // 조퇴인 경우 4, 아니면 정상출근 1
-            
+            attendance.setWorkDate(now);
+            // 기본 출근 시간을 09:00으로 설정
+            attendance.setInTime(now.withHour(9).withMinute(0).withSecond(0).withNano(0));
+            attendance.setOutTime(outTimeValue);
+            attendance.setAttendStatus(isEarlyLeave ? 4 : 1);
             attendanceRepository.save(attendance);
         }
     }

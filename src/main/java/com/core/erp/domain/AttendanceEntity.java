@@ -45,15 +45,9 @@ public class AttendanceEntity {
 
     @Column(name = "in_time", nullable = false)
     private LocalDateTime inTime;
-    
-    @Column(name = "check_in_time")
-    private String checkInTime;
 
     @Column(name = "out_time")
     private LocalDateTime outTime;
-    
-    @Column(name = "check_out_time")
-    private String checkOutTime;
 
     @Column(name = "attend_status", nullable = false)
     private int attendStatus;
