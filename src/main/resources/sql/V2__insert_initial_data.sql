@@ -202,8 +202,8 @@ INSERT INTO `product` (`product_id`, `category_id`, `pro_name`, `pro_barcode`, `
 (36, 32, '펩시', 8801234567925, 750, 1700, '2024-01-28 12:05:00', '2024-01-28 12:05:00', 'https://example.com/images/pepsi.jpg', 0,100),
 
 -- 사이다(33) 카테고리의 상품들
-(37, 33, '칠성사이다 제로', 8801234567926, 800, 1800, '2024-01-28 12:10:00', '2024-01-28 12:10:00', 'https://example.com/images/cider_zero.jpg', 0,100),
-(38, 33, '스프라이트', 8801094203207, 750, 1700, '2024-01-28 12:15:00', '2024-01-28 12:15:00', 'https://example.com/images/sprite.jpg', 0,100);
+(37, 33, '칠성사이다 제로', 8801234567926, 800, 1800, '2024-01-28 12:10:00', '2024-01-28 12:10:00', 'https://example.com/images/cider_zero.jpg', 2,100),
+(38, 33, '스프라이트', 8801094203207, 750, 1700, '2024-01-28 12:15:00', '2024-01-28 12:15:00', 'https://example.com/images/sprite.jpg', 3,100);
 
 -- 7. 상품 세부항목(product_details) 데이터
 INSERT INTO `product_details` (`pro_detail_id`, `product_id`, `manufacturer`, `manu_num`, `shelf_life`, `allergens`, `storage_method`) VALUES
@@ -1036,7 +1036,9 @@ INSERT INTO stock_in_history (history_id, store_id, part_timer_id, product_id, o
 (90, 2, 56, 24, 21, 15, '2025-04-23 02:52:21', '2025-09-11', 2),
 (91, 9, 35, 35, 25, 16, '2025-04-18 02:52:21', '2025-09-06', 6),
 (92, 10, 35, 21, 28, 8, '2025-04-24 02:52:21', '2025-08-03', 4),
-(93, 4, 60, 37, 20, 13, '2025-04-20 02:52:21', '2025-05-27', 4);
+(93, 4, 60, 37, 20, 13, '2025-04-20 02:52:21', '2025-05-27', 4),
+(94, 1, 38, 18, 20, 5, '2025-04-19 02:52:21', '2025-06-20', 1);
+
 
 -- 19. disposal(폐기) 데이터
 INSERT INTO disposal (disposal_id, stock_id, disposal_date, disposal_quantity, processed_by, total_loss_amount, disposal_reason) VALUES
@@ -1969,5 +1971,14 @@ INSERT INTO pw_reset_token (prtoken_id, emp_id, reset_token, prtoken_exp, prtoke
 (4, 14, 'reset-token-14', '2025-04-26 23:59:59', true, '2025-04-25 10:00:00');
 -- emp_id 15는 요청하지 않아서 없음
 
-
-
+INSERT INTO warehouse_stock (stock_id, warehouse_id, store_id, product_id, quantity, last_in_date, stock_status) VALUES
+(1, 1, 1, 24, 50, '2025-04-05 12:00:00', 1),
+(2, 1, 1, 5, 30, '2025-04-10 14:30:00', 2),
+(3, 1, 1, 10, 70, '2025-05-01 09:00:00', 1),
+(4, 2, 2, 3, 25, '2025-04-12 16:45:00', 3),
+(5, 2, 2, 7, 80, '2025-05-03 11:15:00', 1),
+(6, 3, 3, 15, 60, '2025-04-15 13:20:00', 1),
+(7, 3, 3, 19, 90, '2025-04-20 15:00:00', 2),
+(8, 4, 4, 25, 45, '2025-04-18 10:30:00', 1),
+(9, 4, 4, 30, 100, '2025-04-25 14:00:00', 1),
+(10, 5, 5, 35, 55, '2025-05-02 08:45:00', 3);

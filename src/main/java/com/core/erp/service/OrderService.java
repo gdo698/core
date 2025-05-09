@@ -61,9 +61,9 @@ public class OrderService {
         LocalDateTime now = LocalDateTime.now();
 
         // 이번 회차에 발주가 존재하는지 확인
-        if (isAlreadyOrdered(storeId, now)) {
-            throw new IllegalStateException("이미 " + getPeriod(now) + " 발주가 등록되었습니다.");
-        }
+//        if (isAlreadyOrdered(storeId, now)) {
+//            throw new IllegalStateException("이미 " + getPeriod(now) + " 발주가 등록되었습니다.");
+//        }
 
         List<OrderItemRequestDTO> items = requestDTO.getItems();
 

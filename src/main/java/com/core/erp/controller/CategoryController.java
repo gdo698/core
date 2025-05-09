@@ -36,4 +36,22 @@ public class CategoryController {
         }
         return roots;
     }
+
+    // 대분류 (parentCategoryId가 NULL인 경우)
+    @GetMapping("/parents")
+    public List<CategoryTreeDTO> getParentCategories() {
+        return categoryRepository.findByParentCategoryIsNull()
+                .stream()
+                .map(c -> new CategoryTreeDTO(c.getCategoryId(), c.getCategoryName(), new ArrayList<>(), null))
+                .collect(Collectors.toList());
+    }
+
+    // 하위 카테고리 (parentCategoryId로 조회)
+    @GetMapping("/children/{parentId}")
+    public List<CategoryTreeDTO> getChildrenCategories(@PathVariable Integer parentId) {
+        return categoryRepository.findByParentCategory_CategoryId(parentId)
+                .stream()
+                .map(c -> new CategoryTreeDTO(c.getCategoryId(), c.getCategoryName(), new ArrayList<>(), parentId))
+                .collect(Collectors.toList());
+    }
 }

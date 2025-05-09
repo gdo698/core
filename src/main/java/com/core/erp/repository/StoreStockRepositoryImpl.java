@@ -27,56 +27,71 @@ public class StoreStockRepositoryImpl implements StockRepositoryCustom {
             Integer categoryId,
             Pageable pageable
     ) {
+        // ✅ 메인 데이터 쿼리
         StringBuilder jpql = new StringBuilder();
         jpql.append("SELECT new com.core.erp.dto.TotalStockDTO(")
-                .append("s.storeId, s.storeName, ")
+                .append(":storeId, ")
+                .append("(SELECT s.storeName FROM StoreEntity s WHERE s.storeId = :storeId), ")
                 .append("p.proName, p.proBarcode, c.categoryName, ")
-                .append("COALESCE(SUM(ss.quantity), 0), ")
-                .append("COALESCE(SUM(ws.quantity), 0), ")
-                .append("COALESCE(SUM(ss.quantity), 0) + COALESCE(SUM(ws.quantity), 0), ")
-                .append("MAX(shi.inDate), ")
-                .append("CASE p.isPromo ")
-                .append("WHEN 1 THEN '단종' ")
-                .append("WHEN 2 THEN '1+1' ")
-                .append("WHEN 3 THEN '2+1' ")
-                .append("ELSE '없음' END) ")
+                .append("(SELECT COALESCE(SUM(sse.quantity), 0) FROM StoreStockEntity sse WHERE sse.product = p AND sse.store.storeId = :storeId), ")
+                .append("(SELECT COALESCE(SUM(wse.quantity), 0) FROM WarehouseStockEntity wse WHERE wse.product = p AND wse.store.storeId = :storeId), ")
+                .append("(SELECT COALESCE(SUM(sse.quantity), 0) FROM StoreStockEntity sse WHERE sse.product = p AND sse.store.storeId = :storeId) + ")
+                .append("(SELECT COALESCE(SUM(wse.quantity), 0) FROM WarehouseStockEntity wse WHERE wse.product = p AND wse.store.storeId = :storeId), ")
+                .append("(SELECT MAX(shi.inDate) FROM StockInHistoryEntity shi WHERE shi.product = p AND shi.store.storeId = :storeId), ")
+                .append("CASE p.isPromo WHEN 1 THEN '단종' WHEN 2 THEN '1+1' WHEN 3 THEN '2+1' ELSE '없음' END) ")
                 .append("FROM ProductEntity p ")
                 .append("LEFT JOIN p.category c ")
-                .append("LEFT JOIN StoreStockEntity ss ON ss.product = p ")
-                .append("LEFT JOIN ss.store s ")
-                .append("LEFT JOIN WarehouseStockEntity ws ON ws.product = p ")
-                .append("LEFT JOIN StockInHistoryEntity shi ON shi.product = p ")
                 .append("WHERE 1=1 ");
 
+        if (productName != null && !productName.isBlank())
+            jpql.append("AND p.proName LIKE :productName ");
+        if (barcode != null && barcode != 0)
+            jpql.append("AND p.proBarcode = :barcode ");
+        if (categoryId != null)
+            jpql.append("AND c.categoryId = :categoryId ");
 
-        if (storeId != null) {
-            jpql.append("AND s.id = :storeId ");
-        }
-        if (productName != null && !productName.isBlank()) {
-            jpql.append("AND p.productName LIKE :productName ");
-        }
-        if (barcode != null && barcode !=0) {
-            jpql.append("AND p.barcode LIKE :barcode ");
-        }
-        if (categoryId != null) {
-            jpql.append("AND c.id = :categoryId ");
-        }
-
-        jpql.append("GROUP BY p.productId, s.storeId, s.storeName, p.proName, p.proBarcode, c.categoryName, p.isPromo");
+        jpql.append("GROUP BY p.productId, p.proName, p.proBarcode, c.categoryName, p.isPromo");
 
         TypedQuery<TotalStockDTO> query = em.createQuery(jpql.toString(), TotalStockDTO.class);
 
         if (storeId != null) query.setParameter("storeId", storeId);
-        if (productName != null && !productName.isBlank()) query.setParameter("productName", "%" + productName + "%");
-        if (barcode != null && barcode !=0) query.setParameter("barcode", "%" + barcode + "%");
-        if (categoryId != null) query.setParameter("categoryId", categoryId);
+        if (productName != null && !productName.isBlank())
+            query.setParameter("productName", "%" + productName + "%");
+        if (barcode != null && barcode != 0)
+            query.setParameter("barcode", barcode);
+        if (categoryId != null)
+            query.setParameter("categoryId", categoryId);
 
-        // 페이징 계산
-        int totalRows = query.getResultList().size();
         query.setFirstResult((int) pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());
 
         List<TotalStockDTO> results = query.getResultList();
+
+        // ✅ COUNT 쿼리 (페이징 정확하게)
+        StringBuilder countJpql = new StringBuilder();
+        countJpql.append("SELECT COUNT(DISTINCT p.productId) ")
+                .append("FROM ProductEntity p ")
+                .append("LEFT JOIN p.category c ")
+                .append("WHERE 1=1 ");
+
+        if (productName != null && !productName.isBlank())
+            countJpql.append("AND p.proName LIKE :productName ");
+        if (barcode != null && barcode != 0)
+            countJpql.append("AND p.proBarcode = :barcode ");
+        if (categoryId != null)
+            countJpql.append("AND c.categoryId = :categoryId ");
+
+        TypedQuery<Long> countQuery = em.createQuery(countJpql.toString(), Long.class);
+
+        if (productName != null && !productName.isBlank())
+            countQuery.setParameter("productName", "%" + productName + "%");
+        if (barcode != null && barcode != 0)
+            countQuery.setParameter("barcode", barcode);
+        if (categoryId != null)
+            countQuery.setParameter("categoryId", categoryId);
+
+        long totalRows = countQuery.getSingleResult();
+
         return new PageImpl<>(results, pageable, totalRows);
     }
 }
