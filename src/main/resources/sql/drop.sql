@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS `disposal`;
 DROP TABLE IF EXISTS `sales_detail`;
 DROP TABLE IF EXISTS `sales_transaction`;
+DROP TABLE IF EXISTS `sales_settlement`;
 DROP TABLE IF EXISTS `stock_in_history`;
 DROP TABLE IF EXISTS `purchase_order_item`;
 DROP TABLE IF EXISTS `sales_stats`;
@@ -36,6 +37,7 @@ DROP TABLE IF EXISTS `department`;
 DROP TABLE IF EXISTS `part_timer_salary`;
 DROP TABLE IF EXISTS `shift_schedule`;
 DROP TABLE IF EXISTS `part_timer`;
+DROP TABLE IF EXISTS `store_inquiry`;
 DROP TABLE IF EXISTS `store`;
 DROP TABLE IF EXISTS `flyway_schema_history`;
 DROP TABLE IF EXISTS `email_verification`;

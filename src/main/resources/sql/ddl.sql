@@ -14,6 +14,19 @@ CREATE TABLE `store` (
                          PRIMARY KEY (`store_id`)
 );
 
+CREATE TABLE `store_inquiry` (
+                                 `inquiry_id` INT NOT NULL AUTO_INCREMENT COMMENT '문의/컴플레인 고유 번호',
+                                 `store_id` INT NOT NULL COMMENT '매장 고유 번호',
+                                 `inq_phone` VARCHAR(30) NOT NULL COMMENT '문의자 연락처',
+                                 `inq_content` VARCHAR(255) NOT NULL COMMENT '문의/컴플레인 내용',
+                                 `inq_type` TINYINT NOT NULL COMMENT '1: 컴플레인, 2: 칭찬, 3: 건의/문의',
+                                 `inq_status` TINYINT NOT NULL DEFAULT 2 COMMENT '1: 완료, 2: 대기, 3: 취소/반려',
+                                 `inq_level` TINYINT NULL COMMENT '1 ~ 5',
+                                 `inq_created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '문의 작성 일자',
+                                 PRIMARY KEY (`inquiry_id`),
+                                 FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`)
+);
+
 CREATE TABLE `category` (
                             `category_id` int NOT NULL AUTO_INCREMENT COMMENT '자동생성, 카테고리 id',
                             `category_name` VARCHAR(30) NOT NULL COMMENT '식품, 용품, 신선식품, 샌드위치...',
@@ -205,7 +218,8 @@ CREATE TABLE `sales_transaction` (
                                      `paid_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '결제 시간',
                                      `refunded_at` DATETIME DEFAULT NULL COMMENT '환불 시간',
                                      `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '거래 생성 시간',
-
+                                     `age_group` INT NULL COMMENT '연령대',
+                                     `gender` VARCHAR(10) NULL COMMENT '성별',
                                      FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`),
                                      FOREIGN KEY (`emp_id`) REFERENCES `employee` (`emp_id`)
 );
@@ -223,6 +237,19 @@ CREATE TABLE `sales_detail` (
 
                                 FOREIGN KEY (`transaction_id`) REFERENCES `sales_transaction` (`transaction_id`),
                                 FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`)
+);
+
+CREATE TABLE `sales_settlement` (
+                                    `settlement_id` INT AUTO_INCREMENT PRIMARY KEY COMMENT '매출 정산 고유 ID',
+                                    `store_id` INT NOT NULL COMMENT '매장 고유번호',
+                                    `settlement_date` DATE NOT NULL COMMENT '정산일자',
+                                    `total_revenue` INT NOT NULL COMMENT '총 매출',
+                                    `discount_total` INT DEFAULT 0 COMMENT '총 할인 금액',
+                                    `final_amount` INT NOT NULL COMMENT '최종 결제 금액 (할인 적용 후)',
+                                    `settlement_type` ENUM('daily', 'monthly', 'yearly') NOT NULL COMMENT '정산 종류 (일별, 월별, 연도별)',
+                                    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '정산 기록 생성 시간',
+                                    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '정산 기록 수정 시간',
+                                    FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`)
 );
 
 CREATE TABLE `sales_statistics` (
@@ -473,3 +500,5 @@ CREATE TABLE `stock_in_history` (
                                     FOREIGN KEY (`order_id`) REFERENCES `purchase_order` (`order_id`),
                                     FOREIGN KEY (`part_timer_id`) REFERENCES `part_timer` (`part_timer_id`)
 );
+
+

@@ -26,6 +26,9 @@ public class SalesTransactionDTO {
     private LocalDateTime refundedAt;
     private LocalDateTime createdAt;
     private List<SalesDetailDTO> details;
+    private Integer ageGroup;
+    private String gender;
+
 
     // Entity → DTO 변환 생성자
     public SalesTransactionDTO(SalesTransactionEntity entity) {
@@ -41,6 +44,8 @@ public class SalesTransactionDTO {
         this.paidAt = entity.getPaidAt();
         this.refundedAt = entity.getRefundedAt();
         this.createdAt = entity.getCreatedAt();
+        this.ageGroup = entity.getAgeGroup();
+        this.gender = entity.getGender();
 
     }
 

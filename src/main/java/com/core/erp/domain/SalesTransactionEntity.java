@@ -55,6 +55,12 @@ public class SalesTransactionEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "age_group")
+    private Integer ageGroup;
+
+    @Column(name = "gender", length = 10)
+    private String gender;
+
     // DTO → Entity 변환 생성자
     public SalesTransactionEntity(SalesTransactionDTO dto) {
         this.transactionId = dto.getTransactionId();
@@ -68,5 +74,7 @@ public class SalesTransactionEntity {
         this.paidAt = dto.getPaidAt();
         this.refundedAt = dto.getRefundedAt();
         this.createdAt = dto.getCreatedAt();
+        this.ageGroup = dto.getAgeGroup();
+        this.gender = dto.getGender();
     }
 }
