@@ -14,5 +14,7 @@ public interface SalesDetailRepository extends JpaRepository<SalesDetailEntity, 
             "LEFT JOIN FETCH p.category " +
             "WHERE d.transaction.transactionId = :transactionId")
     List<SalesDetailEntity> findWithProductByTransactionId(@Param("transactionId") Integer transactionId);
+
+    List<SalesDetailEntity> findByTransaction_TransactionId(Integer transactionId);
 }
 

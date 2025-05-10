@@ -3,15 +3,19 @@ package com.core.pos.service;
 import com.core.erp.domain.*;
 import com.core.erp.repository.*;
 import com.core.pos.dto.SaleItemDTO;
+import com.core.pos.dto.SaleItemSummaryDTO;
 import com.core.pos.dto.SaleRequestDTO;
 import com.core.erp.repository.SalesDetailRepository;
 import com.core.erp.repository.SalesTransactionRepository;
+import com.core.pos.dto.SalesHistoryDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,17 +26,9 @@ public class PosService {
     private final SalesTransactionRepository salesTransactionRepository;
     private final SalesDetailRepository salesDetailRepository;
 
+    // 거래 저장
     @Transactional
     public void saveTransactionWithDetails(SaleRequestDTO dto, String loginId) {
-        System.out.println("찾으려는 loginId = " + loginId);
-        System.out.println("DB employee loginId = " + employeeRepository.findAll().stream()
-                .map(EmployeeEntity::getLoginId).toList());
-
-        System.out.println("🧾 받은 장바구니 데이터:");
-        dto.getItemList().forEach(item -> {
-            System.out.printf(" - productId: %s, qty: %d, price: %d\n",
-                    item.getProductId(), item.getSalesQuantity(), item.getUnitPrice());
-        });
 
         // 1. 로그인 ID로 직원 조회
         EmployeeEntity employee = employeeRepository.findByLoginId(loginId)
@@ -93,4 +89,27 @@ public class PosService {
             salesDetailRepository.save(detail);
         }
     }
+
+    // 거래 내역 조회
+    public List<SalesHistoryDTO> getTransactionHistoryByStore(Integer storeId) {
+        List<SalesTransactionEntity> transactions =
+                salesTransactionRepository.findByStore_StoreIdOrderByPaidAtDesc(storeId);
+
+        return transactions.stream().map(transaction -> {
+            List<SalesDetailEntity> details =
+                    salesDetailRepository.findByTransaction_TransactionId(transaction.getTransactionId());
+
+            List<SaleItemSummaryDTO> items = details.stream().map(detail -> {
+                String productName = detail.getProduct().getProName(); // 상품명 가져오기
+                return new SaleItemSummaryDTO(
+                        productName,
+                        detail.getSalesQuantity(),
+                        detail.getIsPromo()
+                );
+            }).collect(Collectors.toList());
+
+            return new SalesHistoryDTO(transaction, items);
+        }).collect(Collectors.toList());
+    }
 }
+

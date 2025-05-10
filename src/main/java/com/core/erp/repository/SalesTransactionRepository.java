@@ -14,4 +14,5 @@ public interface SalesTransactionRepository extends JpaRepository<SalesTransacti
     // 거래 ID로 조회 (거래 상세 정보)
     @Query("SELECT t FROM SalesTransactionEntity t WHERE t.transactionId = :transactionId")
     SalesTransactionEntity findByTransactionId(Integer transactionId);
+
 }

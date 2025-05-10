@@ -39,5 +39,7 @@ public class SalesHistoryDTO {
         this.isRefunded = entity.getIsRefunded();
         this.refundReason = entity.getRefundReason();
         this.refundedAt = entity.getRefundedAt();
+        this.items = items;
+
     }
 }
