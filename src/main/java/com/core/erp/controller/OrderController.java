@@ -4,6 +4,7 @@ import com.core.erp.dto.*;
 import com.core.erp.service.OrderService;
 import com.core.erp.service.StockService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/order")
@@ -23,16 +25,33 @@ public class OrderController {
     @GetMapping("/products")
     public ResponseEntity<Page<OrderProductResponseDTO>> getOrderProductList(
             @AuthenticationPrincipal CustomPrincipal userDetails,
-            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer storeId,
+            @RequestParam(required = false) String productName,
+            @RequestParam(required = false) Long barcode,
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) Integer isPromo,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        log.info("📌 [Controller] storeId: {}, productName: {}, barcode: {}, categoryId: {}, isPromo: {}, page: {}, size: {}",
+                storeId, productName, barcode, categoryId, isPromo, page, size);
 
-        Integer storeId = userDetails.getStoreId();
-        Page<OrderProductResponseDTO> result =
-                orderService.getOrderProductList(storeId, keyword, page, size);
+        Integer effectiveStoreId = "ROLE_HQ".equals(userDetails.getRole())
+                ? storeId
+                : userDetails.getStoreId();
+
+        if (effectiveStoreId == null) {
+            throw new IllegalArgumentException("storeId는 필수입니다.");
+        }
+
+        Page<OrderProductResponseDTO> result = orderService.getOrderProductList(
+                effectiveStoreId, productName, barcode, categoryId, isPromo, page, size
+        );
 
         return ResponseEntity.ok(result);
     }
+
+
 
     @PostMapping
     public ResponseEntity<String> registerOrder(
@@ -47,13 +66,20 @@ public class OrderController {
     @GetMapping("/history")
     public ResponseEntity<Page<PurchaseOrderDTO>> getOrderHistory(
             @AuthenticationPrincipal CustomPrincipal userDetails,
+            @RequestParam(required = false) String orderId,
+            @RequestParam(required = false) Integer orderStatus,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Integer storeId = userDetails.getStoreId();
-        Page<PurchaseOrderDTO> result = orderService.getOrderHistory(storeId, page, size);
+        Page<PurchaseOrderDTO> result = orderService.searchOrderHistory(
+                storeId, orderId, orderStatus, startDate, endDate, page, size
+        );
         return ResponseEntity.ok(result);
     }
+
 
     @GetMapping("/history/{orderId}")
     public ResponseEntity<List<PurchaseOrderItemDTO>> getOrderDetail(

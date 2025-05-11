@@ -152,8 +152,8 @@ public class SecurityConfig {
                 
                 // 5. 점포 관련 API - 구체적인 경로 지정
                 .requestMatchers("/api/store/notifications/**").hasAnyRole("STORE", "MASTER")
-                            .requestMatchers("/api/salary/**").hasAnyRole("STORE", "MASTER", "HQ")
-                            .requestMatchers("/api/parttimer-schedule/**").hasAnyRole("HQ", "OWNER", "STORE")
+                .requestMatchers("/api/salary/**").hasAnyRole("STORE", "MASTER", "HQ")
+                .requestMatchers("/api/parttimer-schedule/**").hasAnyRole("HQ", "OWNER", "STORE")
                 .requestMatchers("/api/store/parttimer/**").permitAll()
                 .requestMatchers("/api/purchase-orders/**").hasAnyRole("STORE", "MASTER")
                 .requestMatchers("/api/shift-schedules/**").hasAnyRole("STORE", "MASTER")

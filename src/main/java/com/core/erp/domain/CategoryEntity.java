@@ -33,6 +33,5 @@ public class CategoryEntity {
         this.categoryId = dto.getCategoryId();
         this.categoryName = dto.getCategoryName();
         this.categoryFilter = dto.getCategoryFilter();
-        // parentCategory는 따로 세팅 필요 (id만 받아오니까)
     }
 }

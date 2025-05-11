@@ -35,6 +35,7 @@ public class PartTimeController {
     public ResponseEntity<List<PartTimerDTO>> searchPartTimers(
             @ModelAttribute PartTimerSearchDTO searchDTO) {
 
+        log.info("searchDTO: {}", searchDTO);
         CustomPrincipal user = getCurrentUser();
         List<PartTimerDTO> list = partTimerService.searchPartTimers(user.getRole(), user.getStoreId(), searchDTO);
         return ResponseEntity.ok(list);

@@ -2,27 +2,32 @@ package com.core.erp.dto;
 
 import com.core.erp.domain.PurchaseOrderEntity;
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @ToString
 public class PurchaseOrderDTO {
 
-    private int orderId;
-    private Integer storeId; // FK (id만 관리)
+    private Long orderId;;
+    private Integer storeId;
     private LocalDateTime orderDate;
     private int orderStatus;
     private int totalAmount;
     private int totalQuantity;
 
-    private MultipartFile file;
+    //  Native Query 결과 매핑용 생성자 (파라미터 순서 주의!)
+    public PurchaseOrderDTO(Long orderId, int totalQuantity, int totalAmount, LocalDateTime orderDate, int orderStatus) {
+        this.orderId = orderId;
+        this.totalQuantity = totalQuantity;
+        this.totalAmount = totalAmount;
+        this.orderDate = orderDate;
+        this.orderStatus = orderStatus;
+    }
 
-    // Entity → DTO 변환 생성자
+    //  Entity → DTO 변환 생성자
     public PurchaseOrderDTO(PurchaseOrderEntity entity) {
         this.orderId = entity.getOrderId();
         this.storeId = entity.getStore() != null ? entity.getStore().getStoreId() : null;

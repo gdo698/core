@@ -34,7 +34,8 @@ public class SalaryDTO {
     private Integer totalBonus;
     private Integer totalDeduct;
     private double averageMonthly;
-    private int year;
+    private Integer year;
+    private String month;
 
 
     // Entity → DTO 변환 생성자

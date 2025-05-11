@@ -55,6 +55,7 @@ public class PartTimeService {
         if (isHQ(role)) {
             result = partTimerRepository.searchHeadquarterSide(
                     searchDTO.getPartName(),
+                    searchDTO.getPosition(),
                     searchDTO.getPartStatus(),
                     storeId,
                     searchDTO.getPartTimerId(),
@@ -64,6 +65,7 @@ public class PartTimeService {
             result = partTimerRepository.searchStoreSide(
                     storeId,
                     searchDTO.getPartName(),
+                    searchDTO.getPosition(),
                     searchDTO.getPartStatus(),
                     searchDTO.getPartTimerId(),
                     pageable

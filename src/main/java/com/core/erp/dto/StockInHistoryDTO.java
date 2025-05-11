@@ -17,7 +17,7 @@ public class StockInHistoryDTO {
     private Integer storeId;
     private Integer partTimerId;
     private Integer productId;
-    private Integer orderId;
+    private Long orderId;;
     private int inQuantity;
     private LocalDateTime inDate;
     private LocalDateTime expireDate;

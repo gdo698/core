@@ -18,7 +18,7 @@ public class PurchaseOrderEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
-    private int orderId;
+    private Long orderId;;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
@@ -39,7 +39,6 @@ public class PurchaseOrderEntity {
     // DTO → Entity 변환 생성자
     public PurchaseOrderEntity(PurchaseOrderDTO dto) {
         this.orderId = dto.getOrderId();
-        // store는 별도 매핑 필요
         this.orderDate = dto.getOrderDate();
         this.orderStatus = dto.getOrderStatus();
         this.totalAmount = dto.getTotalAmount();

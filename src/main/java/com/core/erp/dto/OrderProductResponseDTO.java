@@ -15,6 +15,8 @@ public class OrderProductResponseDTO {
 
     private Integer productId;
     private String productName;
+    private Long barcode;
+    private String categoryName;
     private Integer unitPrice;
     private Integer stockQty;
     private Integer proStockLimit;

@@ -1,8 +1,14 @@
 package com.core.erp.service;
 
-import com.core.erp.domain.*;
+import com.core.erp.domain.AnnualLeaveEntity;
+import com.core.erp.domain.AttendanceEntity;
+import com.core.erp.domain.EmployeeEntity;
+import com.core.erp.domain.SalaryEntity;
 import com.core.erp.dto.*;
-import com.core.erp.repository.*;
+import com.core.erp.repository.AnnualLeaveRepository;
+import com.core.erp.repository.AttendanceRepository;
+import com.core.erp.repository.EmployeeRepository;
+import com.core.erp.repository.SalaryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,7 +17,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;

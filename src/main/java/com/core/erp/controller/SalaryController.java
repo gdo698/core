@@ -22,31 +22,44 @@ public class SalaryController {
 
     private final SalaryService salaryService;
 
-    // ✅ 현재 로그인 사용자 정보 추출
+    // 현재 로그인 사용자 정보 추출
     private CustomPrincipal getCurrentUser() {
         Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
         return (CustomPrincipal) auth.getPrincipal();
     }
 
-    // 📄 급여 리스트 조회 (월별 or 연도별)
+    // 급여 리스트 조회 (월별 or 연도별)
     @GetMapping("/list")
     public ResponseEntity<Page<SalaryDTO>> getSalaryList(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String status,
-            @RequestParam int year,
+            @RequestParam(required = false) Integer year,
             @RequestParam(required = false) String month,
             @RequestParam(defaultValue = "monthly") String view,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
             Pageable pageable
     ) {
         CustomPrincipal user = getCurrentUser();
+
+        log.info("📋 요청 파라미터 → name={}, status={}, year={}, month={}, view={}, startDate={}, endDate={}",
+                name, status, year, month, view, startDate, endDate);
+
         Page<SalaryDTO> result = salaryService.getSalaryList(
-                name, status, year, month, view, user.getStoreId(), user.getRole(), pageable
+                name, status, year, month, view, startDate, endDate,
+                user.getStoreId(), user.getRole(), pageable
         );
+
+        log.info("📦 조회 결과 → Elements: {}, Pages: {}", result.getTotalElements(), result.getTotalPages());
+
         return ResponseEntity.ok(result);
     }
 
 
-    // 📄 급여 상세 (해당 아르바이트의 연도/월별 급여)
+
+
+
+    // 급여 상세 (해당 아르바이트의 연도/월별 급여)
     @GetMapping("/detail/{id}")
     public ResponseEntity<List<SalaryDetailDTO>> getSalaryDetail(
             @PathVariable("id") int partTimerId,
@@ -59,7 +72,7 @@ public class SalaryController {
         return ResponseEntity.ok(result);
     }
 
-    // ✅ 급여 자동 생성 (본인 매장 기준)
+    // 급여 자동 생성 (본인 매장 기준)
     @PostMapping("/generate")
     public ResponseEntity<?> generateSalary(@RequestParam String yearMonth) {
         CustomPrincipal user = getCurrentUser();

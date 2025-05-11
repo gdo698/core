@@ -79,22 +79,40 @@ public class SalaryService {
     }
 
     /**
-     * 📋 급여 목록 조회
+     *  급여 목록 조회
      */
-    public Page<SalaryDTO> getSalaryList(String name, String status, int year, String month, String view, Integer storeId, String role, Pageable pageable) {
-        LocalDate start, end;
-        if ("yearly".equals(view)) {
-            start = LocalDate.of(year, 1, 1);
-            end = LocalDate.of(year, 12, 31);
-        } else {
+    public Page<SalaryDTO> getSalaryList(
+            String name, String status, Integer year, String month, String view,
+            String startDate, String endDate, Integer storeId, String role, Pageable pageable
+    ) {
+        LocalDateTime startDateTime;
+        LocalDateTime endDateTime;
+
+        //  1. 기간 검색 우선 처리
+        if (startDate != null && endDate != null) {
+            startDateTime = LocalDate.parse(startDate).atStartOfDay();
+            endDateTime = LocalDate.parse(endDate).atTime(23, 59, 59);
+        } else if ("yearly".equalsIgnoreCase(view)) {
+            int targetYear = (year != null) ? year : LocalDate.now().getYear(); // ✅ Null-safe 처리
+            startDateTime = LocalDate.of(targetYear, 1, 1).atStartOfDay();
+            endDateTime = LocalDate.of(targetYear, 12, 31).atTime(23, 59, 59);
+        }
+        //  3. 월별 조회 (month 필수)
+        else if ("monthly".equalsIgnoreCase(view)) {
+            if (month == null || month.isEmpty()) {
+                throw new IllegalArgumentException("월별 조회 시 'month' 값은 필수입니다.");
+            }
             int m = Integer.parseInt(month);
-            start = LocalDate.of(year, m, 1);
-            end = start.withDayOfMonth(start.lengthOfMonth());
+            LocalDate startLocalDate = LocalDate.of(year, m, 1);
+            startDateTime = startLocalDate.atStartOfDay();
+            endDateTime = startLocalDate.withDayOfMonth(startLocalDate.lengthOfMonth()).atTime(23, 59, 59);
+        }
+        //  4. 잘못된 요청
+        else {
+            throw new IllegalArgumentException("잘못된 조회 방식입니다.");
         }
 
-        LocalDateTime startDateTime = start.atStartOfDay();
-        LocalDateTime endDateTime = end.atTime(23, 59, 59);
-
+        //  5. 데이터 조회
         List<SalaryEntity> all = salaryRepository.findByStore_StoreIdAndPayDateBetween(storeId, startDateTime, endDateTime)
                 .stream()
                 .filter(s -> {
@@ -104,18 +122,18 @@ public class SalaryService {
                     if ("1".equals(status)) statusMatch = s.getPartTimer().getPartStatus() == 1;
                     else if ("0".equals(status)) statusMatch = s.getPartTimer().getPartStatus() == 0;
                     return nameMatch && statusMatch;
-                })
-                .toList();
+                }).toList();
 
+        //  6. 결과 변환 (연도별 vs 월별)
         List<SalaryDTO> content;
-
-        if ("yearly".equals(view)) {
-            // 👇 partTimerId 기준으로 그룹핑 후 각 알바생당 하나의 SalaryDTO 생성
-            Map<Integer, List<SalaryEntity>> grouped = all.stream()
-                    .collect(Collectors.groupingBy(s -> s.getPartTimer().getPartTimerId()));
+        if ("yearly".equalsIgnoreCase(view)) {
+            Map<String, List<SalaryEntity>> grouped = all.stream()
+                    .collect(Collectors.groupingBy(s ->
+                            s.getPartTimer().getPartTimerId() + "_" + s.getPayDate().getYear()
+                    ));
 
             content = grouped.values().stream().map(personList -> {
-                SalaryEntity base = personList.get(0);  // 대표값
+                SalaryEntity base = personList.get(0);
                 SalaryDTO dto = new SalaryDTO();
                 dto.setPartTimerId(base.getPartTimer().getPartTimerId());
                 dto.setName(base.getPartTimer().getPartName());
@@ -124,19 +142,17 @@ public class SalaryService {
                 int totalSalary = personList.stream().mapToInt(SalaryEntity::getNetSalary).sum();
                 int totalBonus = personList.stream().mapToInt(SalaryEntity::getBonus).sum();
                 int totalDeduct = personList.stream().mapToInt(SalaryEntity::getDeductTotal).sum();
-                double averageMonthly = personList.size() > 0 ? (totalSalary * 1.0 / personList.size()) : 0.0;
+                double averageMonthly = personList.isEmpty() ? 0.0 : (double) totalSalary / personList.size();
 
                 dto.setTotalSalary(totalSalary);
                 dto.setTotalBonus(totalBonus);
                 dto.setTotalDeduct(totalDeduct);
-                dto.setAverageMonthly((int) Math.round(averageMonthly));
-                dto.setYear(year);
+                dto.setAverageMonthly(Math.round(averageMonthly));
+                dto.setYear(base.getPayDate().getYear());
 
                 return dto;
             }).toList();
-
         } else {
-            // ✅ 월별은 그대로 유지
             content = all.stream()
                     .map(s -> {
                         SalaryDTO dto = new SalaryDTO(s);
@@ -144,26 +160,25 @@ public class SalaryService {
                             dto.setName(s.getPartTimer().getPartName());
                             dto.setSalaryTypeStr(s.getPartTimer().getSalaryType() == 0 ? "시급제" : "월급제");
                         }
-
                         double workHours = calculateWorkHoursForPartTimer(
-                                s.getPartTimer().getPartTimerId(),
-                                storeId,
-                                startDateTime,
-                                endDateTime
+                                s.getPartTimer().getPartTimerId(), storeId, startDateTime, endDateTime
                         );
                         dto.setWorkHours(workHours);
-
                         return dto;
                     }).toList();
         }
 
-        // 페이징 처리
+        //  7. 페이징 처리
         int startIdx = (int) pageable.getOffset();
         int endIdx = Math.min(startIdx + pageable.getPageSize(), content.size());
         List<SalaryDTO> pagedContent = content.subList(startIdx, endIdx);
 
         return new PageImpl<>(pagedContent, pageable, content.size());
     }
+
+
+
+
 
     /**
      * 📌 급여 상세 조회

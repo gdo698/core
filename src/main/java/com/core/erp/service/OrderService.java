@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -32,27 +33,32 @@ public class OrderService {
     private final PartTimerRepository partTimerRepository;
 
     // 상품 목록 + 재고 조회 (발주 등록 시)
-    public Page<OrderProductResponseDTO> getOrderProductList(Integer storeId, String keyword, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        int offset = (int) pageable.getOffset();
-        int limit = pageable.getPageSize();
+    public Page<OrderProductResponseDTO> getOrderProductList(
+            Integer storeId, String productName, Long barcode,
+            Integer categoryId, Integer isPromo, int page, int size) {
 
-        List<OrderProductProjection> rawList = productRepository.searchProductsWithStock(storeId, keyword, offset, limit);
+        List<OrderProductProjection> projections = productRepository.searchProductsWithStock(
+                storeId, productName, barcode, categoryId, isPromo, size, page * size);
 
-        List<OrderProductResponseDTO> list = rawList.stream()
+        List<OrderProductResponseDTO> dtoList = projections.stream()
                 .map(p -> new OrderProductResponseDTO(
-                        p.getProductId().intValue(),
+                        p.getProductId(),
                         p.getProductName(),
+                        p.getBarcode(),
+                        p.getCategoryName(),
                         p.getUnitPrice(),
                         p.getStockQty(),
                         p.getProStockLimit(),
-                        p.getIsPromo()
-                ))
-                .toList();
+                        p.getIsPromo()))
+                .collect(Collectors.toList());
 
-        int total = productRepository.countProductsWithStock(storeId, keyword);
-        return new PageImpl<>(list, pageable, total);
+
+        int total = productRepository.countProductsWithStock(
+                storeId, productName, barcode, categoryId, isPromo);
+
+        return new PageImpl<>(dtoList, PageRequest.of(page, size), total);
     }
+
 
 
     //  발주 등록
@@ -135,18 +141,18 @@ public class OrderService {
     }
 
 
-    public Page<PurchaseOrderDTO> getOrderHistory(Integer storeId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-
-        Page<PurchaseOrderEntity> orderPage =
-                purchaseOrderRepository.findByStore_StoreIdOrderByOrderIdDesc(storeId, pageable);
-
-        List<PurchaseOrderDTO> dtoList = orderPage.stream()
-                .map(PurchaseOrderDTO::new)
-                .toList();
-
-        return new PageImpl<>(dtoList, pageable, orderPage.getTotalElements());
-    }
+//    public Page<PurchaseOrderDTO> getOrderHistory(Integer storeId, int page, int size) {
+//        Pageable pageable = PageRequest.of(page, size);
+//
+//        Page<PurchaseOrderEntity> orderPage =
+//                purchaseOrderRepository.findByStore_StoreIdOrderByOrderIdDesc(storeId, pageable);
+//
+//        List<PurchaseOrderDTO> dtoList = orderPage.stream()
+//                .map(PurchaseOrderDTO::new)
+//                .toList();
+//
+//        return new PageImpl<>(dtoList, pageable, orderPage.getTotalElements());
+//    }
 
     public List<PurchaseOrderItemDTO> getOrderDetail(Long orderId, Integer loginStoreId, String role) {
         PurchaseOrderEntity order = purchaseOrderRepository.findById(orderId)
@@ -472,5 +478,13 @@ public class OrderService {
         purchaseOrderItemRepository.deleteByPurchaseOrder_OrderId(orderId);
         // 그 다음 발주서 삭제
         purchaseOrderRepository.delete(order);
+    }
+
+    public Page<PurchaseOrderDTO> searchOrderHistory(
+            Integer storeId, String orderId, Integer orderStatus, String startDate, String endDate, int page, int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return purchaseOrderRepository.searchOrderHistory(storeId, orderId, orderStatus, startDate, endDate, pageable);
     }
 }

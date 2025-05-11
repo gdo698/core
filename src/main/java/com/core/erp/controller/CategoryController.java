@@ -54,4 +54,20 @@ public class CategoryController {
                 .map(c -> new CategoryTreeDTO(c.getCategoryId(), c.getCategoryName(), new ArrayList<>(), parentId))
                 .collect(Collectors.toList());
     }
+
+    @GetMapping("/all-descendants/{categoryId}")
+    public List<Integer> getAllDescendantCategoryIds(@PathVariable Integer categoryId) {
+        return findAllDescendants(categoryId);
+    }
+
+    private List<Integer> findAllDescendants(Integer categoryId) {
+        List<Integer> result = new ArrayList<>();
+        result.add(categoryId); // 자기 자신 포함
+
+        List<CategoryEntity> children = categoryRepository.findByParentCategory_CategoryId(categoryId);
+        for (CategoryEntity child : children) {
+            result.addAll(findAllDescendants(child.getCategoryId())); // 재귀 호출
+        }
+        return result;
+    }
 }

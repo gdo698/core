@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class PurchaseOrderItemDTO {
 
     private int itemId;
-    private Integer orderId; // FK (id만 관리)
+    private Long orderId; // FK (id만 관리)
     private Integer productId; // FK (id만 관리)
     private String productName;
     private int orderQuantity;

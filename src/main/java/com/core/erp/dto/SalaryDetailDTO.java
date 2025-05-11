@@ -18,6 +18,7 @@ public class SalaryDetailDTO {
     private Integer deductTotal;
     private Integer netSalary;
 
+
     private Integer totalBonus;
     private Integer totalDeduct;
     private Integer totalNetSalary;

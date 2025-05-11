@@ -17,13 +17,15 @@ public interface PartTimerRepository extends JpaRepository<PartTimerEntity, Inte
      * (1) 점주용 검색 - 자기 지점(storeId)에 한해 필터링
      */
     @Query("SELECT p FROM PartTimerEntity p " +
-            "WHERE (:storeId IS NULL OR p.store.storeId = :storeId) " +
+            "WHERE p.store.storeId = :storeId " +
             "AND (:partName IS NULL OR p.partName LIKE %:partName%) " +
+            "AND (:position IS NULL OR p.position = :position) " +
             "AND (:partStatus IS NULL OR p.partStatus = :partStatus) " +
             "AND (:partTimerId IS NULL OR p.partTimerId = :partTimerId)")
     Page<PartTimerEntity> searchStoreSide(
             @Param("storeId") Integer storeId,
             @Param("partName") String partName,
+            @Param("position") String position,
             @Param("partStatus") Integer partStatus,
             @Param("partTimerId") Integer partTimerId,
             Pageable pageable);
@@ -33,11 +35,13 @@ public interface PartTimerRepository extends JpaRepository<PartTimerEntity, Inte
      */
     @Query("SELECT p FROM PartTimerEntity p " +
             "WHERE (:partName IS NULL OR p.partName LIKE %:partName%) " +
+            "AND (:position IS NULL OR p.position = :position) " +
             "AND (:partStatus IS NULL OR p.partStatus = :partStatus) " +
             "AND (:storeId IS NULL OR p.store.storeId = :storeId) " +
             "AND (:partTimerId IS NULL OR p.partTimerId = :partTimerId)")
     Page<PartTimerEntity> searchHeadquarterSide(
             @Param("partName") String partName,
+            @Param("position") String position,
             @Param("partStatus") Integer partStatus,
             @Param("storeId") Integer storeId,
             @Param("partTimerId") Integer partTimerId,

@@ -1,8 +1,10 @@
 package com.core.erp.dto;
 
 public interface OrderProductProjection {
-    Long getProductId();
+    Integer getProductId();
     String getProductName();
+    Long getBarcode();
+    String getCategoryName();
     Integer getUnitPrice();
     Integer getStockQty();
     Integer getProStockLimit();
