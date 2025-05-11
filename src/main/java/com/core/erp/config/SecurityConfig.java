@@ -118,10 +118,8 @@ public class SecurityConfig {
                 // 본사 직원 급여 내역 조회 API
                 .requestMatchers("/api/hr/my-salary").hasAnyRole("HQ", "HQ_HRM", "HQ_HRM_M", "HQ_PRO", "HQ_PRO_M", "HQ_BR", "HQ_BR_M", "MASTER")
                 
-                // 지점 문의 관련 API 권한 추가
-                .requestMatchers("/api/store-inquiries/**").hasAnyRole("HQ_BR", "HQ_BR_M", "MASTER")
-                
                 // 4.3 지점 관리 기능 
+                .requestMatchers("/api/store-inquiries/**").hasAnyRole("HQ_BR", "HQ_BR_M", "MASTER")
                 // GET 요청은 모든 인증된 사용자에게 허용
                 .requestMatchers(HttpMethod.GET, "/api/headquarters/branches/**")
                     .hasAnyRole("HQ", "HQ_HRM", "HQ_HRM_M", "HQ_PRO", "HQ_PRO_M", "HQ_BR", "HQ_BR_M", "MASTER", "STORE")

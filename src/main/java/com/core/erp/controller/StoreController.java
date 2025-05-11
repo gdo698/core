@@ -16,14 +16,21 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/headquarters/branches")
 @RequiredArgsConstructor
 public class StoreController {
 
     private final StoreRepository storeRepository;
     private final EmployeeRepository employeeRepository;
 
+    // 매장 목록 조회 API (/api/stores) - 모든 매장 기본 정보 반환
+    @GetMapping("/api/stores")
+    public ResponseEntity<List<StoreEntity>> getAllStoresForDropdown() {
+        List<StoreEntity> stores = storeRepository.findAll();
+        return ResponseEntity.ok(stores);
+    }
+
     // 지점 목록 조회
+    @RequestMapping("/api/headquarters/branches")
     @GetMapping
     public ResponseEntity<?> getAllStores() {
         List<StoreEntity> stores = storeRepository.findAll();
@@ -56,7 +63,7 @@ public class StoreController {
     }
 
     // 지점 상세 정보 조회
-    @GetMapping("/{storeId}")
+    @GetMapping("/api/headquarters/branches/{storeId}")
     public ResponseEntity<?> getStoreDetail(@PathVariable int storeId) {
         StoreEntity store = storeRepository.findById(storeId)
             .orElseThrow(() -> new RuntimeException("지점을 찾을 수 없습니다."));
@@ -84,7 +91,7 @@ public class StoreController {
     }
 
     // 지점 추가
-    @PostMapping
+    @PostMapping("/api/headquarters/branches")
     @PreAuthorize("hasAnyRole('HQ_BR', 'HQ_BR_M', 'MASTER')")
     public ResponseEntity<?> createStore(@RequestBody StoreDTO storeDTO) {
         StoreEntity store = new StoreEntity();
@@ -99,7 +106,7 @@ public class StoreController {
     }
 
     // 지점 정보 수정
-    @PutMapping("/{storeId}")
+    @PutMapping("/api/headquarters/branches/{storeId}")
     @PreAuthorize("hasAnyRole('HQ_BR', 'HQ_BR_M', 'MASTER')")
     public ResponseEntity<?> updateStore(@PathVariable int storeId, @RequestBody StoreDTO storeDTO) {
         StoreEntity store = storeRepository.findById(storeId)
@@ -115,7 +122,7 @@ public class StoreController {
     }
 
     // 지점 상태 변경
-    @PutMapping("/{storeId}/status")
+    @PutMapping("/api/headquarters/branches/{storeId}/status")
     @PreAuthorize("hasAnyRole('HQ_BR', 'HQ_BR_M', 'MASTER')")
     public ResponseEntity<?> updateStoreStatus(@PathVariable int storeId, @RequestBody Map<String, Integer> request) {
         StoreEntity store = storeRepository.findById(storeId)
@@ -127,7 +134,7 @@ public class StoreController {
     }
 
     // 지점 검색
-    @GetMapping("/search")
+    @GetMapping("/api/headquarters/branches/search")
     public ResponseEntity<?> searchStores(@RequestParam String keyword) {
         List<StoreEntity> stores = storeRepository.searchStores(keyword);
         return ResponseEntity.ok(stores);
