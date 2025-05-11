@@ -28,7 +28,7 @@ public class AttendanceInfoController {
     public Map<String, Object> getMyAttendanceInfo(Authentication authentication) {
         CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
         String loginId = principal.getLoginId();
-        
+
         System.out.println("마이페이지 API 호출: 로그인ID = " + loginId);
 
         EmployeeEntity emp = employeeRepository.findByLoginId(loginId)

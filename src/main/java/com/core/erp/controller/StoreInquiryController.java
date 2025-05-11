@@ -3,6 +3,7 @@ package com.core.erp.controller;
 import com.core.erp.dto.StoreInquiryDTO;
 import com.core.erp.service.StoreInquiryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,41 @@ import java.util.Map;
 public class StoreInquiryController {
 
     private final StoreInquiryService inquiryService;
+
+    // 모든 지점 문의 조회 (페이징 처리)
+    @GetMapping("/paged")
+    public ResponseEntity<Page<StoreInquiryDTO>> getAllInquiriesPaged(
+            @RequestParam(required = false) Integer storeId,
+            @RequestParam(required = false) Integer type,
+            @RequestParam(required = false) Integer status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        Page<StoreInquiryDTO> result;
+        
+        if (storeId != null && type != null) {
+            result = inquiryService.getInquiriesByStoreIdAndTypeWithPaging(storeId, type, page, size);
+        } else if (storeId != null && status != null) {
+            result = inquiryService.getInquiriesByStoreIdAndStatusWithPaging(storeId, status, page, size);
+        } else if (storeId != null) {
+            result = inquiryService.getInquiriesByStoreIdWithPaging(storeId, page, size);
+        } else if (type != null) {
+            result = inquiryService.getInquiriesByTypeWithPaging(type, page, size);
+        } else if (status != null) {
+            result = inquiryService.getInquiriesByStatusWithPaging(status, page, size);
+        } else {
+            result = inquiryService.getAllInquiriesWithPaging(page, size);
+        }
+        
+        return ResponseEntity.ok(result);
+    }
+    
+    // 지점 랭킹 조회
+    @GetMapping("/ranking")
+    public ResponseEntity<List<Map<String, Object>>> getStoreRanking() {
+        List<Map<String, Object>> rankings = inquiryService.getStoreRanking();
+        return ResponseEntity.ok(rankings);
+    }
 
     // 모든 지점 문의 조회
     @GetMapping
@@ -76,12 +112,5 @@ public class StoreInquiryController {
         Integer level = request.get("level");
         StoreInquiryDTO result = inquiryService.updateInquiryLevel(inquiryId, level);
         return ResponseEntity.ok(result);
-    }
-    
-    // 지점 랭킹 조회
-    @GetMapping("/ranking")
-    public ResponseEntity<List<Map<String, Object>>> getStoreRanking() {
-        List<Map<String, Object>> rankings = inquiryService.getStoreRanking();
-        return ResponseEntity.ok(rankings);
     }
 } 

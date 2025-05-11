@@ -149,22 +149,22 @@ public class AttendanceInfoService {
         
         LocalDate today = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDateTime now = LocalDateTime.now();
-        
+            
         // 출근 시간 파싱 (예: "09:30" 형식)
-        String[] timeParts = checkInTime.split(":");
-        LocalDateTime inTimeValue = now.withHour(Integer.parseInt(timeParts[0]))
-            .withMinute(Integer.parseInt(timeParts[1]))
-            .withSecond(0)
-            .withNano(0);
-        
+            String[] timeParts = checkInTime.split(":");
+            LocalDateTime inTimeValue = now.withHour(Integer.parseInt(timeParts[0]))
+                .withMinute(Integer.parseInt(timeParts[1]))
+                .withSecond(0)
+                .withNano(0);
+            
         // 항상 새 레코드 생성 (누적 방식)
         AttendanceEntity attendance = new AttendanceEntity();
         attendance.setEmployee(employee);
         attendance.setAttendDate(today);
         attendance.setWorkDate(now);
         attendance.setInTime(inTimeValue);
-        attendance.setAttendStatus(isLate ? 2 : 1); // 1: 정상출근, 2: 지각
-        attendanceRepository.save(attendance);
+            attendance.setAttendStatus(isLate ? 2 : 1); // 1: 정상출근, 2: 지각
+            attendanceRepository.save(attendance);
     }
     
     /**
@@ -182,14 +182,14 @@ public class AttendanceInfoService {
         
         LocalDate today = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDateTime now = LocalDateTime.now();
-        
-        // 퇴근 시간 파싱 (예: "18:30" 형식)
-        String[] timeParts = checkOutTime.split(":");
-        LocalDateTime outTimeValue = now.withHour(Integer.parseInt(timeParts[0]))
-            .withMinute(Integer.parseInt(timeParts[1]))
-            .withSecond(0)
-            .withNano(0);
-        
+            
+            // 퇴근 시간 파싱 (예: "18:30" 형식)
+            String[] timeParts = checkOutTime.split(":");
+            LocalDateTime outTimeValue = now.withHour(Integer.parseInt(timeParts[0]))
+                .withMinute(Integer.parseInt(timeParts[1]))
+                .withSecond(0)
+                .withNano(0);
+            
         // 오늘 최신 출근 기록 조회
         Optional<AttendanceEntity> latestCheckIn = attendanceRepository.findTopByEmployee_EmpIdAndAttendDateOrderByInTimeDesc(
             empId.intValue(), today);

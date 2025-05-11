@@ -6,6 +6,10 @@ import com.core.erp.dto.StoreInquiryDTO;
 import com.core.erp.repository.StoreInquiryRepository;
 import com.core.erp.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +28,13 @@ public class StoreInquiryService {
     private final StoreInquiryRepository inquiryRepository;
     private final StoreRepository storeRepository;
     
+    // 모든 문의 조회 (페이징 처리)
+    public Page<StoreInquiryDTO> getAllInquiriesWithPaging(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("inqCreatedAt").descending());
+        return inquiryRepository.findAll(pageable)
+                .map(StoreInquiryDTO::new);
+    }
+    
     // 모든 문의 조회
     public List<StoreInquiryDTO> getAllInquiries() {
         return inquiryRepository.findAll().stream()
@@ -38,11 +49,25 @@ public class StoreInquiryService {
                 .orElseThrow(() -> new RuntimeException("문의를 찾을 수 없습니다. ID: " + inquiryId));
     }
     
+    // 특정 지점의 문의 조회 (페이징 처리)
+    public Page<StoreInquiryDTO> getInquiriesByStoreIdWithPaging(Integer storeId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("inqCreatedAt").descending());
+        return inquiryRepository.findByStore_StoreId(storeId, pageable)
+                .map(StoreInquiryDTO::new);
+    }
+    
     // 특정 지점의 문의 조회
     public List<StoreInquiryDTO> getInquiriesByStoreId(Integer storeId) {
         return inquiryRepository.findByStore_StoreId(storeId).stream()
                 .map(StoreInquiryDTO::new)
                 .collect(Collectors.toList());
+    }
+    
+    // 특정 유형별 문의 조회 (페이징 처리)
+    public Page<StoreInquiryDTO> getInquiriesByTypeWithPaging(int type, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("inqCreatedAt").descending());
+        return inquiryRepository.findByInqType(type, pageable)
+                .map(StoreInquiryDTO::new);
     }
     
     // 특정 유형별 문의 조회
@@ -52,6 +77,13 @@ public class StoreInquiryService {
                 .collect(Collectors.toList());
     }
     
+    // 특정 상태별 문의 조회 (페이징 처리)
+    public Page<StoreInquiryDTO> getInquiriesByStatusWithPaging(int status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("inqCreatedAt").descending());
+        return inquiryRepository.findByInqStatus(status, pageable)
+                .map(StoreInquiryDTO::new);
+    }
+    
     // 특정 상태별 문의 조회
     public List<StoreInquiryDTO> getInquiriesByStatus(int status) {
         return inquiryRepository.findByInqStatus(status).stream()
@@ -59,11 +91,25 @@ public class StoreInquiryService {
                 .collect(Collectors.toList());
     }
     
+    // 지점 ID와 유형으로 문의 조회 (페이징 처리)
+    public Page<StoreInquiryDTO> getInquiriesByStoreIdAndTypeWithPaging(Integer storeId, int type, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("inqCreatedAt").descending());
+        return inquiryRepository.findByStoreIdAndType(storeId, type, pageable)
+                .map(StoreInquiryDTO::new);
+    }
+    
     // 지점 ID와 유형으로 문의 조회
     public List<StoreInquiryDTO> getInquiriesByStoreIdAndType(Integer storeId, int type) {
         return inquiryRepository.findByStoreIdAndType(storeId, type).stream()
                 .map(StoreInquiryDTO::new)
                 .collect(Collectors.toList());
+    }
+    
+    // 지점 ID와 상태로 문의 조회 (페이징 처리)
+    public Page<StoreInquiryDTO> getInquiriesByStoreIdAndStatusWithPaging(Integer storeId, int status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("inqCreatedAt").descending());
+        return inquiryRepository.findByStoreIdAndStatus(storeId, status, pageable)
+                .map(StoreInquiryDTO::new);
     }
     
     // 지점 ID와 상태로 문의 조회
