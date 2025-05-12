@@ -1932,3 +1932,17 @@ INSERT INTO warehouse_stock (stock_id, warehouse_id, store_id, product_id, quant
 (8, 4, 4, 25, 45, '2025-04-18 10:30:00', 1),
 (9, 4, 4, 30, 100, '2025-04-25 14:00:00', 1),
 (10, 5, 5, 35, 55, '2025-05-02 08:45:00', 3);
+
+INSERT INTO stock_inventory_check
+(product_id, store_id, real_quantity, prev_quantity, check_reason, part_timer_id, check_date, is_applied)
+VALUES
+    (1, 1, 50, 40, '월말 실사', 1, NOW(), FALSE),
+    (2, 1, 100, 120, '재고 오류 확인', 2, NOW(), FALSE),
+    (3, 1, 75, 75, '정상', 3, NOW(), TRUE),
+    (4, 2, 200, 180, '과다 재고 확인', 1, NOW(), FALSE),
+    (5, 2, 90, 100, '오차 확인', 2, NOW(), TRUE),
+    (6, 2, 60, 60, '정상', 3, NOW(), FALSE),
+    (7, 3, 120, 110, '월말 실사', 1, NOW(), TRUE),
+    (8, 3, 30, 50, '파손 확인', 2, NOW(), FALSE),
+    (9, 3, 300, 300, '정상', 3, NOW(), TRUE),
+    (10, 3, 150, 140, '오차 확인', 1, NOW(), FALSE);

@@ -60,7 +60,6 @@ public class OrderService {
     }
 
 
-
     //  발주 등록
     @Transactional
     public void registerOrder(Integer storeId, OrderRequestDTO requestDTO) {
@@ -338,7 +337,7 @@ public class OrderService {
         LocalDateTime start;
         LocalDateTime end;
 
-            // PM 오전 6시부터 오후 13시 59분까지
+        // PM 오전 6시부터 오후 13시 59분까지
         if ("AM".equals(period)) {
             start = today.atTime(6, 0);
             end = today.atTime(13, 59, 59);
@@ -481,10 +480,22 @@ public class OrderService {
     }
 
     public Page<PurchaseOrderDTO> searchOrderHistory(
-            Integer storeId, String orderId, Integer orderStatus, String startDate, String endDate, int page, int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size);
+            Integer storeId, String orderId, Integer orderStatus, String startDate, String endDate, int page, int size) {
 
-        return purchaseOrderRepository.searchOrderHistory(storeId, orderId, orderStatus, startDate, endDate, pageable);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<PurchaseOrderProjection> projectionPage =
+                purchaseOrderRepository.searchOrderHistory(storeId, orderId, orderStatus, startDate, endDate, pageable);
+
+        List<PurchaseOrderDTO> dtoList = projectionPage.stream()
+                .map(p -> new PurchaseOrderDTO(
+                        p.getOrderId(),
+                        p.getTotalQuantity(),
+                        p.getTotalAmount(),
+                        p.getOrderDate(),
+                        p.getOrderStatus()))
+                .toList();
+
+        return new PageImpl<>(dtoList, pageable, projectionPage.getTotalElements());
     }
 }
+

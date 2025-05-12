@@ -22,6 +22,7 @@ public interface StockAdjustLogRepository extends JpaRepository<StockAdjustLogEn
       AND (:to IS NULL OR l.adjustDate <= :to)
       AND (:adjustedBy IS NULL OR l.adjustedBy LIKE %:adjustedBy%)
       AND (:productName IS NULL OR l.product.proName LIKE %:productName%)
+      AND (:adjustReason IS NULL OR l.adjustReason = :adjustReason)
 """)
     Page<StockAdjustLogEntity> filterLogs(
             @Param("storeId") Integer storeId,
@@ -31,4 +32,6 @@ public interface StockAdjustLogRepository extends JpaRepository<StockAdjustLogEn
             @Param("productName") String productName,
             Pageable pageable
     );
+
+
 }

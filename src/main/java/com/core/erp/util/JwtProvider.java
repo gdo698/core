@@ -36,7 +36,7 @@ public class JwtProvider {
                               Integer storeId, String name, String branchName) {
         Claims claims = Jwts.claims();
         claims.put("loginId", loginId);
-        claims.put("role", role);
+        claims.put("role", "ROLE_" + role);
         claims.put("userType", userType);
         claims.put("storeId", storeId);
         claims.put("name", name);

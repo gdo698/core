@@ -3,10 +3,8 @@ package com.core.erp.service;
 import com.core.erp.domain.*;
 import com.core.erp.dto.*;
 import com.core.erp.repository.*;
-import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +16,14 @@ import java.util.List;
 
 public class StockService {
 
+    private final StoreRepository storeRepository;
+    private final ProductRepository productRepository;
     private final StockInHistoryRepository stockInHistoryRepository;
     private final StoreStockRepository storeStockRepository;
     private final StockAdjustLogRepository stockAdjustLogRepository;
     private final PartTimerRepository partTimerRepository;
     private final PurchaseOrderItemRepository purchaseOrderItemRepository;
+//    private final StockInventoryCheckRepository inventoryCheckRepository;
 
 
     public Page<StockInHistoryDTO> getStockInHistory(Integer storeId, String role, int page, int size) {
@@ -156,4 +157,7 @@ public class StockService {
     ) {
         return storeStockRepository.findStockSummary(storeId, productName, barcode, categoryId, pageable);
     }
+
+
+
 }

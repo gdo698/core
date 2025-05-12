@@ -51,7 +51,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                 String loginId = claims.get("loginId", String.class);
                 String role = claims.get("role", String.class);
+                Integer storeId = claims.get("storeId", Integer.class);
                 List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
+
 
                 // 4. 인증 객체 생성
                 UsernamePasswordAuthenticationToken authentication =
@@ -60,6 +62,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                 // 5. SecurityContext에 인증 객체 저장
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                System.out.println("✅ JWT 인증 성공 → 사용자: " + loginId + ", 역할: " + role + ", 지점 ID: " + storeId);
+
             } else {
                 System.out.println("JWT 토큰이 없거나 유효하지 않음");
             }
@@ -68,6 +73,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "JWT 유효성 검사 실패");
             return;
+
         }
 
         // 6. 다음 필터로 넘기기
