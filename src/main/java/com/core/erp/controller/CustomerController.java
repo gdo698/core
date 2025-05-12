@@ -5,6 +5,7 @@ import com.core.erp.dto.StoreResponseDTO;
 import com.core.erp.service.CustomerInquiryService;
 import com.core.erp.service.CustomerStoreService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,11 +48,18 @@ public class CustomerController {
      */
     @PostMapping("/inquiry")
     public ResponseEntity<Map<String, Object>> createInquiry(@RequestBody StoreInquiryRequestDTO requestDTO) {
-        Integer inquiryId = customerInquiryService.createInquiry(requestDTO);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "inquiryId", inquiryId,
-            "message", "문의가 성공적으로 접수되었습니다."
-        ));
+        try {
+            Integer inquiryId = customerInquiryService.createInquiry(requestDTO);
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "inquiryId", inquiryId,
+                "message", "문의가 성공적으로 접수되었습니다."
+            ));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                "success", false,
+                "message", e.getMessage()
+            ));
+        }
     }
 }

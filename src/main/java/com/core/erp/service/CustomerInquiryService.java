@@ -16,14 +16,22 @@ public class CustomerInquiryService {
 
     private final StoreInquiryRepository storeInquiryRepository;
     private final CustomerStoreService customerStoreService;
+    private final ProfanityFilterService profanityFilterService;
 
     /**
      * 고객 문의 등록
      * @param requestDTO 문의 정보
      * @return 저장된 문의 ID
+     * @throws IllegalArgumentException 욕설이 포함된 경우 예외 발생
      */
     @Transactional
     public Integer createInquiry(StoreInquiryRequestDTO requestDTO) {
+        // 욕설 필터링 검사
+        String profanityMessage = profanityFilterService.validateText(requestDTO.getInqContent());
+        if (profanityMessage != null) {
+            throw new IllegalArgumentException(profanityMessage);
+        }
+        
         // 매장 정보 조회
         StoreEntity store = customerStoreService.getStoreById(requestDTO.getStoreId());
         
