@@ -20,14 +20,15 @@ public class SalesTransactionDTO {
     private Integer  discountTotal;
     private Integer  finalAmount;
     private String paymentMethod;
-    private Integer  isRefunded;
+    private Integer transactionStatus;
+    private Integer refundAmount;
     private String refundReason;
     private LocalDateTime paidAt;
     private LocalDateTime refundedAt;
     private LocalDateTime createdAt;
     private List<SalesDetailDTO> details;
     private Integer ageGroup;
-    private String gender;
+    private Integer gender;
 
 
     // Entity → DTO 변환 생성자
@@ -39,7 +40,8 @@ public class SalesTransactionDTO {
         this.discountTotal = entity.getDiscountTotal();
         this.finalAmount = entity.getFinalAmount();
         this.paymentMethod = entity.getPaymentMethod();
-        this.isRefunded = entity.getIsRefunded();
+        this.transactionStatus = entity.getTransactionStatus();
+        this.refundAmount = entity.getRefundAmount();
         this.refundReason = entity.getRefundReason();
         this.paidAt = entity.getPaidAt();
         this.refundedAt = entity.getRefundedAt();

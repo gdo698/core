@@ -19,8 +19,11 @@ public class SalesSettleDTO {
     private LocalDate settlementDate;
     private Integer totalRevenue;
     private Integer discountTotal;
+    private Integer refundTotal;
     private Integer finalAmount;
     private SettlementType settlementType;
+    private Integer transactionCount;
+    private Integer refundCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -31,8 +34,11 @@ public class SalesSettleDTO {
         this.settlementDate = entity.getSettlementDate();
         this.totalRevenue = entity.getTotalRevenue();
         this.discountTotal = entity.getDiscountTotal();
+        this.refundTotal = entity.getRefundTotal();
         this.finalAmount = entity.getFinalAmount();
         this.settlementType = entity.getSettlementType();
+        this.transactionCount = entity.getTransactionCount();
+        this.refundCount = entity.getRefundCount();
         this.createdAt = entity.getCreatedAt();
         this.updatedAt = entity.getUpdatedAt();
     }

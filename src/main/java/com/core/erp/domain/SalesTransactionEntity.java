@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "sales_transaction")
@@ -40,8 +41,11 @@ public class SalesTransactionEntity {
     @Column(name = "payment_method", nullable = false, length = 20)
     private String paymentMethod;
 
-    @Column(name = "is_refunded")
-    private Integer isRefunded;
+    @Column(name = "transaction_status", nullable = false)
+    private Integer transactionStatus;  // 0: 완료, 1: 환불, 2: 취소, 3: 실패, 4: 승인 대기
+
+    @Column(name = "refund_amount")
+    private Integer refundAmount;
 
     @Column(name = "refund_reason")
     private String refundReason;
@@ -58,8 +62,12 @@ public class SalesTransactionEntity {
     @Column(name = "age_group")
     private Integer ageGroup;
 
-    @Column(name = "gender", length = 10)
-    private String gender;
+    @Column(name = "gender")
+    private Integer gender;
+
+    @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<SalesDetailEntity> salesDetails;
 
     // DTO → Entity 변환 생성자
     public SalesTransactionEntity(SalesTransactionDTO dto) {
@@ -69,7 +77,8 @@ public class SalesTransactionEntity {
         this.discountTotal = dto.getDiscountTotal();
         this.finalAmount = dto.getFinalAmount();
         this.paymentMethod = dto.getPaymentMethod();
-        this.isRefunded = dto.getIsRefunded();
+        this.transactionStatus = dto.getTransactionStatus();
+        this.refundAmount = dto.getRefundAmount();
         this.refundReason = dto.getRefundReason();
         this.paidAt = dto.getPaidAt();
         this.refundedAt = dto.getRefundedAt();
@@ -77,4 +86,6 @@ public class SalesTransactionEntity {
         this.ageGroup = dto.getAgeGroup();
         this.gender = dto.getGender();
     }
+
+
 }

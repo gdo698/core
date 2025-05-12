@@ -21,6 +21,8 @@ public class SalesDetailDTO {
     private Integer  realIncome;
     private Integer  isPromo;
 
+    private Integer refundAmount;
+
     private ProductDTO product;
     private String productName;
     private String category;
@@ -38,6 +40,7 @@ public class SalesDetailDTO {
         this.costPrice = entity.getCostPrice();
         this.realIncome = entity.getRealIncome();
         this.isPromo = entity.getIsPromo();
+        this.refundAmount = entity.getRefundAmount();
 
         if (entity.getProduct() != null) {
             this.productName = entity.getProduct().getProName();  // 상품명 세팅

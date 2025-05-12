@@ -20,7 +20,7 @@ public class SaleResponseDTO {
     private Integer finalAmount;
     private String paymentMethod;
     private LocalDateTime paidAt;
-    private Integer isRefunded;      // 환불 여부 (0: 정상, 1: 환불됨)
+    private Integer transactionStatus;
 
     public SaleResponseDTO(SalesTransactionEntity entity) {
         this.transactionId = entity.getTransactionId();
@@ -31,6 +31,6 @@ public class SaleResponseDTO {
         this.finalAmount = entity.getFinalAmount();
         this.paymentMethod = entity.getPaymentMethod();
         this.paidAt = entity.getPaidAt();
-        this.isRefunded = entity.getIsRefunded();
+        this.transactionStatus = entity.getTransactionStatus();
     }
 }

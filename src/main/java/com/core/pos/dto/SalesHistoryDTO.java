@@ -19,7 +19,8 @@ public class SalesHistoryDTO {
     private LocalDateTime paidAt;
 
     // 환불 관련 필드
-    private Integer isRefunded;
+    private Integer transactionStatus;
+    private Integer refundAmount;
     private String refundReason;
     private LocalDateTime refundedAt;
 
@@ -36,7 +37,8 @@ public class SalesHistoryDTO {
         this.discountTotal = entity.getDiscountTotal();
         this.finalAmount = entity.getFinalAmount();
         this.paidAt = entity.getPaidAt();
-        this.isRefunded = entity.getIsRefunded();
+        this.transactionStatus = entity.getTransactionStatus();
+        this.refundAmount = entity.getRefundAmount();
         this.refundReason = entity.getRefundReason();
         this.refundedAt = entity.getRefundedAt();
         this.items = items;

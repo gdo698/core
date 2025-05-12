@@ -34,12 +34,21 @@ public class SalesSettleEntity {
     @Column(name = "discount_total")
     private Integer discountTotal;
 
+    @Column(name = "refund_total")
+    private Integer refundTotal;
+
     @Column(name = "final_amount", nullable = false)
     private Integer finalAmount;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "settlement_type", nullable = false, length = 10)
     private SettlementType settlementType;
+
+    @Column(name = "transaction_count")
+    private Integer transactionCount;
+
+    @Column(name = "refund_count")
+    private Integer refundCount;
 
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -58,8 +67,11 @@ public class SalesSettleEntity {
         this.settlementDate = dto.getSettlementDate();
         this.totalRevenue = dto.getTotalRevenue();
         this.discountTotal = dto.getDiscountTotal();
+        this.refundTotal = dto.getRefundTotal();
         this.finalAmount = dto.getFinalAmount();
         this.settlementType = dto.getSettlementType();
+        this.transactionCount = dto.getTransactionCount();
+        this.refundCount = dto.getRefundCount();
         this.createdAt = dto.getCreatedAt();
         this.updatedAt = dto.getUpdatedAt();
     }
