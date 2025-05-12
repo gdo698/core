@@ -88,17 +88,16 @@ public class SalaryService {
         LocalDateTime startDateTime;
         LocalDateTime endDateTime;
 
-        //  1. 기간 검색 우선 처리
+        // ✅ 1. 조회 조건에 따른 날짜 범위 설정
         if (startDate != null && endDate != null) {
             startDateTime = LocalDate.parse(startDate).atStartOfDay();
             endDateTime = LocalDate.parse(endDate).atTime(23, 59, 59);
+            view = "custom";
         } else if ("yearly".equalsIgnoreCase(view)) {
-            int targetYear = (year != null) ? year : LocalDate.now().getYear(); // ✅ Null-safe 처리
+            int targetYear = (year != null) ? year : LocalDate.now().getYear();
             startDateTime = LocalDate.of(targetYear, 1, 1).atStartOfDay();
             endDateTime = LocalDate.of(targetYear, 12, 31).atTime(23, 59, 59);
-        }
-        //  3. 월별 조회 (month 필수)
-        else if ("monthly".equalsIgnoreCase(view)) {
+        } else if ("monthly".equalsIgnoreCase(view)) {
             if (month == null || month.isEmpty()) {
                 throw new IllegalArgumentException("월별 조회 시 'month' 값은 필수입니다.");
             }
@@ -106,13 +105,11 @@ public class SalaryService {
             LocalDate startLocalDate = LocalDate.of(year, m, 1);
             startDateTime = startLocalDate.atStartOfDay();
             endDateTime = startLocalDate.withDayOfMonth(startLocalDate.lengthOfMonth()).atTime(23, 59, 59);
-        }
-        //  4. 잘못된 요청
-        else {
+        } else {
             throw new IllegalArgumentException("잘못된 조회 방식입니다.");
         }
 
-        //  5. 데이터 조회
+        // ✅ 2. 급여 데이터 조회
         List<SalaryEntity> all = salaryRepository.findByStore_StoreIdAndPayDateBetween(storeId, startDateTime, endDateTime)
                 .stream()
                 .filter(s -> {
@@ -122,36 +119,13 @@ public class SalaryService {
                     if ("1".equals(status)) statusMatch = s.getPartTimer().getPartStatus() == 1;
                     else if ("0".equals(status)) statusMatch = s.getPartTimer().getPartStatus() == 0;
                     return nameMatch && statusMatch;
-                }).toList();
+                })
+                .toList();
 
-        //  6. 결과 변환 (연도별 vs 월별)
+        // ✅ 3. 결과 변환
         List<SalaryDTO> content;
         if ("yearly".equalsIgnoreCase(view)) {
-            Map<String, List<SalaryEntity>> grouped = all.stream()
-                    .collect(Collectors.groupingBy(s ->
-                            s.getPartTimer().getPartTimerId() + "_" + s.getPayDate().getYear()
-                    ));
-
-            content = grouped.values().stream().map(personList -> {
-                SalaryEntity base = personList.get(0);
-                SalaryDTO dto = new SalaryDTO();
-                dto.setPartTimerId(base.getPartTimer().getPartTimerId());
-                dto.setName(base.getPartTimer().getPartName());
-                dto.setSalaryTypeStr(base.getPartTimer().getSalaryType() == 0 ? "시급제" : "월급제");
-
-                int totalSalary = personList.stream().mapToInt(SalaryEntity::getNetSalary).sum();
-                int totalBonus = personList.stream().mapToInt(SalaryEntity::getBonus).sum();
-                int totalDeduct = personList.stream().mapToInt(SalaryEntity::getDeductTotal).sum();
-                double averageMonthly = personList.isEmpty() ? 0.0 : (double) totalSalary / personList.size();
-
-                dto.setTotalSalary(totalSalary);
-                dto.setTotalBonus(totalBonus);
-                dto.setTotalDeduct(totalDeduct);
-                dto.setAverageMonthly(Math.round(averageMonthly));
-                dto.setYear(base.getPayDate().getYear());
-
-                return dto;
-            }).toList();
+            content = processYearlyView(all);
         } else {
             content = all.stream()
                     .map(s -> {
@@ -160,15 +134,19 @@ public class SalaryService {
                             dto.setName(s.getPartTimer().getPartName());
                             dto.setSalaryTypeStr(s.getPartTimer().getSalaryType() == 0 ? "시급제" : "월급제");
                         }
+                        dto.setPayDate(s.getPayDate());
+
                         double workHours = calculateWorkHoursForPartTimer(
                                 s.getPartTimer().getPartTimerId(), storeId, startDateTime, endDateTime
                         );
                         dto.setWorkHours(workHours);
+
                         return dto;
-                    }).toList();
+                    })
+                    .toList();
         }
 
-        //  7. 페이징 처리
+        // ✅ 4. 페이징 처리
         int startIdx = (int) pageable.getOffset();
         int endIdx = Math.min(startIdx + pageable.getPageSize(), content.size());
         List<SalaryDTO> pagedContent = content.subList(startIdx, endIdx);
@@ -176,9 +154,33 @@ public class SalaryService {
         return new PageImpl<>(pagedContent, pageable, content.size());
     }
 
+    private List<SalaryDTO> processYearlyView(List<SalaryEntity> all) {
+        Map<String, List<SalaryEntity>> grouped = all.stream()
+                .collect(Collectors.groupingBy(s ->
+                        s.getPartTimer().getPartTimerId() + "_" + s.getPayDate().getYear()
+                ));
 
+        return grouped.values().stream().map(personList -> {
+            SalaryEntity base = personList.get(0);
+            SalaryDTO dto = new SalaryDTO();
+            dto.setPartTimerId(base.getPartTimer().getPartTimerId());
+            dto.setName(base.getPartTimer().getPartName());
+            dto.setSalaryTypeStr(base.getPartTimer().getSalaryType() == 0 ? "시급제" : "월급제");
 
+            int totalSalary = personList.stream().mapToInt(SalaryEntity::getNetSalary).sum();
+            int totalBonus = personList.stream().mapToInt(SalaryEntity::getBonus).sum();
+            int totalDeduct = personList.stream().mapToInt(SalaryEntity::getDeductTotal).sum();
+            double averageMonthly = personList.isEmpty() ? 0.0 : (double) totalSalary / personList.size();
 
+            dto.setTotalSalary(totalSalary);
+            dto.setTotalBonus(totalBonus);
+            dto.setTotalDeduct(totalDeduct);
+            dto.setAverageMonthly(Math.round(averageMonthly));
+            dto.setYear(base.getPayDate().getYear());
+
+            return dto;
+        }).toList();
+    }
 
     /**
      * 📌 급여 상세 조회

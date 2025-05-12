@@ -62,7 +62,7 @@ public class CategoryController {
 
     private List<Integer> findAllDescendants(Integer categoryId) {
         List<Integer> result = new ArrayList<>();
-        result.add(categoryId); // 자기 자신 포함
+        result.add(categoryId);
 
         List<CategoryEntity> children = categoryRepository.findByParentCategory_CategoryId(categoryId);
         for (CategoryEntity child : children) {

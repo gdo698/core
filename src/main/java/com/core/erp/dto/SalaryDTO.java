@@ -25,6 +25,7 @@ public class SalaryDTO {
     private int netSalary;
     private LocalDateTime payDate;
     private int payStatus;
+    private String payDateStr;
 
     // PartTimer 추가 정보
     private String name;              // 아르바이트 이름
@@ -52,6 +53,8 @@ public class SalaryDTO {
         this.netSalary = entity.getNetSalary();
         this.payDate = entity.getPayDate();
         this.payStatus = entity.getPayStatus();
+        this.payDateStr = entity.getPayDate() != null ? entity.getPayDate().toLocalDate().toString() : "-";
+
     }
 
 }
