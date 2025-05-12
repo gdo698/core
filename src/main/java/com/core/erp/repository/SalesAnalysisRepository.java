@@ -106,6 +106,7 @@ public interface SalesAnalysisRepository extends JpaRepository<SalesTransactionE
             "WHERE st.paid_at BETWEEN :startDate AND :endDate " +
             "AND (:storeId IS NULL OR st.store_id = :storeId) " +
             "AND st.gender IS NOT NULL " +
+            "AND st.gender IN (0, 1) " +
             "GROUP BY st.gender " +
             "ORDER BY st.gender", nativeQuery = true)
     List<Object[]> findSalesByGender(
