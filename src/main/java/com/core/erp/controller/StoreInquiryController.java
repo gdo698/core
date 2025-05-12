@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/store-inquiries")
@@ -110,6 +111,17 @@ public class StoreInquiryController {
             @RequestBody Map<String, Integer> request) {
         
         Integer level = request.get("level");
+        
+        // 해당 문의의 타입을 확인
+        StoreInquiryDTO inquiry = inquiryService.getInquiryById(inquiryId);
+        
+        // 건의/문의 타입(3)인 경우 평가를 진행하지 않음
+        if (inquiry.getInqType() == 3) {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "건의/문의 타입은 평가 등급을 부여할 수 없습니다.");
+            return ResponseEntity.badRequest().body(inquiry);
+        }
+        
         StoreInquiryDTO result = inquiryService.updateInquiryLevel(inquiryId, level);
         return ResponseEntity.ok(result);
     }
