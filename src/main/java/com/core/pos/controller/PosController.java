@@ -38,5 +38,19 @@ public class PosController {
         return ResponseEntity.ok(historyList);
     }
 
-
+    // 환불 처리 API
+    @PostMapping("/refund/{transactionId}")
+    public ResponseEntity<String> refundTransaction(
+            @PathVariable Integer transactionId,
+            @RequestParam String refundReason
+    ) {
+        try {
+            posService.processRefund(transactionId, refundReason);
+            return ResponseEntity.ok("환불 처리 완료");
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body("환불 실패: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("서버 오류: " + e.getMessage());
+        }
+    }
 }
