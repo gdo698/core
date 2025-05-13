@@ -34,6 +34,9 @@ public class ProductDetailResponseDTO {
     private List<String> categoryPath; // 대분류 > 중분류 > 소분류 이름 리스트
     private String eventStart;
     private String eventEnd;
+    
+    // 새로 추가된 필드
+    private int hqStock; // 본사 재고
 
     public ProductDetailResponseDTO(
             int productId,
@@ -54,7 +57,8 @@ public class ProductDetailResponseDTO {
             Integer categoryId,
             List<String> categoryPath,
             String eventStart,
-            String eventEnd
+            String eventEnd,
+            int hqStock
     ) {
         this.productId = productId;
         this.proName = proName;
@@ -75,6 +79,7 @@ public class ProductDetailResponseDTO {
         this.categoryPath = categoryPath;
         this.eventStart = eventStart;
         this.eventEnd = eventEnd;
+        this.hqStock = hqStock;
     }
 
     @Getter

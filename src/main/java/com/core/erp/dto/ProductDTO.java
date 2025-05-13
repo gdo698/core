@@ -23,14 +23,14 @@ public class ProductDTO {
     private LocalDateTime proUpdateAt;
     private String proImage;
     private Integer isPromo;
-    private Integer proStock; // 재고
-    private String status;    // 상태
+    private Integer proStock; 
+    private String status; 
     private MultipartFile file;
     private int proStockLimit;
     private String categoryName;
     private LocalDateTime recentStockInDate;
     private int expirationPeriod;
-
+    private Integer hqStock; // 본사 재고
     // Entity → DTO 변환 생성자
     public ProductDTO(ProductEntity entity) {
         this.productId = entity.getProductId();

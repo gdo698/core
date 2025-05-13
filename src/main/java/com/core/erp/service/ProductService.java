@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -34,6 +35,8 @@ public class ProductService {
     private ProductDetailsRepository productDetailsRepository;
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private HQStockRepository hqStockRepository;
 
     // 전체 제품 목록 (기존 메서드)
     public List<ProductDTO> getAllProducts() {
@@ -81,51 +84,56 @@ public class ProductService {
     // 페이징된 제품 목록
     public Page<ProductDTO> getPagedProducts(Pageable pageable) {
         Page<ProductEntity> productPage = productRepository.findAll(pageable);
-        List<ProductDTO> productDTOs = new ArrayList<>();
         
-        for (ProductEntity p : productPage.getContent()) {
-            Integer stock = storeStockRepository.sumStockByProductId(Long.valueOf(p.getProductId()));
-            if (stock == null) stock = 0;
-
-            // isPromo 값에 따라 상태 결정
-            String status;
-            if (p.getIsPromo() != null) {
-                switch (p.getIsPromo()) {
-                    case 1: status = "단종"; break;
-                    case 2: status = "1+1 이벤트"; break;
-                    case 3: status = "2+1 이벤트"; break;
-                    default: status = "판매중";
-                }
-            } else {
-                status = "판매중";
+        return productPage.map(product -> {
+            ProductDTO dto = new ProductDTO(product);
+            
+            // 매장 재고 정보 설정
+            Integer storeStock = storeStockRepository.sumStockByProductId(Long.valueOf(product.getProductId()));
+            if (storeStock == null) storeStock = 0;
+            dto.setProStock(storeStock);
+            
+            // 본사 재고 정보 설정
+            int hqStock = hqStockRepository.findByProductProductId(product.getProductId())
+                .map(hqStockEntity -> hqStockEntity.getQuantity())
+                .orElse(0);
+            dto.setHqStock(hqStock);
+            
+            // 카테고리 이름 설정
+            if (product.getCategory() != null) {
+                dto.setCategoryName(product.getCategory().getCategoryName());
             }
-
-            ProductDTO dto = new ProductDTO(p);
-            dto.setProStock(stock);
-            dto.setStatus(status);
-
-            // 카테고리 이름 세팅
-            if (p.getCategory() != null) {
-                dto.setCategoryName(p.getCategory().getCategoryName());
-            }
-
+            
             // 최근 입고일 조회
-            StockInHistoryEntity recentStockIn = stockInHistoryRepository.findTop1ByProduct_ProductIdOrderByInDateDesc(p.getProductId());
+            StockInHistoryEntity recentStockIn = stockInHistoryRepository
+                .findTop1ByProduct_ProductIdOrderByInDateDesc(product.getProductId());
             if (recentStockIn != null) {
                 dto.setRecentStockInDate(recentStockIn.getInDate());
-            } else {
-                dto.setRecentStockInDate(null);
             }
-
-            productDTOs.add(dto);
-        }
-        
-        return new PageImpl<>(productDTOs, pageable, productPage.getTotalElements());
+            
+            return dto;
+        });
     }
 
     // 상세페이지용 상세 정보
     public ProductDetailResponseDTO getProductDetail(int productId) {
-        ProductEntity product = productRepository.findById(Long.valueOf(productId)).orElseThrow();
+        Optional<ProductEntity> optProduct = productRepository.findById(Long.valueOf(productId));
+        
+        if (!optProduct.isPresent()) {
+            return null; // 또는 예외 처리
+        }
+        
+        ProductEntity product = optProduct.get();
+        
+        // 매장 재고 합계 조회 (기존 코드)
+        Integer totalStock = storeStockRepository.sumStockByProductId(Long.valueOf(productId));
+        if (totalStock == null) totalStock = 0;
+        
+        // 본사 재고 조회 (추가된 코드)
+        int hqStock = hqStockRepository.findByProductProductId(productId)
+            .map(hqStockEntity -> hqStockEntity.getQuantity())
+            .orElse(0);
+        
         String categoryName = product.getCategory().getCategoryName();
         String status = switch (product.getIsPromo()) {
             case 1 -> "단종";
@@ -133,8 +141,6 @@ public class ProductService {
             case 3 -> "2+1 이벤트";
             default -> "판매중";
         };
-        Integer totalStock = storeStockRepository.sumStockByProductId(Long.valueOf(productId));
-        if (totalStock == null) totalStock = 0;
 
         List<ProductDetailResponseDTO.StoreStockInfo> storeStocks = storeStockRepository.findByProduct_ProductId(productId)
                 .stream()
@@ -192,7 +198,8 @@ public class ProductService {
                 product.getCategory().getCategoryId(), // categoryId
                 categoryPath, // categoryPath
                 eventStart,   // eventStart
-                eventEnd      // eventEnd
+                eventEnd,     // eventEnd
+                hqStock       // hqStock
         );
     }
 
