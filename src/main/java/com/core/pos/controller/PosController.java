@@ -4,7 +4,9 @@ import com.core.erp.dto.CustomPrincipal;
 import com.core.pos.dto.DisposalRequestDTO;
 import com.core.pos.dto.SaleRequestDTO;
 import com.core.pos.dto.SalesHistoryDTO;
+import com.core.pos.dto.SettlementRequestDTO;
 import com.core.pos.service.PosService;
+import com.core.pos.service.SettlementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,6 +21,7 @@ import java.util.List;
 public class PosController {
 
     private final PosService posService;
+    private final SettlementService settlementService;
 
     // 결제 저장 API
     @PostMapping("/pay")
@@ -70,5 +73,12 @@ public class PosController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("폐기 등록 실패: " + e.getMessage());
         }
+    }
+
+    // 거래 정산
+    @PostMapping("/settlement/daily")
+    public ResponseEntity<?> calculateDailySettlement(@RequestBody SettlementRequestDTO dto) {
+        settlementService.calculateDailySettlement(dto);
+        return ResponseEntity.ok("정산 완료");
     }
 }

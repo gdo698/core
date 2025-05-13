@@ -2,6 +2,7 @@ package com.core.erp.dto;
 
 import com.core.erp.domain.SalesSettleEntity;
 import com.core.erp.domain.SalesSettleEntity.SettlementType;
+import com.core.erp.domain.SalesSettleEntity.HqStatus;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -24,6 +25,8 @@ public class SalesSettleDTO {
     private SettlementType settlementType;
     private Integer transactionCount;
     private Integer refundCount;
+    private LocalDateTime hqSentAt;
+    private HqStatus hqStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -39,6 +42,8 @@ public class SalesSettleDTO {
         this.settlementType = entity.getSettlementType();
         this.transactionCount = entity.getTransactionCount();
         this.refundCount = entity.getRefundCount();
+        this.hqSentAt = entity.getHqSentAt();
+        this.hqStatus = entity.getHqStatus();
         this.createdAt = entity.getCreatedAt();
         this.updatedAt = entity.getUpdatedAt();
     }

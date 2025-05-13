@@ -1,6 +1,5 @@
-package com.core.erp.domain;
+package com.core.pos.domain;
 
-import com.core.erp.dto.SalesSettleDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,19 +13,24 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SalesSettleEntity {
+public class SalesSettlementEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "settlement_id")
     private Integer settlementId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id", nullable = false)
-    private StoreEntity store;
+    @Column(name = "store_id", nullable = false)
+    private Integer storeId;
 
     @Column(name = "settlement_date", nullable = false)
     private LocalDate settlementDate;
+
+    @Column(name = "start_date")
+    private LocalDate startDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
     @Column(name = "total_revenue", nullable = false)
     private Integer totalRevenue;
@@ -41,7 +45,7 @@ public class SalesSettleEntity {
     private Integer finalAmount;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "settlement_type", nullable = false, length = 10)
+    @Column(name = "settlement_type", nullable = false)
     private SettlementType settlementType;
 
     @Column(name = "transaction_count")
@@ -54,7 +58,7 @@ public class SalesSettleEntity {
     private LocalDateTime hqSentAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "hq_status", length = 10)
+    @Column(name = "hq_status")
     private HqStatus hqStatus;
 
     @Column(name = "created_at", insertable = false, updatable = false)
@@ -69,23 +73,5 @@ public class SalesSettleEntity {
 
     public enum HqStatus {
         PENDING, SENT, FAILED
-    }
-
-    // DTO → Entity 변환 생성자
-    public SalesSettleEntity(SalesSettleDTO dto, StoreEntity storeEntity) {
-        this.settlementId = dto.getSettlementId();
-        this.store = storeEntity;
-        this.settlementDate = dto.getSettlementDate();
-        this.totalRevenue = dto.getTotalRevenue();
-        this.discountTotal = dto.getDiscountTotal();
-        this.refundTotal = dto.getRefundTotal();
-        this.finalAmount = dto.getFinalAmount();
-        this.settlementType = dto.getSettlementType();
-        this.transactionCount = dto.getTransactionCount();
-        this.refundCount = dto.getRefundCount();
-        this.hqSentAt = dto.getHqSentAt();
-        this.hqStatus = dto.getHqStatus();
-        this.createdAt = dto.getCreatedAt();
-        this.updatedAt = dto.getUpdatedAt();
     }
 }

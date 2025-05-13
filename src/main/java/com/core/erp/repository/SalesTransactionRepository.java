@@ -48,4 +48,7 @@ public interface SalesTransactionRepository extends JpaRepository<SalesTransacti
         @Param("end") LocalDateTime end,
         @Param("status") Integer transactionStatus
     );
+
+    // 정산 계산 시 거래목록 조회용
+    List<SalesTransactionEntity> findByStoreStoreIdAndPaidAtBetween(Integer storeId, LocalDateTime start, LocalDateTime end);
 }

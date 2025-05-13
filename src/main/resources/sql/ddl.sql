@@ -247,23 +247,24 @@ CREATE TABLE `sales_detail` (
 );
 
 CREATE TABLE `sales_settlement` (
-                                `settlement_id` INT AUTO_INCREMENT PRIMARY KEY COMMENT '매출 정산 고유 ID',
-                                `store_id` INT NOT NULL COMMENT '매장 고유번호',
-                                `settlement_date` DATE NOT NULL COMMENT '정산 기준일 (마감일 또는 기준일)',
-                                `start_date` DATE NULL COMMENT '정산 시작일',
-                                `end_date` DATE NULL COMMENT '정산 종료일',
-                                `total_revenue` INT NOT NULL COMMENT '총 매출 (할인 전)',
-                                `discount_total` INT DEFAULT 0 COMMENT '총 할인 금액',
-                                `refund_total` INT DEFAULT 0 COMMENT '총 환불 금액',
-                                `final_amount` INT NOT NULL COMMENT '최종 결제 금액 (할인 및 환불 반영)',
-                                `settlement_type` ENUM('daily', 'monthly', 'yearly') NOT NULL COMMENT '정산 종류 (일별, 월별, 연도별)',
-                                `transaction_count` INT DEFAULT 0 COMMENT '총 거래 건수',
-                                `refund_count` INT DEFAULT 0 COMMENT '총 환불 건수',
-                                `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '정산 생성 시각',
-                                `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '정산 수정 시각',
-                                FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`)
+                                    `settlement_id` INT AUTO_INCREMENT PRIMARY KEY COMMENT '매출 정산 고유 ID',
+                                    `store_id` INT NOT NULL COMMENT '매장 고유번호',
+                                    `settlement_date` DATE NOT NULL COMMENT '정산 기준일 (마감일 또는 기준일)',
+                                    `start_date` DATE NULL COMMENT '정산 시작일',
+                                    `end_date` DATE NULL COMMENT '정산 종료일',
+                                    `total_revenue` INT NOT NULL COMMENT '총 매출 (할인 전)',
+                                    `discount_total` INT DEFAULT 0 COMMENT '총 할인 금액',
+                                    `refund_total` INT DEFAULT 0 COMMENT '총 환불 금액',
+                                    `final_amount` INT NOT NULL COMMENT '최종 결제 금액 (할인 및 환불 반영)',
+                                    `settlement_type` ENUM('daily', 'monthly', 'yearly') NOT NULL COMMENT '정산 종류 (일별, 월별, 연도별)',
+                                    `transaction_count` INT DEFAULT 0 COMMENT '총 거래 건수',
+                                    `refund_count` INT DEFAULT 0 COMMENT '총 환불 건수',
+                                    `hq_sent_at` DATETIME DEFAULT NULL COMMENT '본사 전송 시각',
+                                    `hq_status` ENUM('PENDING', 'SENT', 'FAILED') DEFAULT 'PENDING' COMMENT '본사 전송 상태',
+                                    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '정산 생성 시각',
+                                    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '정산 수정 시각',
+                                    FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`)
 );
-
 
 CREATE TABLE `sales_statistics` (
                                     `stats_id` INT NOT NULL COMMENT '통계 ID',
