@@ -1,6 +1,8 @@
 package com.core.erp.repository;
 
 import com.core.erp.domain.StoreStockEntity;
+import com.core.erp.dto.DisposalTargetDTO;
+import com.core.erp.dto.DisposalTargetProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +13,6 @@ import java.util.Optional;
 public interface StoreStockRepository extends JpaRepository<StoreStockEntity, Long>, StockRepositoryCustom {
     @Query("SELECT SUM(s.quantity) FROM StoreStockEntity s WHERE s.product.productId = :productId")
     Integer sumStockByProductId(Long productId);
-
 
     @Query("""
     SELECT s.quantity FROM StoreStockEntity s 
@@ -42,4 +43,21 @@ public interface StoreStockRepository extends JpaRepository<StoreStockEntity, Lo
             @Param("productId") int productId,
             @Param("storeId") Integer storeId
     );
+
+    @Query(value = """
+    SELECT 
+        s.stock_id AS stockId,
+        p.product_id AS productId,
+        p.pro_name AS proName,
+        s.quantity AS quantity,
+        s.last_in_date AS lastInDate,
+        DATE_ADD(s.last_in_date, INTERVAL p.expiration_period DAY) AS expiredDate
+    FROM store_stock s
+    JOIN product p ON s.product_id = p.product_id
+    WHERE DATE_ADD(s.last_in_date, INTERVAL p.expiration_period DAY) < CURRENT_TIMESTAMP
+""", nativeQuery = true)
+    List<DisposalTargetProjection> findExpiredDisposals();
+
+    Optional<Object> findTopByProduct_ProductIdOrderByLastInDateDesc(int productId);
+
 }
