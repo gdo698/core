@@ -65,5 +65,23 @@ public class StockInventoryCheckController {
         return ResponseEntity.ok("실사 롤백 완료");
     }
 
+    @PatchMapping("/rollback-batch")
+    public ResponseEntity<String> rollbackInventoryChecks(
+            @RequestBody List<Integer> checkIds
+    ) {
+        inventoryCheckService.rollbackChecks(checkIds);
+        return ResponseEntity.ok("실사 일괄 롤백 완료");
+    }
+
+    @PatchMapping("/rollback-all")
+    public ResponseEntity<String> rollbackAllInventoryChecks(
+            @AuthenticationPrincipal CustomPrincipal userDetails
+    ) {
+        int storeId = userDetails.getStoreId();
+        inventoryCheckService.rollbackAllAppliedChecks(storeId);
+        return ResponseEntity.ok("전체 실사 롤백 완료");
+    }
+
+
 
 }

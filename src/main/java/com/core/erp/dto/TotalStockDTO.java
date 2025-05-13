@@ -21,16 +21,27 @@ public class TotalStockDTO {
     private Long totalQuantity;
     private LocalDateTime latestInDate;
     private String promoStatus;
-    private Integer realQuantity;
-    private Integer difference;
-    private Integer checkId;
+    private Long realQuantity;
+    private Long difference;
+    private Long checkItemId;
     private Boolean isApplied;
 
     public TotalStockDTO(
-            Integer productId, Integer storeId, String storeName, String productName, Long barcode,
-            String categoryName, Long storeQuantity, Long warehouseQuantity, Long totalQuantity,
-            LocalDateTime latestInDate, String promoStatus, Integer realQuantity, Integer difference,
-            Integer checkId, Boolean isApplied
+            Integer productId,
+            Integer storeId,
+            String storeName,
+            String productName,
+            Long barcode,
+            String categoryName,
+            Long storeQuantity,
+            Long warehouseQuantity,
+            Long totalQuantity,
+            LocalDateTime latestInDate,
+            String promoStatus,
+            Long realQuantity,
+            Long difference,
+            Long checkItemId,
+            Boolean isApplied
     ) {
         this.productId = productId;
         this.storeId = storeId;
@@ -45,7 +56,7 @@ public class TotalStockDTO {
         this.promoStatus = promoStatus;
         this.realQuantity = realQuantity;
         this.difference = difference;
-        this.checkId = checkId;
+        this.checkItemId = checkItemId;
         this.isApplied = isApplied;
     }
 }

@@ -29,6 +29,7 @@ DROP TABLE IF EXISTS `sales_hourly`;
 DROP TABLE IF EXISTS `stock_adjust_log`;
 DROP TABLE IF EXISTS `product_details`;
 DROP TABLE IF EXISTS `warehouse_stock`;
+DROP TABLE IF EXISTS `stock_inventory_check_item`;
 DROP TABLE IF EXISTS `stock_inventory_check`;
 DROP TABLE IF EXISTS `hq_stock`;
 DROP TABLE IF EXISTS `product`;

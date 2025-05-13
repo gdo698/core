@@ -15,21 +15,22 @@ import java.util.List;
 @Repository
 public interface StockInventoryCheckRepository extends JpaRepository<StockInventoryCheckEntity, Integer> {
 
-        @Query("""
+    @Query("""
         SELECT
             i.checkId AS checkId,
             p.proName AS productName,
             p.proBarcode AS barcode,
-            i.prevQuantity AS prevQuantity,
-            i.realQuantity AS realQuantity,
-            (i.realQuantity - i.prevQuantity) AS difference,
+            (sii.storePrevQuantity + sii.warehousePrevQuantity) AS prevQuantity,
+            (sii.storeRealQuantity + sii.warehouseRealQuantity) AS realQuantity,
+            ((sii.storeRealQuantity + sii.warehouseRealQuantity) - (sii.storePrevQuantity + sii.warehousePrevQuantity)) AS difference,
             i.checkReason AS checkReason,
             pt.partName AS partTimerName,
             i.checkDate AS checkDate,
             i.isApplied AS isApplied
-        FROM StockInventoryCheckEntity i
-        LEFT JOIN i.product p
-        LEFT JOIN i.partTimer pt
+        FROM StockInventoryCheckItemEntity sii
+        JOIN sii.product p
+        JOIN sii.inventoryCheck i
+        JOIN i.partTimer pt
         WHERE (:storeId IS NULL OR i.store.storeId = :storeId)
           AND (:productName IS NULL OR p.proName LIKE CONCAT('%', :productName, '%'))
           AND (:barcode IS NULL OR p.proBarcode = :barcode)
@@ -38,16 +39,18 @@ public interface StockInventoryCheckRepository extends JpaRepository<StockInvent
           AND (:endDate IS NULL OR i.checkDate <= :endDate)
           AND (:isApplied IS NULL OR i.isApplied = :isApplied)
         """)
-        Page<StoreStockProjection> searchInventoryChecks(
-                @Param("storeId") Integer storeId,
-                @Param("productName") String productName,
-                @Param("barcode") Long barcode,
-                @Param("partTimerId") Integer partTimerId,
-                @Param("startDate") LocalDate startDate,
-                @Param("endDate") LocalDate endDate,
-                @Param("isApplied") Boolean isApplied,
-                Pageable pageable
-        );
+    Page<StoreStockProjection> searchInventoryChecks(
+            @Param("storeId") Integer storeId,
+            @Param("productName") String productName,
+            @Param("barcode") Long barcode,
+            @Param("partTimerId") Integer partTimerId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("isApplied") Boolean isApplied,
+            Pageable pageable
+    );
 
     List<StockInventoryCheckEntity> findAllByStore_StoreIdAndIsAppliedFalse(int storeId);
+
+    List<StockInventoryCheckEntity> findAllByStore_StoreIdAndIsAppliedTrue(int storeId);
 }

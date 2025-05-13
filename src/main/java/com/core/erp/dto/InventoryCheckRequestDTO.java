@@ -20,7 +20,8 @@ public class InventoryCheckRequestDTO {
     @ToString
     public static class CheckItem {
         private Integer productId;
-        private Integer realQuantity;
+        private Integer storeRealQty;
+        private Integer warehouseRealQty;
     }
 
 }
