@@ -1,13 +1,12 @@
 package com.core.pos.service;
 
 import com.core.erp.domain.*;
+import com.core.erp.dto.DisposalDTO;
+import com.core.erp.dto.SalesDetailDTO;
 import com.core.erp.repository.*;
-import com.core.pos.dto.SaleItemDTO;
-import com.core.pos.dto.SaleItemSummaryDTO;
-import com.core.pos.dto.SaleRequestDTO;
+import com.core.pos.dto.*;
 import com.core.erp.repository.SalesDetailRepository;
 import com.core.erp.repository.SalesTransactionRepository;
-import com.core.pos.dto.SalesHistoryDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +24,9 @@ public class PosService {
     private final ProductRepository productRepository;
     private final SalesTransactionRepository salesTransactionRepository;
     private final SalesDetailRepository salesDetailRepository;
+    private final DisposalRepository disposalRepository;
+    private final StoreStockRepository storeStockRepository;
+
 
     // 거래 저장
     @Transactional
@@ -99,14 +101,9 @@ public class PosService {
             List<SalesDetailEntity> details =
                     salesDetailRepository.findByTransaction_TransactionId(transaction.getTransactionId());
 
-            List<SaleItemSummaryDTO> items = details.stream().map(detail -> {
-                String productName = detail.getProduct().getProName(); // 상품명 가져오기
-                return new SaleItemSummaryDTO(
-                        productName,
-                        detail.getSalesQuantity(),
-                        detail.getIsPromo()
-                );
-            }).collect(Collectors.toList());
+            List<SalesDetailDTO> items = details.stream()
+                    .map(SalesDetailDTO::new)
+                    .collect(Collectors.toList());
 
             return new SalesHistoryDTO(transaction, items);
         }).collect(Collectors.toList());
@@ -141,5 +138,30 @@ public class PosService {
         // 4. 저장
         salesTransactionRepository.save(transaction);
         salesDetailRepository.saveAll(detailList); // saveAll로 일괄 저장
+    }
+
+    // 폐기 등록
+    @Transactional
+    public void saveDisposal(DisposalRequestDTO dto, String loginId) {
+        // 1. 재고 ID로 storeStock 조회
+        StoreStockEntity stock = storeStockRepository.findById(dto.getStockId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 재고 ID를 찾을 수 없습니다: " + dto.getStockId()));
+
+        // 2. 폐기 엔티티 생성 및 값 설정
+        DisposalEntity entity = new DisposalEntity();
+        entity.setStoreStock(stock);
+        entity.setProduct(stock.getProduct()); // 연관 상품 정보 설정
+        entity.setProName(stock.getProduct().getProName());
+        entity.setDisposalDate(LocalDateTime.now()); // 현재 시간으로 설정
+        entity.setDisposalQuantity(dto.getDisposalQuantity());
+        entity.setProcessedBy(loginId); // 로그인한 사용자 정보로 등록자 이름 설정
+        entity.setDisposalReason(dto.getDisposalReason());
+
+        // 총 손실 금액 = 단가(원가) × 수량
+        int costPrice = stock.getProduct().getProCost();
+        entity.setTotalLossAmount(costPrice * dto.getDisposalQuantity());
+
+        // 3. 저장
+        disposalRepository.save(entity);
     }
 }

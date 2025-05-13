@@ -1,6 +1,9 @@
 package com.core.erp.dto;
 
 import com.core.erp.domain.SalesDetailEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Getter
@@ -23,8 +26,11 @@ public class SalesDetailDTO {
 
     private Integer refundAmount;
 
+    @JsonIgnore
     private ProductDTO product;
     private String productName;
+
+    @JsonProperty("category")
     private String category;
 
 

@@ -29,6 +29,8 @@ public class ProductDTO {
     private int proStockLimit;
     private String categoryName;
     private LocalDateTime recentStockInDate;
+    private int expirationPeriod;
+
     // Entity → DTO 변환 생성자
     public ProductDTO(ProductEntity entity) {
         this.productId = entity.getProductId();
@@ -42,5 +44,6 @@ public class ProductDTO {
         this.proImage = entity.getProImage();
         this.isPromo = entity.getIsPromo();
         this.proStockLimit = entity.getProStockLimit();
+        this.expirationPeriod = entity.getExpirationPeriod();
     }
 }

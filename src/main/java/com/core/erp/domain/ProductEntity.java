@@ -57,6 +57,10 @@ public class ProductEntity {
     @Column(name = "event_end")
     private LocalDateTime eventEnd;
 
+    // 유통기한(입고일 기준 n일)
+    @Column(name = "expiration_period", nullable = false)
+    private int expirationPeriod;
+
     // DTO → Entity 변환 생성자
     public ProductEntity(ProductDTO dto) {
         // this.productId = dto.getProductId(); // 신규 등록 시 productId는 세팅하지 않음
@@ -70,5 +74,6 @@ public class ProductEntity {
         this.proImage = dto.getProImage();
         this.isPromo = dto.getIsPromo();
         this.proStockLimit = dto.getProStockLimit();
+        this.expirationPeriod = dto.getExpirationPeriod();
     }
 }

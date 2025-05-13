@@ -102,6 +102,7 @@ CREATE TABLE `product` (
                            `pro_image` varchar(225) NULL COMMENT '이미지 링크',
                            `is_promo`	TINYINT	NULL	COMMENT '1기본 2 이벤트 3 이벤트',
                            `pro_stock_limit` int NOT NULL COMMENT '발주임계치',
+                           `expiration_period` INT NOT NULL COMMENT '유통기한(입고일 기준 n일)',
                            PRIMARY KEY (`product_id`),
                            FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`)
 );
@@ -169,16 +170,20 @@ CREATE TABLE `purchase_order_item` (
 );
 
 CREATE TABLE `disposal` (
-                            `disposal_id` int NOT NULL COMMENT '폐기넘버',
-                            `stock_id` int NOT NULL COMMENT '재고넘버',
-                            `disposal_date` DATETIME NOT NULL COMMENT '폐기날짜',
-                            `disposal_quantity` int NOT NULL COMMENT '폐기 수량',
-                            `processed_by` varchar(30) NOT NULL COMMENT '폐기한 사람',
-                            `total_loss_amount` int NOT NULL COMMENT '폐기 총 금액',
-                            `disposal_reason` varchar(30) NOT NULL DEFAULT '유통기한만료' COMMENT '폐기사유',
+                            `disposal_id` INT NOT NULL AUTO_INCREMENT COMMENT '폐기 넘버',
+                            `stock_id` INT NOT NULL COMMENT '재고 넘버',
+                            `product_id` INT NOT NULL COMMENT '상품 고유번호',
+                            `disposal_date` DATETIME NOT NULL COMMENT '폐기 날짜',
+                            `disposal_quantity` INT NOT NULL COMMENT '폐기 수량',
+                            `processed_by` VARCHAR(30) NOT NULL COMMENT '폐기한 사람',
+                            `total_loss_amount` INT NOT NULL COMMENT '폐기 총 금액',
+                            `disposal_reason` VARCHAR(30) NOT NULL DEFAULT '유통기한만료' COMMENT '폐기 사유',
+                            `pro_name` VARCHAR(255) NOT NULL COMMENT '상품명',  -- 상품명 추가
                             PRIMARY KEY (`disposal_id`),
-                            FOREIGN KEY (`stock_id`) REFERENCES `store_stock` (`stock_id`)
+                            FOREIGN KEY (`stock_id`) REFERENCES `store_stock` (`stock_id`),  -- store_stock과 연결
+                            FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`)  -- product와 연결
 );
+
 
 CREATE TABLE `sales_hourly` (
                                 `sales_hourly_id` int NOT NULL COMMENT '시간대별 매출통계 고유번호',

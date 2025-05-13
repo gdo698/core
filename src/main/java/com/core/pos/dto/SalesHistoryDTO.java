@@ -1,6 +1,7 @@
 package com.core.pos.dto;
 
 import com.core.erp.domain.SalesTransactionEntity;
+import com.core.erp.dto.SalesDetailDTO;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -27,10 +28,10 @@ public class SalesHistoryDTO {
     // 상품 요약 정보
     private Integer totalPrice;
     private Integer discountTotal;
-    private List<SaleItemSummaryDTO> items;
+    private List<SalesDetailDTO> items;
 
     // 변환 생성자
-    public SalesHistoryDTO(SalesTransactionEntity entity, List<SaleItemSummaryDTO> items) {
+    public SalesHistoryDTO(SalesTransactionEntity entity, List<SalesDetailDTO> items) {
         this.transactionId = entity.getTransactionId();
         this.paymentMethod = entity.getPaymentMethod();
         this.totalPrice = entity.getTotalPrice();

@@ -1,6 +1,7 @@
 package com.core.pos.controller;
 
 import com.core.erp.dto.CustomPrincipal;
+import com.core.pos.dto.DisposalRequestDTO;
 import com.core.pos.dto.SaleRequestDTO;
 import com.core.pos.dto.SalesHistoryDTO;
 import com.core.pos.service.PosService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/pos")
 @RequiredArgsConstructor
 public class PosController {
@@ -51,6 +53,22 @@ public class PosController {
             return ResponseEntity.badRequest().body("환불 실패: " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("서버 오류: " + e.getMessage());
+        }
+    }
+
+    // 폐기 등록 API
+    @PostMapping("/disposals")
+    public ResponseEntity<String> registerDisposal(@RequestBody DisposalRequestDTO dto, Authentication authentication) {
+        try {
+            // 로그인된 사용자 정보로 등록자 이름 처리
+            CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
+            String loginId = principal.getLoginId();
+
+            posService.saveDisposal(dto, loginId);
+
+            return ResponseEntity.ok("폐기 등록 완료");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("폐기 등록 실패: " + e.getMessage());
         }
     }
 }
