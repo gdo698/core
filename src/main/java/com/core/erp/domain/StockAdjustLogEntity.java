@@ -30,6 +30,9 @@ public class StockAdjustLogEntity {
     @Column(nullable = false)
     private int newQuantity;
 
+    @Column(nullable = false)
+    private int quantityDiff;
+
     @Column(length = 100, nullable = true)
     private String adjustReason;
 

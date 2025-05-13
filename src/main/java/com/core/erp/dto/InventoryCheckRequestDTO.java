@@ -1,18 +1,26 @@
 package com.core.erp.dto;
 
 import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.List;
 
 @Getter
+@Setter
+@ToString
 public class InventoryCheckRequestDTO {
     private Integer storeId;
     private Integer partTimerId;
     private String reason;
     private List<CheckItem> checks;
 
+    @Setter
     @Getter
+    @ToString
     public static class CheckItem {
-        private Long productId;
+        private Integer productId;
         private Integer realQuantity;
     }
+
 }

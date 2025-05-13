@@ -27,20 +27,20 @@ public class StockInventoryCheckEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private StoreEntity store;
 
-    @Column(nullable = false)
-    private Integer realQuantity;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "part_timer_id", nullable = false)
+    private PartTimerEntity partTimer;
 
     @Column(nullable = false)
     private Integer prevQuantity;
 
-    @Formula("real_quantity - prev_quantity")
-    private Integer difference;
+    @Column(nullable = false)
+    private Integer realQuantity;
 
     private String checkReason;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "part_timer_id", nullable = false)
-    private PartTimerEntity partTimer;
+    @Formula("real_quantity - prev_quantity")
+    private Integer difference;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime checkDate = LocalDateTime.now();

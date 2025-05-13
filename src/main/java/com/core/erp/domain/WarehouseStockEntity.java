@@ -39,4 +39,12 @@ public class WarehouseStockEntity {
     private int stockStatus;
 
 
+    public WarehouseStockEntity(Integer o, StoreEntity store, ProductEntity product, int warehouseId, int quantity, LocalDateTime now, int stockStatus) {
+        this.store = store;
+        this.product = product;
+        this.warehouseId = warehouseId;
+        this.quantity = quantity;
+        this.lastInDate = now;
+        this.stockStatus = stockStatus;
+    }
 }

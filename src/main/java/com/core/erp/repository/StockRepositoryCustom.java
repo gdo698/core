@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface StockRepositoryCustom {
     Page<TotalStockDTO> findStockSummary(
+            Integer productId,
             Integer storeId,
             String productName,
             Long barcode,

@@ -153,9 +153,9 @@ public class StockService {
     }
 
 
-    public Page<TotalStockDTO> getStockSummary(Integer storeId, String productName, Long barcode, Integer categoryId, Pageable pageable
+    public Page<TotalStockDTO> getStockSummary(Integer productId, Integer storeId, String productName, Long barcode, Integer categoryId, Pageable pageable
     ) {
-        return storeStockRepository.findStockSummary(storeId, productName, barcode, categoryId, pageable);
+        return storeStockRepository.findStockSummary(productId, storeId, productName, barcode, categoryId, pageable);
     }
 
 

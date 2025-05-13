@@ -21,6 +21,7 @@ public class StoreStockRepositoryImpl implements StockRepositoryCustom {
 
     @Override
     public Page<TotalStockDTO> findStockSummary(
+            Integer productId,
             Integer storeId,
             String productName,
             Long barcode,
@@ -30,6 +31,7 @@ public class StoreStockRepositoryImpl implements StockRepositoryCustom {
         // 메인 데이터 쿼리
         StringBuilder jpql = new StringBuilder();
         jpql.append("SELECT new com.core.erp.dto.TotalStockDTO(")
+                .append("p.productId, ")
                 .append(":storeId, ")
                 .append("(SELECT s.storeName FROM StoreEntity s WHERE s.storeId = :storeId), ")
                 .append("p.proName, p.proBarcode, c.categoryName, ")
@@ -38,7 +40,12 @@ public class StoreStockRepositoryImpl implements StockRepositoryCustom {
                 .append("(SELECT COALESCE(SUM(sse.quantity), 0) FROM StoreStockEntity sse WHERE sse.product = p AND sse.store.storeId = :storeId) + ")
                 .append("(SELECT COALESCE(SUM(wse.quantity), 0) FROM WarehouseStockEntity wse WHERE wse.product = p AND wse.store.storeId = :storeId), ")
                 .append("(SELECT MAX(shi.inDate) FROM StockInHistoryEntity shi WHERE shi.product = p AND shi.store.storeId = :storeId), ")
-                .append("CASE p.isPromo WHEN 1 THEN '단종' WHEN 2 THEN '1+1' WHEN 3 THEN '2+1' ELSE '없음' END) ")
+                .append("CASE p.isPromo WHEN 1 THEN '단종' WHEN 2 THEN '1+1' WHEN 3 THEN '2+1' ELSE '없음' END, ")
+                .append("(SELECT sic.realQuantity FROM StockInventoryCheckEntity sic WHERE sic.product = p AND sic.store.storeId = :storeId ORDER BY sic.checkDate DESC LIMIT 1), ")
+                .append("(SELECT sic.realQuantity - sic.prevQuantity FROM StockInventoryCheckEntity sic WHERE sic.product = p AND sic.store.storeId = :storeId ORDER BY sic.checkDate DESC LIMIT 1), ")
+                .append("(SELECT sic.checkId FROM StockInventoryCheckEntity sic WHERE sic.product = p AND sic.store.storeId = :storeId ORDER BY sic.checkDate DESC LIMIT 1), ")
+                .append("(SELECT sic.isApplied FROM StockInventoryCheckEntity sic WHERE sic.product = p AND sic.store.storeId = :storeId ORDER BY sic.checkDate DESC LIMIT 1)")
+                .append(") ")
                 .append("FROM ProductEntity p ")
                 .append("LEFT JOIN p.category c ")
                 .append("LEFT JOIN c.parentCategory pc ")

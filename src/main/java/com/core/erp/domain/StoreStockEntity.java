@@ -46,4 +46,15 @@ public class StoreStockEntity {
         this.stockStatus = dto.getStockStatus();
     }
 
+    public StoreStockEntity(Integer o, StoreEntity store, ProductEntity product, int quantity, Object lastInDate, int stockStatus) {
+        this.store = store;
+        this.product = product;
+        this.quantity = quantity;
+        if (lastInDate instanceof LocalDateTime) {
+            this.lastInDate = (LocalDateTime) lastInDate;
+        } else {
+            this.lastInDate = LocalDateTime.now();
+        }
+        this.stockStatus = stockStatus;
+    }
 }

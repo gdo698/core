@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @ToString
 public class TotalStockDTO {
 
+    private Integer productId;
     private Integer storeId;
     private String storeName;
     private String productName;
@@ -20,19 +21,18 @@ public class TotalStockDTO {
     private Long totalQuantity;
     private LocalDateTime latestInDate;
     private String promoStatus;
+    private Integer realQuantity;
+    private Integer difference;
+    private Integer checkId;
+    private Boolean isApplied;
 
     public TotalStockDTO(
-            Integer storeId,
-            String storeName,
-            String productName,
-            Long barcode,
-            String categoryName,
-            Long storeQuantity,
-            Long warehouseQuantity,
-            Long totalQuantity,
-            LocalDateTime latestInDate,
-            String promoStatus
+            Integer productId, Integer storeId, String storeName, String productName, Long barcode,
+            String categoryName, Long storeQuantity, Long warehouseQuantity, Long totalQuantity,
+            LocalDateTime latestInDate, String promoStatus, Integer realQuantity, Integer difference,
+            Integer checkId, Boolean isApplied
     ) {
+        this.productId = productId;
         this.storeId = storeId;
         this.storeName = storeName;
         this.productName = productName;
@@ -43,5 +43,9 @@ public class TotalStockDTO {
         this.totalQuantity = totalQuantity;
         this.latestInDate = latestInDate;
         this.promoStatus = promoStatus;
+        this.realQuantity = realQuantity;
+        this.difference = difference;
+        this.checkId = checkId;
+        this.isApplied = isApplied;
     }
 }

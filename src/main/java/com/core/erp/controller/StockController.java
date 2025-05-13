@@ -59,6 +59,7 @@ public class StockController {
             @AuthenticationPrincipal CustomPrincipal userDetails,
             @RequestParam(required = false) Integer storeId,
             @RequestParam(required = false) String productName,
+            @RequestParam(required = false) Integer productId,
             @RequestParam(required = false) Long barcode,
             @RequestParam(required = false) Integer categoryId,
             @RequestParam(defaultValue = "0") int page,
@@ -71,7 +72,7 @@ public class StockController {
         Pageable pageable = PageRequest.of(page, size);
 
         Page<TotalStockDTO> result = stockService.getStockSummary(
-                finalStoreId, productName, barcode, categoryId, pageable
+                productId, finalStoreId, productName, barcode, categoryId, pageable
         );
 
         return ResponseEntity.ok(result);
