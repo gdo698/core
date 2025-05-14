@@ -2,6 +2,7 @@ package com.core.erp.controller;
 
 import com.core.erp.dto.*;
 import com.core.erp.service.IntegratedStockMonitoringService;
+import com.core.erp.service.HQStockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +24,7 @@ import java.util.Map;
 public class IntegratedStockMonitoringController {
 
     private final IntegratedStockMonitoringService integratedStockService;
+    private final HQStockService hqStockService;
 
     /**
      * 통합 재고 현황 요약 정보 조회 API
@@ -34,6 +36,15 @@ public class IntegratedStockMonitoringController {
     public ResponseEntity<StockStatusSummaryDTO> getStockStatusSummary(
             @RequestParam(defaultValue = "integrated") String viewMode,
             @RequestParam(required = false) Integer storeId) {
+        
+        // 페이지 로드시 본사 재고 전체 재계산
+        try {
+            hqStockService.recalculateAllHQStocks();
+        } catch (Exception e) {
+            // 재계산 실패해도 요약 정보는 보여주기 위해 로그만 남김
+            System.err.println("통합 재고 모니터링 페이지 접속 시 본사 재고 재계산 실패: " + e.getMessage());
+        }
+        
         return ResponseEntity.ok(integratedStockService.getStockStatusSummary(viewMode, storeId));
     }
 

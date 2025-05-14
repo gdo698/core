@@ -31,6 +31,7 @@ public class OrderService {
     private final StockInHistoryRepository stockInHistoryRepository;
     private final StoreStockRepository storeStockRepository;
     private final PartTimerRepository partTimerRepository;
+    private final HQStockService hqStockService;
 
     // 상품 목록 + 재고 조회 (발주 등록 시)
     public Page<OrderProductResponseDTO> getOrderProductList(
@@ -322,6 +323,14 @@ public class OrderService {
         stock.setQuantity(stock.getQuantity() + inQty);
         stock.setLastInDate(LocalDateTime.now());
         storeStockRepository.save(stock);
+        
+        // 데이터 일관성을 위해 본사 재고 재계산
+        try {
+            hqStockService.recalculateAllHQStocks();
+        } catch (Exception e) {
+            // 재계산이 실패해도 입고는 성공했으므로 로그만 남김
+            System.err.println("입고 처리 후 본사 재고 재계산 실패: " + e.getMessage());
+        }
     }
 
     private void updateOrderStatus(PurchaseOrderEntity order, boolean allFullyReceived) {

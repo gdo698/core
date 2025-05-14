@@ -4,6 +4,7 @@ import com.core.erp.dto.CustomPrincipal;
 import com.core.erp.dto.StockAdjustDTO;
 import com.core.erp.dto.StockAdjustLogDTO;
 import com.core.erp.service.StockService;
+import com.core.erp.service.HQStockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,13 +20,24 @@ import java.time.LocalDateTime;
 public class StockAdjustController {
 
     private final StockService stockService;
+    private final HQStockService hqStockService;
 
     @PatchMapping("/manual-adjust")
     public ResponseEntity<String> manualAdjustStock(
             @RequestBody StockAdjustDTO dto,
             @AuthenticationPrincipal CustomPrincipal user
     ) {
+        // 1. 재고 수동 조정 수행
         stockService.adjustStock(dto, user);
+        
+        // 2. 본사 재고 재계산 (데이터 일관성 유지)
+        try {
+            hqStockService.recalculateAllHQStocks();
+        } catch (Exception e) {
+            // 재계산 실패해도 재고 조정은 성공했으므로 로그만 남김
+            System.err.println("재고 조정 후 본사 재고 재계산 실패: " + e.getMessage());
+        }
+        
         return ResponseEntity.ok("재고 수량이 수정되었습니다.");
     }
 
