@@ -21,6 +21,6 @@ public interface HQStockRepository extends JpaRepository<HQStockEntity, Integer>
     
     // StoreStock의 데이터를 기반으로 본사 재고 업데이트 
     @Modifying
-    @Query(value = "UPDATE hq_stock h SET h.quantity = 1000 - COALESCE((SELECT SUM(ss.quantity) FROM store_stock ss WHERE ss.product_id = h.product_id), 0) WHERE h.product_id = :productId", nativeQuery = true)
+    @Query(value = "UPDATE hq_stock h SET h.quantity = h.total_quantity - COALESCE((SELECT SUM(ss.quantity) FROM store_stock ss WHERE ss.product_id = h.product_id), 0) WHERE h.product_id = :productId", nativeQuery = true)
     void recalculateQuantity(int productId);
 }

@@ -17,6 +17,7 @@ public class HQStockDTO {
     private LocalDateTime lastUpdate;
     private LocalDateTime createdAt;
     private String updatedBy;
+    private int totalQuantity;
     private String productName;
     private Long barcode;
     private String categoryName;
@@ -29,6 +30,7 @@ public class HQStockDTO {
         this.lastUpdate = entity.getLastUpdate();
         this.createdAt = entity.getCreatedAt();
         this.updatedBy = entity.getUpdatedBy();
+        this.totalQuantity = entity.getTotalQuantity();
         this.productName = entity.getProduct().getProName();
         this.barcode = entity.getProduct().getProBarcode();
         this.categoryName = entity.getProduct().getCategory() != null ? 

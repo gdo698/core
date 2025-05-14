@@ -44,11 +44,16 @@ public class HQStockService {
             Optional<HQStockEntity> existingStock = hqStockRepository.findByProductProductId(product.getProductId());
             
             if (existingStock.isPresent()) {
-                hqStockRepository.updateQuantity(product.getProductId(), 1000, "SYSTEM");
+                HQStockEntity stock = existingStock.get();
+                stock.setQuantity(1000);
+                stock.setTotalQuantity(1000); // 총재고도 초기화
+                stock.setUpdatedBy("SYSTEM");
+                hqStockRepository.save(stock);
             } else {
                 HQStockEntity newStock = new HQStockEntity();
                 newStock.setProduct(product);
                 newStock.setQuantity(1000);
+                newStock.setTotalQuantity(1000); // 총재고 설정
                 newStock.setUpdatedBy("SYSTEM");
                 hqStockRepository.save(newStock);
             }
@@ -64,11 +69,19 @@ public class HQStockService {
             Optional<HQStockEntity> existingStock = hqStockRepository.findByProductProductId(productId);
             
             if (existingStock.isPresent()) {
-                hqStockRepository.updateQuantity(productId, quantity, updatedBy);
+                HQStockEntity stock = existingStock.get();
+                // 기존 본사 재고와 새 재고의 차이를 계산
+                int diff = quantity - stock.getQuantity();
+                // 총재고도 같은 양만큼 변경
+                stock.setQuantity(quantity);
+                stock.setTotalQuantity(stock.getTotalQuantity() + diff);
+                stock.setUpdatedBy(updatedBy);
+                hqStockRepository.save(stock);
             } else {
                 HQStockEntity newStock = new HQStockEntity();
                 newStock.setProduct(product.get());
                 newStock.setQuantity(quantity);
+                newStock.setTotalQuantity(quantity); // 총재고 = 본사재고 (매장재고 없음)
                 newStock.setUpdatedBy(updatedBy);
                 hqStockRepository.save(newStock);
             }

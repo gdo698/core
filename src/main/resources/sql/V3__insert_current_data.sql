@@ -162,6 +162,5 @@ INSERT INTO sales_detail (sales_detail_id, transaction_id, product_id, sales_qua
 (2074, 1025, 9, 2, 1200, 50, 2350, 400, 1550, NULL, 0),
 (2075, 1025, 11, 1, 3200, 0, 3200, 1800, 1400, NULL, 0);
 
-
-INSERT INTO hq_stock (product_id, quantity, last_update, created_at)
-SELECT product_id, 1000, NOW(), NOW() FROM product;
+INSERT INTO hq_stock (product_id, quantity, total_quantity, created_at)
+SELECT product_id, 1000, 1000, NOW() FROM product;
