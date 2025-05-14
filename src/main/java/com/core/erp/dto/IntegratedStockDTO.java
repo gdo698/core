@@ -62,7 +62,7 @@ public class IntegratedStockDTO {
         dto.setLocation("본사");
         dto.setStoreQuantity(0L);
         dto.setWarehouseQuantity((long) hqStock.getQuantity());
-        dto.setTotalQuantity((long) hqStock.getQuantity());
+        dto.setTotalQuantity((long) hqStock.getTotalQuantity());
         dto.setLatestInDate(hqStock.getLastUpdate());
         dto.setHeadquarters(true);
         dto.setMinStock(1000); // 본사 최소 재고 기준값
