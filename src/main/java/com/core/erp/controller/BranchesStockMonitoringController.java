@@ -87,7 +87,7 @@ public class BranchesStockMonitoringController {
      * @return 필터링된 재고 목록
      */
     @GetMapping("/list")
-    public ResponseEntity<Page<TotalStockDTO>> getFilteredStockList(
+    public ResponseEntity<?> getFilteredStockList(
             @RequestParam(required = false) Integer storeId,
             @RequestParam(required = false) String productName,
             @RequestParam(required = false) Long barcode,
@@ -95,11 +95,26 @@ public class BranchesStockMonitoringController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         
-        Pageable pageable = PageRequest.of(page, size, Sort.by("productName").ascending());
-        
-        Page<TotalStockDTO> result = stockMonitoringService.getFilteredStockList(
-                storeId, productName, barcode, categoryId, pageable);
-                
-        return ResponseEntity.ok(result);
+        try {
+            Pageable pageable = PageRequest.of(page, size, Sort.by("productName").ascending());
+            
+            Page<TotalStockDTO> result = stockMonitoringService.getFilteredStockList(
+                    storeId, productName, barcode, categoryId, pageable);
+                    
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            // 오류 로그 기록
+            e.printStackTrace();
+            
+            // 사용자 친화적인 오류 메시지 반환
+            String errorMessage = "재고 목록을 불러오는 중 오류가 발생했습니다.";
+            
+            // 더 구체적인 오류 정보 제공 (개발 환경에서만)
+            if (e.getMessage() != null && !e.getMessage().isBlank()) {
+                errorMessage = e.getMessage();
+            }
+            
+            return ResponseEntity.status(500).body(errorMessage);
+        }
     }
 } 
