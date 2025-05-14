@@ -5,6 +5,7 @@ import com.core.erp.dto.stock.StockFlowLogDTO;
 import com.core.erp.dto.stock.StockFlowSearchCondition;
 import com.core.erp.repository.StockFlowRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StockFlowService {
@@ -97,12 +99,18 @@ public class StockFlowService {
     public Page<StockFlowLogDTO> searchFlows(StockFlowSearchCondition cond) {
         Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
 
+        LocalDateTime start = cond.getStartDate() != null ? cond.getStartDate().atStartOfDay() : null;
+        LocalDateTime end = cond.getEndDate() != null ? cond.getEndDate().atTime(23, 59, 59) : null;
+        log.info("검색 조건 - 시작일: {}, 종료일: {}", cond.getStartDate(), cond.getEndDate());
+
+
         Page<StockFlowEntity> page = stockFlowRepository.searchStockFlows(
                 cond.getStoreId(),
                 cond.getProductId(),
+                cond.getProductName(),
                 cond.getFlowType(),
-                cond.getStartDate(),
-                cond.getEndDate(),
+                start,
+                end,
                 pageable
         );
 

@@ -45,6 +45,7 @@ public interface StockFlowRepository extends JpaRepository<StockFlowEntity, Long
             SELECT f FROM StockFlowEntity f
 WHERE (:storeId IS NULL OR f.store.storeId = :storeId)
   AND (:productId IS NULL OR f.product.productId = :productId)
+  AND (:productName IS NULL OR f.product.proName LIKE %:productName%)
   AND (:flowType IS NULL OR f.flowType = :flowType)
   AND (:startDate IS NULL OR f.flowDate >= :startDate)
   AND (:endDate IS NULL OR f.flowDate <= :endDate)
@@ -53,6 +54,7 @@ ORDER BY f.flowDate DESC
     Page<StockFlowEntity> searchStockFlows(
             @Param("storeId") Integer storeId,
             @Param("productId") Long productId,
+            @Param("productName") String productName,
             @Param("flowType") Integer flowType,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate,
