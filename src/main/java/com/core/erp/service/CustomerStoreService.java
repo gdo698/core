@@ -1,7 +1,7 @@
 package com.core.erp.service;
 
 import com.core.erp.domain.StoreEntity;
-import com.core.erp.dto.StoreResponseDTO;
+import com.core.erp.dto.store.StoreResponseDTO;
 import com.core.erp.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

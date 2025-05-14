@@ -1,6 +1,6 @@
 package com.core.erp.domain;
 
-import com.core.erp.dto.ShiftScheduleDTO;
+import com.core.erp.dto.partTimer.ShiftScheduleDTO;
 import jakarta.persistence.*;
 import lombok.*;
 

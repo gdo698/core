@@ -1,6 +1,6 @@
 package com.core.erp.domain;
 
-import com.core.erp.dto.PartTimerDTO;
+import com.core.erp.dto.partTimer.PartTimerDTO;
 import jakarta.persistence.*;
 import lombok.*;
 

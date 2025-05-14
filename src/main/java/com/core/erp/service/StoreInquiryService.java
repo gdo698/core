@@ -2,7 +2,7 @@ package com.core.erp.service;
 
 import com.core.erp.domain.StoreEntity;
 import com.core.erp.domain.StoreInquiryEntity;
-import com.core.erp.dto.StoreInquiryDTO;
+import com.core.erp.dto.store.StoreInquiryDTO;
 import com.core.erp.repository.StoreInquiryRepository;
 import com.core.erp.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.HashMap;
 import java.util.ArrayList;

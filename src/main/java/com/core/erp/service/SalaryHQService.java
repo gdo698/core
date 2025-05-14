@@ -1,7 +1,7 @@
 package com.core.erp.service;
 
 import com.core.erp.domain.SalaryEntity;
-import com.core.erp.dto.SalaryDTO;
+import com.core.erp.dto.salary.SalaryDTO;
 import com.core.erp.repository.SalaryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

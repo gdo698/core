@@ -1,11 +1,10 @@
 package com.core.erp.service;
 import com.core.erp.domain.SalesDetailEntity;
 import com.core.erp.domain.SalesTransactionEntity;
-import com.core.erp.dto.SalesDetailDTO;
-import com.core.erp.dto.SalesTransactionDTO;
+import com.core.erp.dto.sales.SalesDetailDTO;
+import com.core.erp.dto.sales.SalesTransactionDTO;
 import com.core.erp.repository.SalesDetailRepository;
 import com.core.erp.repository.SalesTransactionRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -2,15 +2,17 @@
 package com.core.erp.controller;
 
 import com.core.erp.dto.*;
+import com.core.erp.dto.BoardCommentResponseDTO;
+import com.core.erp.dto.BoardPostResponseDTO;
+import com.core.erp.dto.TblBoardCommentsDTO;
+import com.core.erp.dto.TblBoardPostsDTO;
 import com.core.erp.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/headquarters/board")

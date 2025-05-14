@@ -2,7 +2,7 @@ package com.core.erp.controller;
 
 import com.core.erp.domain.StoreEntity;
 import com.core.erp.domain.EmployeeEntity;
-import com.core.erp.dto.StoreDTO;
+import com.core.erp.dto.store.StoreDTO;
 import com.core.erp.repository.StoreRepository;
 import com.core.erp.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,8 +1,7 @@
 package com.core.erp.repository;
 
 import com.core.erp.domain.PurchaseOrderEntity;
-import com.core.erp.dto.PurchaseOrderDTO;
-import com.core.erp.dto.PurchaseOrderProjection;
+import com.core.erp.dto.order.PurchaseOrderProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

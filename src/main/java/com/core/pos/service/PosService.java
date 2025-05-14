@@ -1,9 +1,9 @@
 package com.core.pos.service;
 
 import com.core.erp.domain.*;
-import com.core.erp.dto.DisposalDTO;
-import com.core.erp.dto.SalesDetailDTO;
+import com.core.erp.dto.sales.SalesDetailDTO;
 import com.core.erp.repository.*;
+import com.core.erp.service.StockFlowService;
 import com.core.pos.dto.*;
 import com.core.erp.repository.SalesDetailRepository;
 import com.core.erp.repository.SalesTransactionRepository;
@@ -26,6 +26,7 @@ public class PosService {
     private final SalesDetailRepository salesDetailRepository;
     private final DisposalRepository disposalRepository;
     private final StoreStockRepository storeStockRepository;
+    private final StockFlowService stockFlowService;
 
 
     // 거래 저장
@@ -89,6 +90,28 @@ public class PosService {
 
             // 상세 저장
             salesDetailRepository.save(detail);
+
+            // 재고 흐름 로그 기록 (판매)
+            StoreStockEntity stock = storeStockRepository
+                    .findByStore_StoreIdAndProduct_ProductId(store.getStoreId(), product.getProductId())
+                    .orElseThrow(() -> new RuntimeException("재고 정보를 찾을 수 없습니다."));
+
+            int beforeQty = stock.getQuantity();
+            int afterQty = beforeQty - item.getSalesQuantity();
+            stock.setQuantity(afterQty);
+            storeStockRepository.save(stock);
+
+            stockFlowService.logStockFlow(
+                    store,
+                    product,
+                    4,
+                    -item.getSalesQuantity(),
+                    beforeQty,
+                    afterQty,
+                    "매장",
+                    loginId,
+                    "POS 판매"
+            );
         }
     }
 
@@ -133,6 +156,30 @@ public class PosService {
             // 각 상품의 환불 금액을 처리
             detail.setFinalAmount(0);  // 환불된 상품의 결제 금액 0으로 처리
             detail.setRefundAmount(detail.getRealIncome());  // 실제 수익(원가를 제외한 금액)을 환불 금액으로 처리
+
+
+            // 환불 흐름 로그 기록
+            StoreStockEntity stock = storeStockRepository
+                    .findByStore_StoreIdAndProduct_ProductId(
+                            transaction.getStore().getStoreId(), detail.getProduct().getProductId())
+                    .orElseThrow(() -> new RuntimeException("재고 없음"));
+
+            int beforeQty = stock.getQuantity();
+            int afterQty = beforeQty + detail.getSalesQuantity();
+            stock.setQuantity(afterQty);
+            storeStockRepository.save(stock);
+
+            stockFlowService.logStockFlow(
+                    stock.getStore(),
+                    detail.getProduct(),
+                    5,
+                    detail.getSalesQuantity(),
+                    beforeQty,
+                    afterQty,
+                    "매장",
+                    transaction.getEmployee().getEmpName(),
+                    refundReason
+            );
         }
 
         // 4. 저장
@@ -163,5 +210,23 @@ public class PosService {
 
         // 3. 저장
         disposalRepository.save(entity);
+
+        // 4. 재고 흐름 로그 기록
+        int beforeQty = stock.getQuantity();
+        int afterQty = beforeQty - dto.getDisposalQuantity();
+        stock.setQuantity(afterQty);
+        storeStockRepository.save(stock);
+
+        stockFlowService.logStockFlow(
+                stock.getStore(),
+                stock.getProduct(),
+                3, // 폐기
+                -dto.getDisposalQuantity(), // 폐기는 감소
+                stock.getQuantity(), // 반영 전 수량
+                stock.getQuantity() - dto.getDisposalQuantity(), // 반영 후 수량 (DB 업데이트 전이라 직접 계산)
+                "매장",
+                loginId,
+                dto.getDisposalReason()
+        );
     }
 }

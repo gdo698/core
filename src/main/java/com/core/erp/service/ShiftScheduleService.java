@@ -2,7 +2,7 @@ package com.core.erp.service;
 
 import com.core.erp.domain.ShiftScheduleEntity;
 import com.core.erp.domain.PartTimerEntity;
-import com.core.erp.dto.ShiftScheduleDTO;
+import com.core.erp.dto.partTimer.ShiftScheduleDTO;
 import com.core.erp.repository.PartTimerRepository;
 import com.core.erp.repository.ShiftScheduleRepository;
 import lombok.RequiredArgsConstructor;

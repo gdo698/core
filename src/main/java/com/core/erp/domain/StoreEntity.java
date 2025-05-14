@@ -1,6 +1,6 @@
 package com.core.erp.domain;
 
-import com.core.erp.dto.StoreDTO;
+import com.core.erp.dto.store.StoreDTO;
 import jakarta.persistence.*;
 import lombok.*;
 

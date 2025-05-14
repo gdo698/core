@@ -2,6 +2,7 @@ package com.core.erp.service;
 
 import com.core.erp.domain.*;
 import com.core.erp.dto.*;
+import com.core.erp.dto.order.*;
 import com.core.erp.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +30,10 @@ public class OrderService {
     private final PurchaseOrderRepository purchaseOrderRepository;
     private final PurchaseOrderItemRepository purchaseOrderItemRepository;
     private final StockInHistoryRepository stockInHistoryRepository;
-    private final StoreStockRepository storeStockRepository;
     private final PartTimerRepository partTimerRepository;
     private final HQStockService hqStockService;
+    private final WarehouseStockRepository warehouseStockRepository;
+    private final StockFlowService stockFlowService;
 
     // 상품 목록 + 재고 조회 (발주 등록 시)
     public Page<OrderProductResponseDTO> getOrderProductList(
@@ -67,9 +69,9 @@ public class OrderService {
         LocalDateTime now = LocalDateTime.now();
 
         // 이번 회차에 발주가 존재하는지 확인
-//        if (isAlreadyOrdered(storeId, now)) {
-//            throw new IllegalStateException("이미 " + getPeriod(now) + " 발주가 등록되었습니다.");
-//        }
+        if (isAlreadyOrdered(storeId, now)) {
+            throw new IllegalStateException("이미 " + getPeriod(now) + " 발주가 등록되었습니다.");
+        }
 
         List<OrderItemRequestDTO> items = requestDTO.getItems();
 
@@ -218,7 +220,7 @@ public class OrderService {
 
             stockInHistoryRepository.save(history);
 
-            updateStoreStock(order.getStore(), item.getProduct(), item.getOrderQuantity());
+            updateWarehouseStock(order.getStore(), item.getProduct(), item.getOrderQuantity(), partTimer.getPartName());
         }
 
     }
@@ -238,7 +240,7 @@ public class OrderService {
             purchaseOrderItemRepository.save(item);
 
             recordStockInHistory(order, item, partTimer, dto.getInQuantity());
-            updateStoreStock(order.getStore(), item.getProduct(), dto.getInQuantity());
+            updateWarehouseStock(order.getStore(), item.getProduct(), dto.getInQuantity(), partTimer.getPartName());
 
             if (item.getIsFullyReceived() == 0) {
                 allFullyReceived = false;
@@ -307,23 +309,39 @@ public class OrderService {
         stockInHistoryRepository.save(history);
     }
 
-    private void updateStoreStock(StoreEntity store, ProductEntity product, int inQty) {
-        StoreStockEntity stock = storeStockRepository
+    private void updateWarehouseStock(StoreEntity store, ProductEntity product, int inQty, String processedBy) {
+        WarehouseStockEntity stock = warehouseStockRepository
                 .findByStore_StoreIdAndProduct_ProductId(store.getStoreId(), product.getProductId())
                 .orElseGet(() -> {
-                    StoreStockEntity newStock = new StoreStockEntity();
+                    WarehouseStockEntity newStock = new WarehouseStockEntity();
                     newStock.setStore(store);
                     newStock.setProduct(product);
+                    newStock.setWarehouseId(0); // 기본 창고 ID, 필요 시 분기
                     newStock.setQuantity(0);
                     newStock.setLastInDate(LocalDateTime.now());
                     newStock.setStockStatus(1);
-                    return storeStockRepository.save(newStock);
+                    return warehouseStockRepository.save(newStock);
                 });
 
-        stock.setQuantity(stock.getQuantity() + inQty);
+        int beforeQty = stock.getQuantity();
+        stock.setQuantity(beforeQty + inQty);
         stock.setLastInDate(LocalDateTime.now());
-        storeStockRepository.save(stock);
-        
+
+        warehouseStockRepository.save(stock);
+
+        //  StockFlow 로그 기록 (입고: flowType = 0)
+        stockFlowService.logStockFlow(
+                store,
+                product,
+                0,
+                inQty,
+                beforeQty,
+                beforeQty + inQty,
+                "창고",
+                processedBy,
+                "발주 입고"
+        );
+
         // 데이터 일관성을 위해 본사 재고 재계산
         try {
             hqStockService.recalculateAllHQStocks();
@@ -331,7 +349,10 @@ public class OrderService {
             // 재계산이 실패해도 입고는 성공했으므로 로그만 남김
             System.err.println("입고 처리 후 본사 재고 재계산 실패: " + e.getMessage());
         }
+
     }
+
+
 
     private void updateOrderStatus(PurchaseOrderEntity order, boolean allFullyReceived) {
         order.setOrderStatus(allFullyReceived ? 1 : 2);

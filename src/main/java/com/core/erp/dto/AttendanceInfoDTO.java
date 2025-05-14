@@ -1,5 +1,6 @@
 package com.core.erp.dto;
 
+import com.core.erp.dto.employee.EmployeeDTO;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;

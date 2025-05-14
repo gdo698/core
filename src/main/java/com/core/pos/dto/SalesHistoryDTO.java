@@ -1,7 +1,7 @@
 package com.core.pos.dto;
 
 import com.core.erp.domain.SalesTransactionEntity;
-import com.core.erp.dto.SalesDetailDTO;
+import com.core.erp.dto.sales.SalesDetailDTO;
 import lombok.*;
 
 import java.time.LocalDateTime;

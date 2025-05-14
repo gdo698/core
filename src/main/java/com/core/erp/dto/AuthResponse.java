@@ -1,7 +1,5 @@
 package com.core.erp.dto;
 
-import com.core.erp.domain.StoreEntity;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

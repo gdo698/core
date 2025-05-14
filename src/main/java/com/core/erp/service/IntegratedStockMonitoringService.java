@@ -2,17 +2,20 @@ package com.core.erp.service;
 
 import com.core.erp.domain.*;
 import com.core.erp.dto.*;
+import com.core.erp.dto.category.CategoryDTO;
+import com.core.erp.dto.stock.IntegratedStockDTO;
+import com.core.erp.dto.stock.StockCategoryStatDTO;
+import com.core.erp.dto.stock.StockStatusSummaryDTO;
+import com.core.erp.dto.store.StoreDTO;
 import com.core.erp.repository.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 통합 재고 모니터링 서비스

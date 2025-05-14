@@ -1,6 +1,6 @@
 package com.core.erp.service;
 
-import com.core.erp.dto.EmployeeListDTO;
+import com.core.erp.dto.employee.EmployeeListDTO;
 import com.core.erp.domain.EmployeeEntity;
 import com.core.erp.domain.DepartmentEntity;
 import com.core.erp.repository.EmployeeRepository;

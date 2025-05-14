@@ -1,8 +1,7 @@
 package com.core.erp.controller;
 
-import com.core.erp.dto.CustomPrincipal;
-import com.core.erp.dto.StockCategoryStatDTO;
-import com.core.erp.dto.StockStatusSummaryDTO;
+import com.core.erp.dto.stock.StockCategoryStatDTO;
+import com.core.erp.dto.stock.StockStatusSummaryDTO;
 import com.core.erp.dto.TotalStockDTO;
 import com.core.erp.service.BranchesStockMonitoringService;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

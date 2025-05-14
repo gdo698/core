@@ -1,8 +1,8 @@
 package com.core.erp.controller;
 
 import com.core.erp.dto.CustomPrincipal;
-import com.core.erp.dto.PartTimerDTO;
-import com.core.erp.dto.PartTimerSearchDTO;
+import com.core.erp.dto.partTimer.PartTimerDTO;
+import com.core.erp.dto.partTimer.PartTimerSearchDTO;
 import com.core.erp.service.PartTimeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

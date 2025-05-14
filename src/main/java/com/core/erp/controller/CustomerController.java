@@ -1,7 +1,7 @@
 package com.core.erp.controller;
 
-import com.core.erp.dto.StoreInquiryRequestDTO;
-import com.core.erp.dto.StoreResponseDTO;
+import com.core.erp.dto.store.StoreInquiryRequestDTO;
+import com.core.erp.dto.store.StoreResponseDTO;
 import com.core.erp.service.CustomerInquiryService;
 import com.core.erp.service.CustomerStoreService;
 import lombok.RequiredArgsConstructor;

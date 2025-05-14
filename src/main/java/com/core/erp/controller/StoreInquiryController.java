@@ -1,6 +1,6 @@
 package com.core.erp.controller;
 
-import com.core.erp.dto.StoreInquiryDTO;
+import com.core.erp.dto.store.StoreInquiryDTO;
 import com.core.erp.service.StoreInquiryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

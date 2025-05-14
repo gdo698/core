@@ -1,8 +1,7 @@
 package com.core.erp.repository;
 
 import com.core.erp.domain.ProductEntity;
-import com.core.erp.dto.OrderProductProjection;
-import com.core.erp.dto.OrderProductResponseDTO;
+import com.core.erp.dto.order.OrderProductProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

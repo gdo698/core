@@ -1,7 +1,7 @@
 package com.core.erp.controller;
 
 import com.core.erp.domain.CategoryEntity;
-import com.core.erp.dto.CategoryTreeDTO;
+import com.core.erp.dto.category.CategoryTreeDTO;
 import com.core.erp.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

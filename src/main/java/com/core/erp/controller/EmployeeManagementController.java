@@ -3,7 +3,7 @@ package com.core.erp.controller;
 import com.core.erp.domain.DepartmentEntity;
 import com.core.erp.domain.EmployeeEntity;
 import com.core.erp.domain.StoreEntity;
-import com.core.erp.dto.EmployeeManagementDTO;
+import com.core.erp.dto.employee.EmployeeManagementDTO;
 import com.core.erp.repository.DepartmentRepository;
 import com.core.erp.repository.EmployeeRepository;
 import com.core.erp.repository.StoreRepository;

@@ -1,7 +1,7 @@
 package com.core.erp.controller;
 
-import com.core.erp.dto.DisposalDTO;
-import com.core.erp.dto.DisposalTargetDTO;
+import com.core.erp.dto.disposal.DisposalDTO;
+import com.core.erp.dto.disposal.DisposalTargetDTO;
 import com.core.erp.service.DisposalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;

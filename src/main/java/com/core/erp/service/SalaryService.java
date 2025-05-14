@@ -1,8 +1,8 @@
 package com.core.erp.service;
 
 import com.core.erp.domain.*;
-import com.core.erp.dto.SalaryDTO;
-import com.core.erp.dto.SalaryDetailDTO;
+import com.core.erp.dto.salary.SalaryDTO;
+import com.core.erp.dto.salary.SalaryDetailDTO;
 import com.core.erp.repository.AttendanceRepository;
 import com.core.erp.repository.PartTimerRepository;
 import com.core.erp.repository.SalaryRepository;

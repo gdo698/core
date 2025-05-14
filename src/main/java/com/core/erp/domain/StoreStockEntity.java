@@ -1,6 +1,6 @@
 package com.core.erp.domain;
 
-import com.core.erp.dto.StoreStockDTO;
+import com.core.erp.dto.stock.StoreStockDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,6 +36,9 @@ public class StoreStockEntity {
 
     @Column(name = "stock_status", nullable = false)
     private int stockStatus;
+
+    @Column(name = "location_code")
+    private String locationCode;
 
     // DTO → Entity 변환 생성자
     public StoreStockEntity(StoreStockDTO dto) {

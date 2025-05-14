@@ -1,7 +1,7 @@
 package com.core.erp.controller;
 
-import com.core.erp.dto.EmployeeListDTO;
-import com.core.erp.dto.DepartmentDTO;
+import com.core.erp.dto.employee.EmployeeListDTO;
+import com.core.erp.dto.employee.DepartmentDTO;
 import com.core.erp.service.EmployeeListService;
 import com.core.erp.service.DepartmentService;
 import lombok.RequiredArgsConstructor;

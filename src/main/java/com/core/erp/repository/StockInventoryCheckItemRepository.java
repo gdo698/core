@@ -1,7 +1,7 @@
 package com.core.erp.repository;
 
 import com.core.erp.domain.StockInventoryCheckItemEntity;
-import com.core.erp.dto.StoreStockProjection;
+import com.core.erp.dto.stock.StoreStockProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface StockInventoryCheckItemRepository extends JpaRepository<StockInventoryCheckItemEntity, Long> {
@@ -63,5 +64,16 @@ public interface StockInventoryCheckItemRepository extends JpaRepository<StockIn
           AND i.isApplied = true
         """)
     List<StockInventoryCheckItemEntity> findAllAppliedByStoreId(@Param("storeId") int storeId);
+
+    @Query("""
+    SELECT i FROM StockInventoryCheckItemEntity i
+    WHERE i.inventoryCheck.store.storeId = :storeId
+      AND i.product.productId = :productId
+    ORDER BY i.inventoryCheck.checkDate DESC
+""")
+    Optional<StockInventoryCheckItemEntity> findTopByStoreIdAndProductIdOrderByCheckDateDesc(
+            @Param("storeId") int storeId,
+            @Param("productId") int productId
+    );
 }
 

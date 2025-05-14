@@ -1,9 +1,9 @@
 package com.core.erp.service;
 
 import com.core.erp.domain.DisposalEntity;
-import com.core.erp.dto.DisposalDTO;
-import com.core.erp.dto.DisposalTargetDTO;
-import com.core.erp.dto.DisposalTargetProjection;
+import com.core.erp.dto.disposal.DisposalDTO;
+import com.core.erp.dto.disposal.DisposalTargetDTO;
+import com.core.erp.dto.disposal.DisposalTargetProjection;
 import com.core.erp.repository.DisposalRepository;
 import com.core.erp.repository.StoreStockRepository;
 import lombok.RequiredArgsConstructor;

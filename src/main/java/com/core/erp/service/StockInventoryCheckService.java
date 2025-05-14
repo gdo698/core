@@ -2,7 +2,7 @@ package com.core.erp.service;
 
 import com.core.erp.domain.*;
 import com.core.erp.dto.CustomPrincipal;
-import com.core.erp.dto.InventoryCheckRequestDTO;
+import com.core.erp.dto.stock.InventoryCheckRequestDTO;
 import com.core.erp.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +24,7 @@ public class StockInventoryCheckService {
     private final ProductRepository productRepository;
     private final StoreRepository storeRepository;
     private final StockAdjustLogRepository stockAdjustLogRepository;
+    private final StockFlowService stockFlowService;
 
     @Transactional
     public void registerCheck(CustomPrincipal userDetails, InventoryCheckRequestDTO request) {
@@ -87,32 +88,45 @@ public class StockInventoryCheckService {
                 .findByStore_StoreIdAndProduct_ProductId(storeId, productId)
                 .orElseGet(() -> createWarehouseStock(storeId, productId));
 
+        int beforeTotal = item.getStorePrevQuantity() + item.getWarehousePrevQuantity();
+        int afterTotal = item.getStoreRealQuantity() + item.getWarehouseRealQuantity();
+        int diff = afterTotal - beforeTotal;
+
         storeStock.setQuantity(item.getStoreRealQuantity());
         warehouseStock.setQuantity(item.getWarehouseRealQuantity());
 
         storeStockRepository.save(storeStock);
         warehouseStockRepository.save(warehouseStock);
 
-        int prevTotal = item.getStorePrevQuantity() + item.getWarehousePrevQuantity();
-        int newTotal = item.getStoreRealQuantity() + item.getWarehouseRealQuantity();
-        int diff = newTotal - prevTotal;
-
         if (diff != 0) {
             StockAdjustLogEntity log = new StockAdjustLogEntity();
             log.setStore(item.getInventoryCheck().getStore());
             log.setProduct(item.getProduct());
-            log.setPrevQuantity(prevTotal);
-            log.setNewQuantity(newTotal);
+            log.setPrevQuantity(beforeTotal);
+            log.setNewQuantity(afterTotal);
             log.setQuantityDiff(diff);
             log.setAdjustDate(LocalDateTime.now());
             log.setAdjustedBy(item.getInventoryCheck().getPartTimer().getPartName());
             log.setAdjustReason("실사 반영");
             stockAdjustLogRepository.save(log);
+
+            stockFlowService.logStockFlow(
+                    item.getInventoryCheck().getStore(),
+                    item.getProduct(),
+                    4,
+                    diff,
+                    beforeTotal,
+                    afterTotal,
+                    "실사",
+                    item.getInventoryCheck().getPartTimer().getPartName(),
+                    "재고 실사 반영"
+            );
         }
 
         item.setIsApplied(true);
         inventoryCheckItemRepository.save(item);
     }
+
 
     @Transactional
     public void applyCheckItems(List<Long> checkItemIds) {
@@ -149,15 +163,32 @@ public class StockInventoryCheckService {
                 .findByStore_StoreIdAndProduct_ProductId(storeId, productId)
                 .orElseGet(() -> createWarehouseStock(storeId, productId));
 
+        int currentTotal = item.getStoreRealQuantity() + item.getWarehouseRealQuantity();
+        int rollbackTotal = item.getStorePrevQuantity() + item.getWarehousePrevQuantity();
+        int rollbackDiff = rollbackTotal - currentTotal;
+
         storeStock.setQuantity(item.getStorePrevQuantity());
         warehouseStock.setQuantity(item.getWarehousePrevQuantity());
 
         storeStockRepository.save(storeStock);
         warehouseStockRepository.save(warehouseStock);
 
+        stockFlowService.logStockFlow(
+                item.getInventoryCheck().getStore(),
+                item.getProduct(),
+                5,
+                rollbackDiff,
+                currentTotal,
+                rollbackTotal,
+                "실사 롤백",
+                item.getInventoryCheck().getPartTimer().getPartName(),
+                "재고 실사 롤백"
+        );
+
         item.setIsApplied(false);
         inventoryCheckItemRepository.save(item);
     }
+
 
     @Transactional
     public void rollbackCheckItems(List<Long> checkItemIds) {

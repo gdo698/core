@@ -1,7 +1,7 @@
 package com.core.erp.controller;
 
 import com.core.erp.dto.CustomPrincipal;
-import com.core.erp.dto.InventoryCheckRequestDTO;
+import com.core.erp.dto.stock.InventoryCheckRequestDTO;
 import com.core.erp.service.StockInventoryCheckService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

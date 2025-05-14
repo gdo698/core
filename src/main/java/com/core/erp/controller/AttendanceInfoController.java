@@ -2,7 +2,7 @@ package com.core.erp.controller;
 
 import com.core.erp.dto.AttendanceInfoDTO;
 import com.core.erp.dto.CustomPrincipal;
-import com.core.erp.dto.EmployeeDTO;
+import com.core.erp.dto.employee.EmployeeDTO;
 import com.core.erp.service.AttendanceInfoService;
 import com.core.erp.domain.EmployeeEntity;
 import com.core.erp.repository.EmployeeRepository;

@@ -1,22 +1,20 @@
 package com.core.erp.service;
 
 import com.core.erp.domain.*;
-import com.core.erp.dto.ProductDTO;
-import com.core.erp.dto.ProductDetailResponseDTO;
-import com.core.erp.dto.ProductRegisterRequestDTO;
-import com.core.erp.dto.ProductUpdateRequestDTO;
+import com.core.erp.dto.product.ProductDTO;
+import com.core.erp.dto.product.ProductDetailResponseDTO;
+import com.core.erp.dto.product.ProductRegisterRequestDTO;
+import com.core.erp.dto.product.ProductUpdateRequestDTO;
 import com.core.erp.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;

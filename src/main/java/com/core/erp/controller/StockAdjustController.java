@@ -1,8 +1,8 @@
 package com.core.erp.controller;
 
 import com.core.erp.dto.CustomPrincipal;
-import com.core.erp.dto.StockAdjustDTO;
-import com.core.erp.dto.StockAdjustLogDTO;
+import com.core.erp.dto.stock.StockAdjustDTO;
+import com.core.erp.dto.stock.StockAdjustLogDTO;
 import com.core.erp.service.StockService;
 import com.core.erp.service.HQStockService;
 import lombok.RequiredArgsConstructor;

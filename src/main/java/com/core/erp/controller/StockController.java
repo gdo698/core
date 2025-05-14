@@ -1,6 +1,9 @@
 package com.core.erp.controller;
 
-import com.core.erp.dto.*;
+import com.core.erp.dto.CustomPrincipal;
+import com.core.erp.dto.TotalStockDTO;
+import com.core.erp.dto.stock.StockDetailDTO;
+import com.core.erp.dto.stock.StockInHistoryDTO;
 import com.core.erp.service.StockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,7 +15,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/stock")
@@ -78,7 +80,16 @@ public class StockController {
         return ResponseEntity.ok(result);
     }
 
-
+    //  상품 재고 상세 정보 조회
+    @GetMapping("/detail/{productId}")
+    public ResponseEntity<StockDetailDTO> getStockDetail(
+            @AuthenticationPrincipal CustomPrincipal userDetails,
+            @PathVariable Long productId
+    ) {
+        Integer storeId = userDetails.getStoreId();
+        StockDetailDTO detail = stockService.findStockDetail(productId,storeId);
+        return ResponseEntity.ok(detail);
+    }
 
 
 }

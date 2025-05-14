@@ -1,6 +1,6 @@
 package com.core.erp.domain;
 
-import com.core.erp.dto.SalaryDTO;
+import com.core.erp.dto.salary.SalaryDTO;
 import jakarta.persistence.*;
 import lombok.*;
 

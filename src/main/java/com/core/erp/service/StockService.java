@@ -2,6 +2,8 @@ package com.core.erp.service;
 
 import com.core.erp.domain.*;
 import com.core.erp.dto.*;
+import com.core.erp.dto.order.PurchaseOrderItemDTO;
+import com.core.erp.dto.stock.*;
 import com.core.erp.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,9 @@ public class StockService {
     private final StockAdjustLogRepository stockAdjustLogRepository;
     private final PartTimerRepository partTimerRepository;
     private final PurchaseOrderItemRepository purchaseOrderItemRepository;
-//    private final StockInventoryCheckRepository inventoryCheckRepository;
+    private final StockInventoryCheckRepository inventoryCheckRepository;
+    private final StockInventoryCheckItemRepository stockInventoryCheckItemRepository;
+    private final WarehouseStockRepository warehouseStockRepository;
 
 
     public Page<StockInHistoryDTO> getStockInHistory(Integer storeId, String role, int page, int size) {
@@ -158,6 +162,39 @@ public class StockService {
         return storeStockRepository.findStockSummary(productId, storeId, productName, barcode, categoryId, pageable);
     }
 
+    public StockDetailDTO findStockDetail(Long productId, int storeId) {
+
+        // [1] 상품 정보 조회
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("상품 없음"));
+
+        // [2] 매장 재고 조회
+        StoreStockEntity storeStock = storeStockRepository
+                .findByStore_StoreIdAndProduct_ProductId(storeId, Math.toIntExact(productId))
+                .orElse(null);
+
+        // [3] 창고 재고 조회
+        WarehouseStockEntity warehouseStock = warehouseStockRepository
+                .findByStore_StoreIdAndProduct_ProductId(storeId, Math.toIntExact(productId))
+                .orElse(null);
+
+        // [4] 최신 실사 정보 조회
+        StockInventoryCheckItemEntity checkItem = stockInventoryCheckItemRepository
+                .findTopByStoreIdAndProductIdOrderByCheckDateDesc(storeId, Math.toIntExact(productId))
+                .orElse(null);
+
+        // [5] DTO 생성 및 반환
+        return new StockDetailDTO(
+                product.getProName(),
+                product.getProBarcode(),
+                product.getIsPromo(),
+                storeStock != null ? storeStock.getQuantity() : 0,
+                warehouseStock != null ? warehouseStock.getQuantity() : 0,
+                checkItem != null ? checkItem.getStoreRealQuantity() : 0,
+                checkItem != null ? checkItem.getWarehouseRealQuantity() : 0,
+                storeStock != null ? storeStock.getLocationCode() : null
+        );
+    }
 
 
 }

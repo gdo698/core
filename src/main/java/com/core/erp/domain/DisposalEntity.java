@@ -1,6 +1,6 @@
 package com.core.erp.domain;
 
-import com.core.erp.dto.DisposalDTO;
+import com.core.erp.dto.disposal.DisposalDTO;
 import jakarta.persistence.*;
 import lombok.*;
 

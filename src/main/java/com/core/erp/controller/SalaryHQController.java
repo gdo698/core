@@ -1,7 +1,7 @@
 package com.core.erp.controller;
 
 import com.core.erp.dto.CustomPrincipal;
-import com.core.erp.dto.SalaryDTO;
+import com.core.erp.dto.salary.SalaryDTO;
 import com.core.erp.service.SalaryHQService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

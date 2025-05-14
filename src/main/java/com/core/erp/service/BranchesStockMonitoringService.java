@@ -2,8 +2,11 @@ package com.core.erp.service;
 
 import com.core.erp.domain.CategoryEntity;
 import com.core.erp.domain.StoreEntity;
-import com.core.erp.domain.StoreStockEntity;
 import com.core.erp.dto.*;
+import com.core.erp.dto.category.CategoryDTO;
+import com.core.erp.dto.stock.StockCategoryStatDTO;
+import com.core.erp.dto.stock.StockStatusSummaryDTO;
+import com.core.erp.dto.store.StoreDTO;
 import com.core.erp.repository.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

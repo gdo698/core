@@ -1,6 +1,6 @@
 package com.core.erp.domain;
 
-import com.core.erp.dto.PurchaseOrderItemDTO;
+import com.core.erp.dto.order.PurchaseOrderItemDTO;
 import jakarta.persistence.*;
 import lombok.*;
 

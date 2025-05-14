@@ -1,7 +1,7 @@
 package com.core.erp.controller;
 
 import com.core.erp.dto.CustomPrincipal;
-import com.core.erp.dto.ShiftScheduleDTO;
+import com.core.erp.dto.partTimer.ShiftScheduleDTO;
 import com.core.erp.service.ShiftScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;

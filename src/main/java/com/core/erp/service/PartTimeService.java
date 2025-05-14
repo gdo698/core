@@ -2,8 +2,8 @@ package com.core.erp.service;
 
 import com.core.erp.domain.PartTimerEntity;
 import com.core.erp.domain.StoreEntity;
-import com.core.erp.dto.PartTimerDTO;
-import com.core.erp.dto.PartTimerSearchDTO;
+import com.core.erp.dto.partTimer.PartTimerDTO;
+import com.core.erp.dto.partTimer.PartTimerSearchDTO;
 import com.core.erp.repository.PartTimerRepository;
 import com.core.erp.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;

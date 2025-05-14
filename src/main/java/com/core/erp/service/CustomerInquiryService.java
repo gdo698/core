@@ -2,7 +2,7 @@ package com.core.erp.service;
 
 import com.core.erp.domain.StoreEntity;
 import com.core.erp.domain.StoreInquiryEntity;
-import com.core.erp.dto.StoreInquiryRequestDTO;
+import com.core.erp.dto.store.StoreInquiryRequestDTO;
 import com.core.erp.repository.StoreInquiryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
