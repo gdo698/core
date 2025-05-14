@@ -161,6 +161,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/shift-schedules/**").hasAnyRole("STORE", "MASTER")
                 .requestMatchers("/api/store/**").permitAll()
 
+                // 통합 재고 모니터링 API 보호 - 본사 및 점주 접근 가능
+                .requestMatchers("/api/integrated-stock/**").hasAnyRole("HQ", "HQ_HRM", "HQ_PRO", "HQ_BR", "MASTER", "STORE")
+
                 // POS API 보호 - 점주와 마스터만 접근 가능
                 .requestMatchers("/api/pos/**").hasAnyRole("STORE", "MASTER")
 
