@@ -4,6 +4,7 @@ import com.core.erp.repository.SalesTransactionRepository;
 import com.core.pos.domain.SalesSettlementEntity;
 import com.core.pos.domain.SalesSettlementEntity.HqStatus;
 import com.core.pos.domain.SalesSettlementEntity.SettlementType;
+import com.core.pos.dto.SettlementDTO;
 import com.core.pos.dto.SettlementRequestDTO;
 import com.core.pos.repository.SalesSettlementRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,9 @@ public class SettlementService {
 
     private final SalesTransactionRepository transactionRepository;
     private final SalesSettlementRepository settlementRepository;
+    private final SettlementSenderService senderService;
 
+    // 일별 매출 정산 처리
     public void calculateDailySettlement(SettlementRequestDTO request) {
         Integer storeId = request.getStoreId();
         LocalDate date = request.getTargetDate();
@@ -32,8 +35,10 @@ public class SettlementService {
         LocalDateTime start = date.atStartOfDay();
         LocalDateTime end = date.plusDays(1).atStartOfDay();
 
+        // 해당 매장의 하루치 거래 내역 조회
         var transactions = transactionRepository.findByStoreStoreIdAndPaidAtBetween(storeId, start, end);
 
+        // 정산 항목 계산
         int totalRevenue = 0;
         int discountTotal = 0;
         int refundTotal = 0;
@@ -69,6 +74,15 @@ public class SettlementService {
                 .hqSentAt(null)
                 .build();
 
+        // 본사 전송 시도
+        SettlementDTO dto = SettlementDTO.from(entity);
+        boolean sent = senderService.sendToHeadOffice(dto);
+
+        // 전송 결과에 따라 상태 업데이트
+        entity.setHqStatus(sent ? HqStatus.SENT : HqStatus.FAILED);
+        entity.setHqSentAt(LocalDateTime.now());
+
+        // 정산 저장 (전송 상태 포함)
         settlementRepository.save(entity);
     }
 }

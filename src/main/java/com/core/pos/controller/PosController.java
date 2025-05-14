@@ -75,7 +75,7 @@ public class PosController {
         }
     }
 
-    // 거래 정산
+    // 매출 정산 API
     @PostMapping("/settlement/daily")
     public ResponseEntity<?> calculateDailySettlement(@RequestBody SettlementRequestDTO dto) {
         settlementService.calculateDailySettlement(dto);
