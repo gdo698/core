@@ -14,10 +14,13 @@ public class HQStockDTO {
     private int hqStockId;
     private int productId;
     private int quantity;
+    private int totalQuantity;
+    private Integer regularInDay;
+    private Integer regularInQuantity;
+    private Boolean regularInActive;
     private LocalDateTime lastUpdate;
     private LocalDateTime createdAt;
     private String updatedBy;
-    private int totalQuantity;
     private String productName;
     private Long barcode;
     private String categoryName;
@@ -27,10 +30,13 @@ public class HQStockDTO {
         this.hqStockId = entity.getHqStockId();
         this.productId = entity.getProduct().getProductId();
         this.quantity = entity.getQuantity();
+        this.totalQuantity = entity.getTotalQuantity();
+        this.regularInDay = entity.getRegularInDay();
+        this.regularInQuantity = entity.getRegularInQuantity();
+        this.regularInActive = entity.getRegularInActive();
         this.lastUpdate = entity.getLastUpdate();
         this.createdAt = entity.getCreatedAt();
         this.updatedBy = entity.getUpdatedBy();
-        this.totalQuantity = entity.getTotalQuantity();
         this.productName = entity.getProduct().getProName();
         this.barcode = entity.getProduct().getProBarcode();
         this.categoryName = entity.getProduct().getCategory() != null ? 

@@ -1,13 +1,16 @@
 package com.core.erp.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
 import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
 @NoArgsConstructor
+// @AllArgsConstructor 제거 - 수동으로 생성자를 정의했기 때문에 중복 발생 문제
 public class ProductDetailResponseDTO {
     // 제품 기본 정보
     private int productId;
@@ -37,6 +40,11 @@ public class ProductDetailResponseDTO {
     
     // 새로 추가된 필드
     private int hqStock; // 본사 재고
+    
+    // 정기 입고 관련 필드 추가
+    private Integer regularInDay;
+    private Integer regularInQuantity;
+    private Boolean regularInActive;
 
     public ProductDetailResponseDTO(
             int productId,
@@ -58,7 +66,10 @@ public class ProductDetailResponseDTO {
             List<String> categoryPath,
             String eventStart,
             String eventEnd,
-            int hqStock
+            int hqStock,
+            Integer regularInDay,
+            Integer regularInQuantity,
+            Boolean regularInActive
     ) {
         this.productId = productId;
         this.proName = proName;
@@ -80,49 +91,39 @@ public class ProductDetailResponseDTO {
         this.eventStart = eventStart;
         this.eventEnd = eventEnd;
         this.hqStock = hqStock;
+        this.regularInDay = regularInDay;
+        this.regularInQuantity = regularInQuantity;
+        this.regularInActive = regularInActive;
     }
 
     @Getter
     @Setter
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class StoreStockInfo {
         private String storeName;
         private int quantity;
-        public StoreStockInfo(String storeName, int quantity) {
-            this.storeName = storeName;
-            this.quantity = quantity;
-        }
     }
 
     @Getter
     @Setter
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class StockInInfo {
         private String storeName;
-        private String inDate;
-        private int inQuantity;
-        public StockInInfo(String storeName, String inDate, int inQuantity) {
-            this.storeName = storeName;
-            this.inDate = inDate;
-            this.inQuantity = inQuantity;
-        }
+        private String date;
+        private int quantity;
     }
 
     @Getter
     @Setter
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class ProductDetailInfo {
         private String manufacturer;
         private String manuNum;
         private String shelfLife;
         private String allergens;
         private String storageMethod;
-        public ProductDetailInfo(String manufacturer, String manuNum, String shelfLife, String allergens, String storageMethod) {
-            this.manufacturer = manufacturer;
-            this.manuNum = manuNum;
-            this.shelfLife = shelfLife;
-            this.allergens = allergens;
-            this.storageMethod = storageMethod;
-        }
     }
 }

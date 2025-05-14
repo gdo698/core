@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -101,6 +102,64 @@ public class HQStockService {
         
         for (ProductEntity product : products) {
             hqStockRepository.recalculateQuantity(product.getProductId());
+        }
+    }
+    
+    // 정기 입고 설정 업데이트
+    @Transactional
+    public void updateRegularInSettings(int productId, Integer regularInDay, Integer regularInQuantity, Boolean regularInActive) {
+        Optional<HQStockEntity> existingStock = hqStockRepository.findByProductProductId(productId);
+        
+        if (existingStock.isPresent()) {
+            HQStockEntity stock = existingStock.get();
+            
+            if (regularInDay != null) {
+                stock.setRegularInDay(regularInDay);
+            }
+            
+            if (regularInQuantity != null) {
+                stock.setRegularInQuantity(regularInQuantity);
+            }
+            
+            if (regularInActive != null) {
+                stock.setRegularInActive(regularInActive);
+            }
+            
+            stock.setUpdatedBy("USER");
+            hqStockRepository.save(stock);
+        } else {
+            Optional<ProductEntity> product = productRepository.findById(Long.valueOf(productId));
+            
+            if (product.isPresent()) {
+                HQStockEntity newStock = new HQStockEntity();
+                newStock.setProduct(product.get());
+                newStock.setQuantity(0);
+                newStock.setTotalQuantity(0);
+                newStock.setRegularInDay(regularInDay);
+                newStock.setRegularInQuantity(regularInQuantity);
+                newStock.setRegularInActive(regularInActive != null ? regularInActive : false);
+                newStock.setUpdatedBy("USER");
+                hqStockRepository.save(newStock);
+            }
+        }
+    }
+    
+    // 특정 일자에 정기 입고 처리 (스케줄러에서 호출)
+    @Transactional
+    public void processRegularInForDay(int day) {
+        // 해당 일자에 정기 입고가 활성화된 모든 재고 조회
+        List<HQStockEntity> stocksToUpdate = hqStockRepository.findAllByRegularInDayAndRegularInActiveTrue(day);
+        
+        for (HQStockEntity stock : stocksToUpdate) {
+            int regularQuantity = stock.getRegularInQuantity() != null ? stock.getRegularInQuantity() : 0;
+            
+            if (regularQuantity > 0) {
+                // 본사 재고 및 총재고 증가
+                stock.setQuantity(stock.getQuantity() + regularQuantity);
+                stock.setTotalQuantity(stock.getTotalQuantity() + regularQuantity);
+                stock.setUpdatedBy("SYSTEM (정기 입고)");
+                hqStockRepository.save(stock);
+            }
         }
     }
 }

@@ -27,7 +27,16 @@ public class HQStockEntity {
     private int quantity;  // 본사 재고 수량
     
     @Column(name = "total_quantity", nullable = false)
-    private int totalQuantity;  // 총 재고 수량 (본사 + 매장) 
+    private int totalQuantity;  // 총 재고 수량 (본사 + 매장)
+
+    @Column(name = "regular_in_day")
+    private Integer regularInDay;  // 정기 입고일 (1~30)
+
+    @Column(name = "regular_in_quantity")
+    private Integer regularInQuantity;  // 정기 입고 수량
+
+    @Column(name = "regular_in_active")
+    private Boolean regularInActive = false;  // 정기 입고 활성화 여부 (기본값: 비활성화)
 
     @Column(name = "last_update")
     private LocalDateTime lastUpdate;
