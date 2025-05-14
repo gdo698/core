@@ -1,18 +1,14 @@
 package com.core.erp.controller;
 
 import com.core.erp.dto.CustomPrincipal;
-import com.core.erp.dto.InventoryCheckDTO;
 import com.core.erp.dto.InventoryCheckRequestDTO;
 import com.core.erp.service.StockInventoryCheckService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -22,6 +18,7 @@ public class StockInventoryCheckController {
 
     private final StockInventoryCheckService inventoryCheckService;
 
+    /** ✅ 실사 등록 */
     @PostMapping
     public ResponseEntity<String> registerInventoryCheck(
             @AuthenticationPrincipal CustomPrincipal userDetails,
@@ -32,56 +29,57 @@ public class StockInventoryCheckController {
         return ResponseEntity.ok("실사 등록 완료");
     }
 
-    @PatchMapping("/apply/{checkId}")
-    public ResponseEntity<String> applyInventoryCheck(
-            @AuthenticationPrincipal CustomPrincipal userDetails,
-            @PathVariable int checkId
+    /** ✅ 단일 실사 반영 (checkItemId 기준) */
+    @PatchMapping("/apply/{checkItemId}")
+    public ResponseEntity<String> applyInventoryCheckItem(
+            @PathVariable Long checkItemId
     ) {
-        inventoryCheckService.applyCheck(checkId);
+        inventoryCheckService.applyCheckItem(checkItemId);
         return ResponseEntity.ok("실사 반영 완료");
     }
 
+    /** ✅ 선택 실사 항목 일괄 반영 */
     @PatchMapping("/apply-batch")
-    public ResponseEntity<String> applyInventoryChecks(
-            @RequestBody List<Integer> checkIds
+    public ResponseEntity<String> applyInventoryCheckItems(
+            @RequestBody List<Long> checkItemIds
     ) {
-        inventoryCheckService.applyChecks(checkIds);
+        inventoryCheckService.applyCheckItems(checkItemIds);
         return ResponseEntity.ok("실사 일괄 반영 완료");
     }
 
-
+    /** ✅ 전체 미반영 항목 반영 */
     @PatchMapping("/apply-all")
-    public ResponseEntity<String> applyAllChecks(@AuthenticationPrincipal CustomPrincipal userDetails) {
-        int storeId = userDetails.getStoreId();
-        inventoryCheckService.applyAllPendingChecks(storeId);
-        return ResponseEntity.ok("일괄 반영 완료");
+    public ResponseEntity<String> applyAllInventoryCheckItems(
+            @AuthenticationPrincipal CustomPrincipal userDetails
+    ) {
+        inventoryCheckService.applyAllPendingCheckItems(userDetails.getStoreId());
+        return ResponseEntity.ok("전체 실사 반영 완료");
     }
 
-    @PatchMapping("/rollback/{checkId}")
-    public ResponseEntity<String> rollbackInventoryCheck(
-            @AuthenticationPrincipal CustomPrincipal userDetails,
-            @PathVariable int checkId) {
-        inventoryCheckService.rollbackCheck(checkId);
+    /** ✅ 단일 실사 롤백 (checkItemId 기준) */
+    @PatchMapping("/rollback/{checkItemId}")
+    public ResponseEntity<String> rollbackInventoryCheckItem(
+            @PathVariable Long checkItemId
+    ) {
+        inventoryCheckService.rollbackCheckItem(checkItemId);
         return ResponseEntity.ok("실사 롤백 완료");
     }
 
+    /** ✅ 선택 실사 항목 일괄 롤백 */
     @PatchMapping("/rollback-batch")
-    public ResponseEntity<String> rollbackInventoryChecks(
-            @RequestBody List<Integer> checkIds
+    public ResponseEntity<String> rollbackInventoryCheckItems(
+            @RequestBody List<Long> checkItemIds
     ) {
-        inventoryCheckService.rollbackChecks(checkIds);
+        inventoryCheckService.rollbackCheckItems(checkItemIds);
         return ResponseEntity.ok("실사 일괄 롤백 완료");
     }
 
+    /** ✅ 전체 반영된 항목 롤백 */
     @PatchMapping("/rollback-all")
-    public ResponseEntity<String> rollbackAllInventoryChecks(
+    public ResponseEntity<String> rollbackAllInventoryCheckItems(
             @AuthenticationPrincipal CustomPrincipal userDetails
     ) {
-        int storeId = userDetails.getStoreId();
-        inventoryCheckService.rollbackAllAppliedChecks(storeId);
+        inventoryCheckService.rollbackAllAppliedCheckItems(userDetails.getStoreId());
         return ResponseEntity.ok("전체 실사 롤백 완료");
     }
-
-
-
 }

@@ -55,7 +55,7 @@ public class StoreStockRepositoryImpl implements StockRepositoryCustom {
                         " AND sii.inventoryCheck.checkDate=(SELECT MAX(sic.checkDate) FROM StockInventoryCheckEntity sic " +
                         " WHERE sic.store.storeId=:storeId AND EXISTS(SELECT 1 FROM StockInventoryCheckItemEntity sub " +
                         " WHERE sub.inventoryCheck=sic AND sub.product=p))), " +
-                        "(SELECT sii.inventoryCheck.isApplied FROM StockInventoryCheckItemEntity sii " +
+                        "(SELECT sii.isApplied FROM StockInventoryCheckItemEntity sii " +
                         " WHERE sii.product=p AND sii.inventoryCheck.store.storeId=:storeId " +
                         " AND sii.inventoryCheck.checkDate=(SELECT MAX(sic.checkDate) FROM StockInventoryCheckEntity sic " +
                         " WHERE sic.store.storeId=:storeId AND EXISTS(SELECT 1 FROM StockInventoryCheckItemEntity sub " +

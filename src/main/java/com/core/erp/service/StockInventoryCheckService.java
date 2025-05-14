@@ -17,6 +17,7 @@ import java.util.List;
 public class StockInventoryCheckService {
 
     private final StockInventoryCheckRepository inventoryCheckRepository;
+    private final StockInventoryCheckItemRepository inventoryCheckItemRepository;
     private final StoreStockRepository storeStockRepository;
     private final WarehouseStockRepository warehouseStockRepository;
     private final PartTimerRepository partTimerRepository;
@@ -24,7 +25,6 @@ public class StockInventoryCheckService {
     private final StoreRepository storeRepository;
     private final StockAdjustLogRepository stockAdjustLogRepository;
 
-    // ========================= [ 실사 등록 ] =========================
     @Transactional
     public void registerCheck(CustomPrincipal userDetails, InventoryCheckRequestDTO request) {
         StoreEntity store = storeRepository.findById(request.getStoreId())
@@ -57,6 +57,7 @@ public class StockInventoryCheckService {
                     .warehousePrevQuantity(warehousePrev)
                     .storeRealQuantity(item.getStoreRealQty())
                     .warehouseRealQuantity(item.getWarehouseRealQty())
+                    .isApplied(false)
                     .build();
 
             items.add(checkItem);
@@ -66,126 +67,113 @@ public class StockInventoryCheckService {
         inventoryCheckRepository.save(check);
     }
 
-    // ========================= [ 실사 반영 ] =========================
     @Transactional
-    public void applyCheck(int checkId) {
-        StockInventoryCheckEntity check = inventoryCheckRepository.findById(checkId)
-                .orElseThrow(() -> new IllegalArgumentException("실사 이력이 존재하지 않습니다."));
+    public void applyCheckItem(Long checkItemId) {
+        StockInventoryCheckItemEntity item = inventoryCheckItemRepository.findById(checkItemId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 실사 항목이 존재하지 않습니다."));
 
-        if (Boolean.TRUE.equals(check.getIsApplied())) {
-            throw new IllegalStateException("이미 반영된 실사 이력입니다.");
+        if (Boolean.TRUE.equals(item.getIsApplied())) {
+            throw new IllegalStateException("이미 반영된 실사 항목입니다.");
         }
 
-        if (check.getItems() == null || check.getItems().isEmpty()) {
-            throw new IllegalStateException("실사 항목이 존재하지 않습니다.");
+        int storeId = item.getInventoryCheck().getStore().getStoreId();
+        int productId = item.getProduct().getProductId();
+
+        StoreStockEntity storeStock = storeStockRepository
+                .findByStore_StoreIdAndProduct_ProductId(storeId, productId)
+                .orElseGet(() -> createStoreStock(storeId, productId));
+
+        WarehouseStockEntity warehouseStock = warehouseStockRepository
+                .findByStore_StoreIdAndProduct_ProductId(storeId, productId)
+                .orElseGet(() -> createWarehouseStock(storeId, productId));
+
+        storeStock.setQuantity(item.getStoreRealQuantity());
+        warehouseStock.setQuantity(item.getWarehouseRealQuantity());
+
+        storeStockRepository.save(storeStock);
+        warehouseStockRepository.save(warehouseStock);
+
+        int prevTotal = item.getStorePrevQuantity() + item.getWarehousePrevQuantity();
+        int newTotal = item.getStoreRealQuantity() + item.getWarehouseRealQuantity();
+        int diff = newTotal - prevTotal;
+
+        if (diff != 0) {
+            StockAdjustLogEntity log = new StockAdjustLogEntity();
+            log.setStore(item.getInventoryCheck().getStore());
+            log.setProduct(item.getProduct());
+            log.setPrevQuantity(prevTotal);
+            log.setNewQuantity(newTotal);
+            log.setQuantityDiff(diff);
+            log.setAdjustDate(LocalDateTime.now());
+            log.setAdjustedBy(item.getInventoryCheck().getPartTimer().getPartName());
+            log.setAdjustReason("실사 반영");
+            stockAdjustLogRepository.save(log);
         }
 
-        for (StockInventoryCheckItemEntity item : check.getItems()) {
-            int storeId = check.getStore().getStoreId();
-            int productId = item.getProduct().getProductId();
-
-            StoreStockEntity storeStock = storeStockRepository
-                    .findByStore_StoreIdAndProduct_ProductId(storeId, productId)
-                    .orElseGet(() -> createStoreStock(storeId, productId));
-
-            WarehouseStockEntity warehouseStock = warehouseStockRepository
-                    .findByStore_StoreIdAndProduct_ProductId(storeId, productId)
-                    .orElseGet(() -> createWarehouseStock(storeId, productId));
-
-            storeStock.setQuantity(item.getStoreRealQuantity());
-            warehouseStock.setQuantity(item.getWarehouseRealQuantity());
-
-            storeStockRepository.save(storeStock);
-            warehouseStockRepository.save(warehouseStock);
-
-            int prevTotal = item.getStorePrevQuantity() + item.getWarehousePrevQuantity();
-            int newTotal = item.getStoreRealQuantity() + item.getWarehouseRealQuantity();
-            int diff = newTotal - prevTotal;
-
-            if (diff != 0) {
-                StockAdjustLogEntity log = new StockAdjustLogEntity();
-                log.setStore(check.getStore());
-                log.setProduct(item.getProduct());
-                log.setPrevQuantity(prevTotal);
-                log.setNewQuantity(newTotal);
-                log.setQuantityDiff(diff);
-                log.setAdjustDate(LocalDateTime.now());
-                log.setAdjustedBy(check.getPartTimer().getPartName());
-                log.setAdjustReason("실사 반영");
-                stockAdjustLogRepository.save(log);
-            }
-        }
-
-        check.setIsApplied(true);
-        inventoryCheckRepository.save(check);
+        item.setIsApplied(true);
+        inventoryCheckItemRepository.save(item);
     }
 
     @Transactional
-    public void applyChecks(List<Integer> checkIds) {
-        for (int checkId : checkIds) {
-            applyCheck(checkId);
+    public void applyCheckItems(List<Long> checkItemIds) {
+        for (Long checkItemId : checkItemIds) {
+            applyCheckItem(checkItemId);
         }
     }
 
     @Transactional
-    public void applyAllPendingChecks(int storeId) {
-        List<StockInventoryCheckEntity> checks = inventoryCheckRepository.findAllByStore_StoreIdAndIsAppliedFalse(storeId);
-        for (StockInventoryCheckEntity check : checks) {
-            applyCheck(Math.toIntExact(check.getCheckId()));
+    public void applyAllPendingCheckItems(int storeId) {
+        List<StockInventoryCheckItemEntity> items = inventoryCheckItemRepository.findAllPendingByStoreId(storeId);
+        for (StockInventoryCheckItemEntity item : items) {
+            applyCheckItem(item.getCheckItemId());
         }
     }
 
     @Transactional
-    public void rollbackAllAppliedChecks(int storeId) {
-        List<StockInventoryCheckEntity> checks = inventoryCheckRepository.findAllByStore_StoreIdAndIsAppliedTrue(storeId);
-        for (StockInventoryCheckEntity check : checks) {
-            rollbackCheck(Math.toIntExact(check.getCheckId()));
-        }
-    }
+    public void rollbackCheckItem(Long checkItemId) {
+        StockInventoryCheckItemEntity item = inventoryCheckItemRepository.findById(checkItemId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 실사 항목이 존재하지 않습니다."));
 
-    // ========================= [ 롤백 처리 ] =========================
-    @Transactional
-    public void rollbackCheck(int checkId) {
-        StockInventoryCheckEntity check = inventoryCheckRepository.findById(checkId)
-                .orElseThrow(() -> new IllegalArgumentException("실사 이력이 존재하지 않습니다."));
-
-        if (!Boolean.TRUE.equals(check.getIsApplied())) {
-            throw new IllegalStateException("반영되지 않은 실사는 롤백할 수 없습니다.");
+        if (!Boolean.TRUE.equals(item.getIsApplied())) {
+            throw new IllegalStateException("아직 반영되지 않은 항목은 롤백할 수 없습니다.");
         }
 
-        for (StockInventoryCheckItemEntity item : check.getItems()) {
-            int storeId = check.getStore().getStoreId();
-            int productId = item.getProduct().getProductId();
-            int prevStore = item.getStorePrevQuantity();
-            int prevWarehouse = item.getWarehousePrevQuantity();
+        int storeId = item.getInventoryCheck().getStore().getStoreId();
+        int productId = item.getProduct().getProductId();
 
-            StoreStockEntity storeStock = storeStockRepository
-                    .findByStore_StoreIdAndProduct_ProductId(storeId, productId)
-                    .orElseThrow(() -> new IllegalStateException("StoreStock 데이터 없음"));
+        StoreStockEntity storeStock = storeStockRepository
+                .findByStore_StoreIdAndProduct_ProductId(storeId, productId)
+                .orElseGet(() -> createStoreStock(storeId, productId));
 
-            WarehouseStockEntity warehouseStock = warehouseStockRepository
-                    .findByStore_StoreIdAndProduct_ProductId(storeId, productId)
-                    .orElseThrow(() -> new IllegalStateException("WarehouseStock 데이터 없음"));
+        WarehouseStockEntity warehouseStock = warehouseStockRepository
+                .findByStore_StoreIdAndProduct_ProductId(storeId, productId)
+                .orElseGet(() -> createWarehouseStock(storeId, productId));
 
-            storeStock.setQuantity(prevStore);
-            warehouseStock.setQuantity(prevWarehouse);
+        storeStock.setQuantity(item.getStorePrevQuantity());
+        warehouseStock.setQuantity(item.getWarehousePrevQuantity());
 
-            storeStockRepository.save(storeStock);
-            warehouseStockRepository.save(warehouseStock);
-        }
+        storeStockRepository.save(storeStock);
+        warehouseStockRepository.save(warehouseStock);
 
-        check.setIsApplied(false);
-        inventoryCheckRepository.save(check);
+        item.setIsApplied(false);
+        inventoryCheckItemRepository.save(item);
     }
 
     @Transactional
-    public void rollbackChecks(List<Integer> checkIds) {
-        for (int checkId : checkIds) {
-            rollbackCheck(checkId);
+    public void rollbackCheckItems(List<Long> checkItemIds) {
+        for (Long checkItemId : checkItemIds) {
+            rollbackCheckItem(checkItemId);
         }
     }
 
-    // ========================= [ 스톡 생성 ] =========================
+    @Transactional
+    public void rollbackAllAppliedCheckItems(int storeId) {
+        List<StockInventoryCheckItemEntity> items = inventoryCheckItemRepository.findAllAppliedByStoreId(storeId);
+        for (StockInventoryCheckItemEntity item : items) {
+            rollbackCheckItem(item.getCheckItemId());
+        }
+    }
+
     private StoreStockEntity createStoreStock(int storeId, int productId) {
         StoreEntity store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new IllegalArgumentException("매장이 존재하지 않습니다."));

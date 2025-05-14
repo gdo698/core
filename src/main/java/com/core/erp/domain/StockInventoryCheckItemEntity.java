@@ -45,4 +45,7 @@ public class StockInventoryCheckItemEntity {
 
     @Formula("(store_real_quantity + warehouse_real_quantity) - (store_prev_quantity + warehouse_prev_quantity)")
     private Integer totalDifference;
+
+    @Column(name = "is_applied", nullable = false)
+    private Boolean isApplied = false;
 }
