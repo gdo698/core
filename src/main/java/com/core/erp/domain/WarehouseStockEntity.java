@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Builder
 @Entity
 @Table(name = "warehouse_stock")
 @Getter
@@ -47,4 +48,6 @@ public class WarehouseStockEntity {
         this.lastInDate = now;
         this.stockStatus = stockStatus;
     }
+
+
 }

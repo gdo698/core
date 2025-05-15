@@ -1,11 +1,13 @@
 package com.core.erp.controller;
 
+import com.core.erp.dto.CustomPrincipal;
 import com.core.erp.dto.product.ProductDTO;
 import com.core.erp.dto.product.ProductDetailResponseDTO;
 import com.core.erp.dto.product.ProductUpdateRequestDTO;
 import com.core.erp.dto.product.ProductRegisterRequestDTO;
 import com.core.erp.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.ResponseEntity;
@@ -38,8 +40,11 @@ public class ProductController {
     }
 
     @GetMapping("/detail/{id}")
-    public ProductDetailResponseDTO getProductDetail(@PathVariable int id) {
-        return productService.getProductDetail(id);
+    public ProductDetailResponseDTO getProductDetail(
+            @PathVariable int id,
+            @AuthenticationPrincipal CustomPrincipal user
+    ) {
+        return productService.getProductDetail(id, user);
     }
 
     @PutMapping("/edit/{id}")
@@ -68,4 +73,6 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("등록 실패");
         }
     }
+
+
 }

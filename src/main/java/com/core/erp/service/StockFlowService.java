@@ -1,10 +1,14 @@
 package com.core.erp.service;
 
-import com.core.erp.domain.*;
+import com.core.erp.domain.ProductEntity;
+import com.core.erp.domain.StockFlowEntity;
+import com.core.erp.domain.StoreEntity;
+import com.core.erp.dto.CustomPrincipal;
 import com.core.erp.dto.stock.StockFlowLogDTO;
 import com.core.erp.dto.stock.StockFlowSearchCondition;
 import com.core.erp.repository.StockFlowRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,8 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
+@ToString
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -21,19 +25,7 @@ public class StockFlowService {
 
     private final StockFlowRepository stockFlowRepository;
 
-    /**
-     * 재고 흐름 로그 저장
-     *
-     * @param store          지점
-     * @param product        상품
-     * @param flowType       흐름 유형 코드 (0~7)
-     * @param quantity       변화 수량 (양수 or 음수)
-     * @param beforeQuantity 반영 전 수량
-     * @param afterQuantity  반영 후 수량
-     * @param location       위치 (ex. 매장, 창고)
-     * @param processedBy    담당자명
-     * @param note           비고/사유
-     */
+    // 재고 흐름 저장
     public void logStockFlow(StoreEntity store,
                              ProductEntity product,
                              int flowType,
@@ -60,12 +52,52 @@ public class StockFlowService {
         stockFlowRepository.save(flow);
     }
 
-    public Page<StockFlowLogDTO> getLogs(Integer storeId, Long productId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<StockFlowEntity> pageResult = stockFlowRepository
-                .findByStore_StoreIdAndProduct_ProductIdOrderByFlowDateDesc(storeId, productId, pageable);
+    // HQ/매장 공용 로그 조회
+    public Page<StockFlowLogDTO> getLogs(CustomPrincipal user, Long productId, int page, int size) {
+        log.info("📦 getLogs 요청: user={}, productId={}, page={}, size={}",
+                user, productId, page, size);
+        StockFlowSearchCondition cond = new StockFlowSearchCondition();
+        cond.setPage(page);
+        cond.setSize(size);
+        cond.setProductId(productId);
 
-        return pageResult.map(flow -> new StockFlowLogDTO(
+        if (!"ROLE_HQ".equals(user.getRole())) {
+            cond.setStoreId(user.getStoreId());
+        }
+
+        return searchFlows(cond);
+    }
+
+
+    // 검색 조건 기반 로그 조회
+    public Page<StockFlowLogDTO> searchFlows(StockFlowSearchCondition cond) {
+        log.info("🔍 searchFlows 조건: storeId={}, productId={}", cond.getStoreId(), cond.getProductId());
+        Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
+        LocalDateTime start = cond.getStartDate() != null ? cond.getStartDate().atStartOfDay() : null;
+        LocalDateTime end = cond.getEndDate() != null ? cond.getEndDate().atTime(23, 59, 59) : null;
+
+        Page<StockFlowEntity> page = stockFlowRepository.searchStockFlows(
+                cond.getStoreId(),
+                cond.getProductId(),
+                cond.getProductName(),
+                cond.getFlowType(),
+                start,
+                end,
+                pageable
+        );
+
+        return page.map(this::mapToDto);
+    }
+
+    // HQ 외 사용자의 storeId를 강제로 조건에 설정
+    public void bindUserStoreIfNeeded(StockFlowSearchCondition cond, CustomPrincipal user) {
+        if (!"ROLE_HQ".equals(user.getRole())) {
+            cond.setStoreId(user.getStoreId());
+        }
+    }
+
+    private StockFlowLogDTO mapToDto(StockFlowEntity flow) {
+        return new StockFlowLogDTO(
                 flow.getFlowId(),
                 flow.getProduct().getProductId(),
                 flow.getProduct().getProName(),
@@ -79,7 +111,7 @@ public class StockFlowService {
                 flow.getNote(),
                 flow.getProcessedBy(),
                 flow.getFlowDate()
-        ));
+        );
     }
 
     private String getFlowTypeLabel(int type) {
@@ -95,40 +127,4 @@ public class StockFlowService {
             default -> "기타";
         };
     }
-
-    public Page<StockFlowLogDTO> searchFlows(StockFlowSearchCondition cond) {
-        Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
-
-        LocalDateTime start = cond.getStartDate() != null ? cond.getStartDate().atStartOfDay() : null;
-        LocalDateTime end = cond.getEndDate() != null ? cond.getEndDate().atTime(23, 59, 59) : null;
-        log.info("검색 조건 - 시작일: {}, 종료일: {}", cond.getStartDate(), cond.getEndDate());
-
-
-        Page<StockFlowEntity> page = stockFlowRepository.searchStockFlows(
-                cond.getStoreId(),
-                cond.getProductId(),
-                cond.getProductName(),
-                cond.getFlowType(),
-                start,
-                end,
-                pageable
-        );
-
-        return page.map(flow -> new StockFlowLogDTO(
-                flow.getFlowId(),
-                flow.getProduct().getProductId(),
-                flow.getProduct().getProName(),
-                flow.getProduct().getProBarcode(),
-                flow.getFlowType(),
-                getFlowTypeLabel(flow.getFlowType()),
-                flow.getQuantity(),
-                flow.getBeforeQuantity(),
-                flow.getAfterQuantity(),
-                flow.getLocation(),
-                flow.getNote(),
-                flow.getProcessedBy(),
-                flow.getFlowDate()
-        ));
-    }
-
 }
