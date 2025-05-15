@@ -29,7 +29,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/auth/register",
             "/api/auth/check-email",
             "/api/auth/send-verification-email",  // 이메일 인증 코드 발송
-            "/api/auth/verify-email"             // 이메일 인증 코드 확인
+            "/api/auth/verify-email",             // 이메일 인증 코드 확인
+            "/ws",                                // WebSocket 엔드포인트
+            "/ws/**"                              // WebSocket 하위 경로
     );
 
     @Override
@@ -43,6 +45,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         System.out.println("===== JwtAuthenticationFilter 실행 =====");
         System.out.println("요청 URI: " + uri);
         System.out.println("요청 메서드: " + method);
+        
+        // 로그인 요청 특별 처리
+        if (uri.equals("/api/auth/login")) {
+            System.out.println("===== 로그인 요청 감지 =====");
+            
+            // 요청 본문 내용 로깅 (디버깅용)
+            try {
+                String requestBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+                System.out.println("로그인 요청 본문: " + requestBody);
+                
+                // 원래의 요청 본문을 다시 읽을 수 있도록 래핑
+                request = new CustomHttpServletRequestWrapper(request, requestBody);
+            } catch (Exception e) {
+                System.err.println("로그인 요청 본문 읽기 실패: " + e.getMessage());
+            }
+        }
         
         // 이메일 인증 API 요청 로깅
         boolean isEmailVerificationRequest = uri.equals("/api/auth/send-verification-email") || 
@@ -58,7 +76,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         
         // 인증이 필요하지 않은 경로인지 확인
-        boolean isExcludedPath = excludedPaths.stream().anyMatch(uri::equals);
+        boolean isExcludedPath = excludedPaths.stream().anyMatch(path -> {
+            if (path.endsWith("/**")) {
+                String basePath = path.substring(0, path.length() - 3);
+                return uri.startsWith(basePath);
+            }
+            return uri.equals(path);
+        });
         
         if (isExcludedPath) {
             System.out.println("인증이 필요 없는 경로: " + uri + " - JWT 필터 건너뜀");

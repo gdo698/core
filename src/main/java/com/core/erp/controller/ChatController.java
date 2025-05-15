@@ -1,0 +1,102 @@
+package com.core.erp.controller;
+
+import com.core.erp.dto.CustomPrincipal;
+import com.core.erp.dto.chat.ChatMessageDTO;
+import com.core.erp.dto.chat.ChatRoomDTO;
+import com.core.erp.service.ChatService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/chat")
+@RequiredArgsConstructor
+public class ChatController {
+
+    private final ChatService chatService;
+
+    /**
+     * 로그인한 사용자의 채팅방 목록 조회
+     */
+    @GetMapping("/rooms")
+    public ResponseEntity<List<ChatRoomDTO>> getRooms(Authentication authentication) {
+        CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
+        List<ChatRoomDTO> rooms = chatService.getUserChatRooms(principal.getEmpId());
+        return ResponseEntity.ok(rooms);
+    }
+
+    /**
+     * 채팅방 생성
+     */
+    @PostMapping("/rooms")
+    public ResponseEntity<ChatRoomDTO> createRoom(
+            @RequestBody Map<String, Object> request,
+            Authentication authentication) {
+        
+        CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
+        
+        ChatRoomDTO chatRoomDTO = new ChatRoomDTO();
+        chatRoomDTO.setRoomName((String) request.get("roomName"));
+        chatRoomDTO.setRoomType((String) request.get("roomType"));
+        
+        @SuppressWarnings("unchecked")
+        List<Integer> memberIds = (List<Integer>) request.get("memberIds");
+        
+        ChatRoomDTO createdRoom = chatService.createChatRoom(chatRoomDTO, principal.getEmpId(), memberIds);
+        return ResponseEntity.ok(createdRoom);
+    }
+
+    /**
+     * 특정 채팅방 조회
+     */
+    @GetMapping("/rooms/{roomId}")
+    public ResponseEntity<ChatRoomDTO> getRoom(
+            @PathVariable Long roomId,
+            Authentication authentication) {
+        
+        CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
+        ChatRoomDTO room = chatService.getChatRoom(roomId, principal.getEmpId());
+        return ResponseEntity.ok(room);
+    }
+
+    /**
+     * 채팅방 메시지 목록 조회
+     */
+    @GetMapping("/rooms/{roomId}/messages")
+    public ResponseEntity<List<ChatMessageDTO>> getMessages(
+            @PathVariable Long roomId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
+            Authentication authentication) {
+        
+        CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
+        List<ChatMessageDTO> messages = chatService.getChatMessages(roomId, principal.getEmpId(), page, size);
+        return ResponseEntity.ok(messages);
+    }
+
+    /**
+     * 웹소켓을 통한 메시지 전송
+     */
+    @MessageMapping("/chat.sendMessage")
+    public void sendMessage(@Payload ChatMessageDTO messageDTO, SimpMessageHeaderAccessor headerAccessor) {
+        Authentication authentication = (Authentication) headerAccessor.getUser();
+        CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
+        
+        chatService.sendMessage(messageDTO, principal);
+    }
+
+    /**
+     * 본사 직원 목록 조회
+     */
+    @GetMapping("/employees")
+    public ResponseEntity<List<Map<String, Object>>> getHeadquartersEmployees() {
+        return ResponseEntity.ok(chatService.getHeadquartersEmployees());
+    }
+} 

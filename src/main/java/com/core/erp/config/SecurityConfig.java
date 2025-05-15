@@ -83,7 +83,8 @@ public class SecurityConfig {
                     "/api/products/all", 
                     "/api/categories/tree", // 상품 정보 조회 API
                     "/api/barcode",
-                    "/api/customer/**"  // 모든 고객 관련 API 허용
+                    "/api/customer/**",  // 모든 고객 관련 API 허용
+                    "/ws/**"            // WebSocket 엔드포인트 허용
                 ).permitAll() // 모든 사용자 접근 허용
                 
                 // 2. 상품 관련 API - 여러 권한에 접근 허용
