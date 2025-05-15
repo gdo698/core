@@ -39,6 +39,7 @@ public class BarcodeApiController {
         result.put("unitPrice", product.getProSellCost());
         result.put("stockId", stock.getStockId());
         result.put("isExpired", isExpired);
+        result.put("isPromo", product.getIsPromo());
 
         return ResponseEntity.ok(result);
     }

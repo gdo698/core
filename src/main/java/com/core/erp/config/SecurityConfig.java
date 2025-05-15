@@ -50,9 +50,11 @@ public class SecurityConfig {
                 CorsConfiguration config = new CorsConfiguration();
                 // 명시적 도메인 목록 설정
                 config.setAllowedOrigins(List.of(
-                    "http://localhost:3000", 
-                    "http://localhost:8080", 
-                    "http://127.0.0.1:3000", 
+                    "http://localhost:3000",
+                    "http://localhost:3001",
+                    "http://localhost:8080",
+                    "http://127.0.0.1:3000",
+                    "http://127.0.0.1:3001",
                     "http://127.0.0.1:8080"
                 )); // 특정 출처 허용
                 config.setAllowedMethods(List.of("GET","PATCH" ,"POST", "PUT", "DELETE", "OPTIONS")); // 허용할 HTTP 메서드

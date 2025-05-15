@@ -40,6 +40,7 @@ public class BarcodeApiService {
                 dto.setManufacturer(detailsOpt.map(ProductDetailsEntity::getManufacturer).orElse("제조사 정보 없음"));
                 dto.setCategory(product.getCategory() != null ? product.getCategory().getCategoryName() : "기타");
                 dto.setExpirationInfo(detailsOpt.map(ProductDetailsEntity::getShelfLife).orElse("유통기한 정보 없음"));
+                dto.setIsPromo(product.getIsPromo());
 
 
                 return dto;

@@ -1,10 +1,7 @@
 package com.core.pos.controller;
 
 import com.core.erp.dto.CustomPrincipal;
-import com.core.pos.dto.DisposalRequestDTO;
-import com.core.pos.dto.SaleRequestDTO;
-import com.core.pos.dto.SalesHistoryDTO;
-import com.core.pos.dto.SettlementRequestDTO;
+import com.core.pos.dto.*;
 import com.core.pos.service.PosService;
 import com.core.pos.service.SettlementService;
 import lombok.RequiredArgsConstructor;
@@ -75,10 +72,32 @@ public class PosController {
         }
     }
 
-    // 매출 정산 API
+    // 일별 정산 API
     @PostMapping("/settlement/daily")
     public ResponseEntity<?> calculateDailySettlement(@RequestBody SettlementRequestDTO dto) {
         settlementService.calculateDailySettlement(dto);
         return ResponseEntity.ok("정산 완료");
     }
+
+    // 월별 정산 API
+    @PostMapping("/settlement/monthly")
+    public ResponseEntity<?> calculateMonthlySettlement(@RequestBody SettlementRequestDTO dto) {
+        settlementService.calculateMonthlySettlement(dto);
+        return ResponseEntity.ok("월별 정산 완료");
+    }
+
+    // 연별 정산 API
+    @PostMapping("/settlement/yearly")
+    public ResponseEntity<?> calculateYearly(@RequestBody SettlementRequestDTO dto) {
+        settlementService.calculateYearlySettlement(dto);
+        return ResponseEntity.ok("연별 정산 완료");
+    }
+
+    // 영수증
+    @GetMapping("/receipt/{transactionId}")
+    public ResponseEntity<SalesHistoryDTO> getReceipt(@PathVariable Integer transactionId) {
+        return ResponseEntity.ok(posService.getReceiptByTransactionId(transactionId));
+    }
+
+
 }

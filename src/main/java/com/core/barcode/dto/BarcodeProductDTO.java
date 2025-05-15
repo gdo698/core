@@ -27,4 +27,6 @@ public class BarcodeProductDTO {
 
     private Integer productId;
 
+    private Integer isPromo;
+
 }

@@ -229,4 +229,19 @@ public class PosService {
                 dto.getDisposalReason()
         );
     }
+
+    // 영수증
+    public SalesHistoryDTO getReceiptByTransactionId(Integer txId) {
+        SalesTransactionEntity tx = salesTransactionRepository.findById(txId)
+                .orElseThrow(() -> new RuntimeException("거래를 찾을 수 없습니다."));
+
+        List<SalesDetailEntity> details = salesDetailRepository.findByTransaction_TransactionId(txId);
+
+        List<SalesDetailDTO> items = details.stream()
+                .map(SalesDetailDTO::new)
+                .collect(Collectors.toList());
+
+        return new SalesHistoryDTO(tx, items);
+    }
+
 }
