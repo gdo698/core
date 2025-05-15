@@ -197,8 +197,11 @@ public class ChatService {
         ChatMessageEntity savedMessage = chatMessageRepository.save(messageEntity);
         ChatMessageDTO savedMessageDTO = ChatMessageDTO.fromEntity(savedMessage);
         
-        // 웹소켓으로 메시지 전송
+        // 웹소켓으로 메시지 전송 (채팅방)
         messagingTemplate.convertAndSend("/topic/chat/room/" + roomId, savedMessageDTO);
+        
+        // 글로벌 채널로도 메시지 전송 (모든 사용자에게 알림 제공)
+        messagingTemplate.convertAndSend("/topic/chat/messages", savedMessageDTO);
         
         return savedMessageDTO;
     }
