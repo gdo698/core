@@ -187,12 +187,25 @@ public class ChatService {
         }
         
         // 메시지 저장
+        ChatMessageEntity.MessageType messageType;
+        try {
+            messageType = ChatMessageEntity.MessageType.valueOf(messageDTO.getMessageType());
+        } catch (IllegalArgumentException e) {
+            messageType = ChatMessageEntity.MessageType.CHAT;
+        }
+        
         ChatMessageEntity messageEntity = ChatMessageEntity.builder()
                 .chatRoom(chatRoom)
                 .sender(sender)
                 .content(messageDTO.getContent())
-                .messageType(ChatMessageEntity.MessageType.CHAT)
+                .messageType(messageType)
                 .build();
+        
+        // LEAVE 메시지인 경우 채팅방에서 해당 사용자 제거
+        if (messageType == ChatMessageEntity.MessageType.LEAVE) {
+            chatRoom.getMembers().remove(sender);
+            chatRoomRepository.save(chatRoom);
+        }
         
         ChatMessageEntity savedMessage = chatMessageRepository.save(messageEntity);
         ChatMessageDTO savedMessageDTO = ChatMessageDTO.fromEntity(savedMessage);
