@@ -19,13 +19,21 @@ public class ChatMemberDTO {
     private String deptName;
 
     public static ChatMemberDTO fromEntity(EmployeeEntity entity) {
-        return ChatMemberDTO.builder()
+        ChatMemberDTO dto = ChatMemberDTO.builder()
                 .empId(entity.getEmpId())
                 .empName(entity.getEmpName())
                 .empRole(entity.getEmpRole())
                 .empImg(entity.getEmpImg())
-                .deptId(entity.getDepartment().getDeptId())
-                .deptName(entity.getDepartment().getDeptName())
                 .build();
+                
+        if (entity.getDepartment() != null) {
+            dto.setDeptId(entity.getDepartment().getDeptId());
+            dto.setDeptName(entity.getDepartment().getDeptName());
+        } else {
+            dto.setDeptId(null);
+            dto.setDeptName("미지정");
+        }
+        
+        return dto;
     }
 } 

@@ -186,26 +186,23 @@ public class ChatService {
             throw new AccessDeniedException("메시지를 보낼 권한이 없습니다.");
         }
         
-        // 메시지 저장
-        ChatMessageEntity.MessageType messageType;
-        try {
-            messageType = ChatMessageEntity.MessageType.valueOf(messageDTO.getMessageType());
-        } catch (IllegalArgumentException e) {
-            messageType = ChatMessageEntity.MessageType.CHAT;
+        // 메시지 타입 설정 (기본은 CHAT, 요청에 메시지 타입이 있는 경우 해당 값 사용)
+        ChatMessageEntity.MessageType messageType = ChatMessageEntity.MessageType.CHAT;
+        if (messageDTO.getMessageType() != null) {
+            try {
+                messageType = ChatMessageEntity.MessageType.valueOf(messageDTO.getMessageType());
+            } catch (IllegalArgumentException e) {
+                // 잘못된 메시지 타입은 기본 타입(CHAT)으로 설정
+            }
         }
         
+        // 메시지 저장
         ChatMessageEntity messageEntity = ChatMessageEntity.builder()
                 .chatRoom(chatRoom)
                 .sender(sender)
                 .content(messageDTO.getContent())
                 .messageType(messageType)
                 .build();
-        
-        // LEAVE 메시지인 경우 채팅방에서 해당 사용자 제거
-        if (messageType == ChatMessageEntity.MessageType.LEAVE) {
-            chatRoom.getMembers().remove(sender);
-            chatRoomRepository.save(chatRoom);
-        }
         
         ChatMessageEntity savedMessage = chatMessageRepository.save(messageEntity);
         ChatMessageDTO savedMessageDTO = ChatMessageDTO.fromEntity(savedMessage);
@@ -220,12 +217,142 @@ public class ChatService {
     }
     
     /**
+     * 채팅방 나가기
+     */
+    @Transactional
+    public void leaveRoom(Long roomId, Integer empId) {
+        ChatRoomEntity chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("채팅방을 찾을 수 없습니다."));
+        
+        EmployeeEntity employee = employeeRepository.findById(empId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        
+        // 본사 직원이며 채팅방 멤버인지 확인
+        Integer deptId = employee.getDepartment().getDeptId();
+        if (deptId < 4 || deptId > 10) {
+            throw new AccessDeniedException("본사 직원만 채팅 기능을 사용할 수 있습니다.");
+        }
+        
+        if (!chatRoom.getMembers().contains(employee)) {
+            throw new AccessDeniedException("채팅방의 멤버가 아닙니다.");
+        }
+        
+        // 멤버에서 제거
+        chatRoom.getMembers().remove(employee);
+        chatRoomRepository.save(chatRoom);
+        
+        // 나가기 메시지 저장
+        ChatMessageEntity leaveMessage = ChatMessageEntity.builder()
+                .chatRoom(chatRoom)
+                .sender(employee)
+                .content(employee.getEmpName() + "님이 퇴장하였습니다.")
+                .messageType(ChatMessageEntity.MessageType.LEAVE)
+                .build();
+        
+        chatMessageRepository.save(leaveMessage);
+        
+        // 웹소켓으로 나가기 메시지 전송
+        ChatMessageDTO leaveMessageDTO = ChatMessageDTO.fromEntity(leaveMessage);
+        messagingTemplate.convertAndSend("/topic/chat/room/" + roomId, leaveMessageDTO);
+        
+        // 채팅방 업데이트 알림
+        ChatRoomDTO updatedRoom = ChatRoomDTO.fromEntity(chatRoom);
+        messagingTemplate.convertAndSend("/topic/chat/rooms/update", updatedRoom);
+    }
+    
+    /**
+     * 채팅방에 사용자 초대
+     */
+    @Transactional
+    public void inviteToRoom(Long roomId, Integer inviterId, List<Integer> memberIds) {
+        ChatRoomEntity chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("채팅방을 찾을 수 없습니다."));
+        
+        EmployeeEntity inviter = employeeRepository.findById(inviterId)
+                .orElseThrow(() -> new RuntimeException("초대자를 찾을 수 없습니다."));
+        
+        // 본사 직원이며 채팅방 멤버인지 확인
+        Integer deptId = inviter.getDepartment().getDeptId();
+        if (deptId < 4 || deptId > 10 || !chatRoom.getMembers().contains(inviter)) {
+            throw new AccessDeniedException("초대 권한이 없습니다.");
+        }
+        
+        List<EmployeeEntity> newMembers = new ArrayList<>();
+        
+        for (Integer memberId : memberIds) {
+            EmployeeEntity member = employeeRepository.findById(memberId)
+                    .orElseThrow(() -> new RuntimeException("초대할 멤버를 찾을 수 없습니다."));
+            
+            // 본사 직원인지 확인
+            Integer memberDeptId = member.getDepartment().getDeptId();
+            if (memberDeptId < 4 || memberDeptId > 10) {
+                throw new AccessDeniedException("본사 직원만 채팅방에 초대할 수 있습니다.");
+            }
+            
+            // 이미 채팅방 멤버인 경우 건너뜀
+            if (chatRoom.getMembers().contains(member)) {
+                continue;
+            }
+            
+            chatRoom.getMembers().add(member);
+            newMembers.add(member);
+        }
+        
+        // 추가된 멤버가 없으면 처리 종료
+        if (newMembers.isEmpty()) {
+            return;
+        }
+        
+        // 채팅방 저장
+        chatRoomRepository.save(chatRoom);
+        
+        // 초대 메시지 생성
+        StringBuilder inviteMessage = new StringBuilder();
+        inviteMessage.append(inviter.getEmpName()).append("님이 ");
+        
+        if (newMembers.size() == 1) {
+            inviteMessage.append(newMembers.get(0).getEmpName());
+        } else {
+            for (int i = 0; i < newMembers.size(); i++) {
+                if (i > 0) {
+                    inviteMessage.append(", ");
+                }
+                inviteMessage.append(newMembers.get(i).getEmpName());
+            }
+        }
+        
+        inviteMessage.append("님을 초대했습니다.");
+        
+        // 초대 메시지 저장
+        ChatMessageEntity joinMessage = ChatMessageEntity.builder()
+                .chatRoom(chatRoom)
+                .sender(inviter)
+                .content(inviteMessage.toString())
+                .messageType(ChatMessageEntity.MessageType.JOIN)
+                .build();
+        
+        chatMessageRepository.save(joinMessage);
+        
+        // 웹소켓으로 초대 메시지 전송
+        ChatMessageDTO joinMessageDTO = ChatMessageDTO.fromEntity(joinMessage);
+        messagingTemplate.convertAndSend("/topic/chat/room/" + roomId, joinMessageDTO);
+        
+        // 채팅방 업데이트 알림
+        ChatRoomDTO updatedRoom = ChatRoomDTO.fromEntity(chatRoom);
+        messagingTemplate.convertAndSend("/topic/chat/rooms/update", updatedRoom);
+    }
+
+    /**
      * 사용자 목록 조회 (본사 직원만)
      */
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getHeadquartersEmployees() {
         return employeeRepository.findAll().stream()
                 .filter(employee -> {
+                    // department가 null인 경우 제외
+                    if (employee.getDepartment() == null) {
+                        return false;
+                    }
                     Integer deptId = employee.getDepartment().getDeptId();
                     return deptId >= 4 && deptId <= 10; // 본사 직원만 필터링
                 })

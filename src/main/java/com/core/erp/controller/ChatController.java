@@ -82,6 +82,37 @@ public class ChatController {
     }
 
     /**
+     * 채팅방 나가기
+     */
+    @PostMapping("/rooms/{roomId}/leave")
+    public ResponseEntity<Void> leaveRoom(
+            @PathVariable Long roomId,
+            Authentication authentication) {
+        
+        CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
+        chatService.leaveRoom(roomId, principal.getEmpId());
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 채팅방에 사용자 초대
+     */
+    @PostMapping("/rooms/{roomId}/invite")
+    public ResponseEntity<Void> inviteToRoom(
+            @PathVariable Long roomId,
+            @RequestBody Map<String, Object> request,
+            Authentication authentication) {
+        
+        CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
+        
+        @SuppressWarnings("unchecked")
+        List<Integer> memberIds = (List<Integer>) request.get("memberIds");
+        
+        chatService.inviteToRoom(roomId, principal.getEmpId(), memberIds);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
      * 웹소켓을 통한 메시지 전송
      */
     @MessageMapping("/chat.sendMessage")
