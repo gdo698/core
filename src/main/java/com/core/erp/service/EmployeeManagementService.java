@@ -9,6 +9,7 @@ import com.core.erp.repository.DepartmentRepository;
 import com.core.erp.repository.EmployeeRepository;
 import com.core.erp.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,8 @@ public class EmployeeManagementService {
     private final DepartmentRepository departmentRepository;
     private final StoreRepository storeRepository;
     private final EmployeeListService employeeListService;
+    @Autowired
+    private NotificationService notificationService;
 
     public EmployeeManagementDTO getEmployeeById(Integer empId) {
         // 1. 디버깅 로그 추가
@@ -75,6 +78,16 @@ public class EmployeeManagementService {
         }
         
         EmployeeEntity savedEmployee = employeeRepository.save(entity);
+        // 알림 생성 (신규 등록 시)
+        try {
+            notificationService.createJoinNotification(
+                savedEmployee.getEmpId(),
+                savedEmployee.getEmpName() + "님이 신규 등록되었습니다.",
+                "/headquarters/hr/employees"
+            );
+        } catch (Exception e) {
+            System.err.println("사원 등록 알림 생성 실패: " + e.getMessage());
+        }
         return convertToDTO(savedEmployee);
     }
 
@@ -92,6 +105,16 @@ public class EmployeeManagementService {
         }
         
         EmployeeEntity updatedEmployee = employeeRepository.save(existingEmployee);
+        // 알림 생성 (수정 시)
+        try {
+            notificationService.createJoinNotification(
+                updatedEmployee.getEmpId(),
+                updatedEmployee.getEmpName() + "님의 정보가 수정되었습니다.",
+                "/headquarters/hr/employees"
+            );
+        } catch (Exception e) {
+            System.err.println("사원 수정 알림 생성 실패: " + e.getMessage());
+        }
         return convertToDTO(updatedEmployee);
     }
 

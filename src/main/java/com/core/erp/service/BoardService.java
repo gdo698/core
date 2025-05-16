@@ -13,12 +13,14 @@ import com.core.erp.repository.TblBoardCommentsRepository;
 import com.core.erp.repository.TblBoardPostsRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +29,9 @@ public class BoardService {
     private final TblBoardPostsRepository boardPostsRepository;
     private final TblBoardCommentsRepository boardCommentsRepository;
     private final EmployeeRepository employeeRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     // 게시판 타입별 게시글 목록 조회
     public List<BoardPostResponseDTO> getBoardPostsByType(int boardType) {
@@ -117,12 +122,49 @@ public class BoardService {
     public BoardPostResponseDTO createBoardPost(TblBoardPostsDTO dto, String loginId) {
         EmployeeEntity employee = employeeRepository.findByLoginId(loginId)
             .orElseThrow(() -> new RuntimeException("사원 정보를 찾을 수 없습니다."));
-        
         TblBoardPostsEntity entity = new TblBoardPostsEntity(dto);
         entity.setEmployee(employee);
         entity.setBoardCreatedAt(LocalDateTime.now());
-        
         TblBoardPostsEntity savedEntity = boardPostsRepository.save(entity);
+        // 알림 생성 코드 추가
+        System.out.println("[알림] 게시글 등록 알림 코드 진입");
+        try {
+            String link = "/headquarters/branches/inquiry"; // 기본값
+            if (Objects.equals(dto.getBoardType(), 1)) { // 건의사항(공지)
+                link = "/headquarters/board/suggestions";
+            } else if (Objects.equals(dto.getBoardType(), 2)) { // 점포 문의사항
+                link = "/headquarters/board/store-inquiries";
+            }
+            List<EmployeeEntity> targets = new ArrayList<>();
+            if (Objects.equals(dto.getBoardType(), 1)) {
+                // 공지사항: 본사 직원 전체(부서ID 4~10)
+                for (int deptId = 4; deptId <= 10; deptId++) {
+                    targets.addAll(employeeRepository.findByDepartment_DeptId(deptId));
+                }
+            } else {
+                // 2,3: 지점관리+MASTER
+                targets.addAll(employeeRepository.findByDepartment_DeptId(8));
+                List<EmployeeEntity> masters = employeeRepository.findByDepartment_DeptId(10);
+                for (EmployeeEntity master : masters) {
+                    if (targets.stream().noneMatch(e -> e.getEmpId() == master.getEmpId())) {
+                        targets.add(master);
+                    }
+                }
+            }
+            for (EmployeeEntity target : targets) {
+                notificationService.createNotification(
+                    target.getEmpId(),
+                    Objects.equals(dto.getBoardType(), 1) ? null : 8,
+                    "BOARD_POST",
+                    "INFO",
+                    "[게시판] 새 글이 등록되었습니다.",
+                    link
+                );
+            }
+        } catch (Exception e) {
+            System.out.println("[알림] 게시글 등록 알림 예외: " + e.getMessage());
+            e.printStackTrace();
+        }
         return new BoardPostResponseDTO(savedEntity);
     }
     

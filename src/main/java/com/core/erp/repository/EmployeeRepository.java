@@ -16,4 +16,7 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Intege
     
     @Query("SELECT e FROM EmployeeEntity e WHERE e.store = :store AND e.empRole = :role")
     List<EmployeeEntity> findByStoreAndEmpRole(@Param("store") StoreEntity store, @Param("role") String role);
+
+    @Query("SELECT e FROM EmployeeEntity e WHERE e.department.deptId = :deptId")
+    List<EmployeeEntity> findByDepartment_DeptId(@Param("deptId") int deptId);
 }

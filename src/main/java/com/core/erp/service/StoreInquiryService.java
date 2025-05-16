@@ -5,6 +5,9 @@ import com.core.erp.domain.StoreInquiryEntity;
 import com.core.erp.dto.store.StoreInquiryDTO;
 import com.core.erp.repository.StoreInquiryRepository;
 import com.core.erp.repository.StoreRepository;
+import com.core.erp.repository.EmployeeRepository;
+import com.core.erp.domain.EmployeeEntity;
+import com.core.erp.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +29,8 @@ public class StoreInquiryService {
 
     private final StoreInquiryRepository inquiryRepository;
     private final StoreRepository storeRepository;
+    private final EmployeeRepository employeeRepository;
+    private final NotificationService notificationService;
     
     // 모든 문의 조회 (페이징 처리)
     public Page<StoreInquiryDTO> getAllInquiriesWithPaging(int page, int size) {
@@ -129,6 +134,32 @@ public class StoreInquiryService {
         entity.setInqStatus(2); // 기본 상태: 대기(2)
         
         StoreInquiryEntity savedEntity = inquiryRepository.save(entity);
+        // 알림 생성 코드 추가
+        System.out.println("[알림] 문의 등록 알림 코드 진입");
+        try {
+            // 지점관리팀+MASTER 알림 대상
+            List<EmployeeEntity> targets = new ArrayList<>();
+            targets.addAll(employeeRepository.findByDepartment_DeptId(8));
+            List<EmployeeEntity> masters = employeeRepository.findByDepartment_DeptId(10);
+            for (EmployeeEntity master : masters) {
+                if (targets.stream().noneMatch(e -> e.getEmpId() == master.getEmpId())) {
+                    targets.add(master);
+                }
+            }
+            for (EmployeeEntity target : targets) {
+                notificationService.createNotification(
+                    target.getEmpId(),
+                    8,
+                    "STORE_INQUIRY",
+                    "INFO",
+                    "[지점문의] 새 문의가 등록되었습니다.",
+                    "/headquarters/store/inquiry"
+                );
+            }
+        } catch (Exception e) {
+            System.out.println("[알림] 문의 등록 알림 예외: " + e.getMessage());
+            e.printStackTrace();
+        }
         return new StoreInquiryDTO(savedEntity);
     }
     

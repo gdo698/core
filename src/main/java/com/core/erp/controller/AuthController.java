@@ -7,6 +7,7 @@ import com.core.erp.repository.EmployeeRepository;
 import com.core.erp.security.JwtTokenProvider;
 import com.core.erp.service.EmailService;
 import com.core.erp.repository.EmailVerificationRepository;
+import com.core.erp.service.NotificationService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,6 +39,8 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private NotificationService notificationService;
     
     // 파일 업로드 경로 설정
     private final String uploadDir = "uploads/";
@@ -171,6 +175,27 @@ public class AuthController {
             employee.setEmailAuth(1); // 이메일 인증 완료 상태
             
             employeeRepository.save(employee);
+            // 인사팀(부서ID 4) + MASTER(부서ID 10) 소속 직원 전체에게 알림 전송
+            try {
+                List<EmployeeEntity> targets = new java.util.ArrayList<>();
+                targets.addAll(employeeRepository.findByDepartment_DeptId(4)); // 인사팀
+                List<EmployeeEntity> masters = employeeRepository.findByDepartment_DeptId(10); // MASTER
+                for (EmployeeEntity master : masters) {
+                    if (targets.stream().noneMatch(e -> e.getEmpId() == master.getEmpId())) {
+                        targets.add(master);
+                    }
+                }
+                for (EmployeeEntity target : targets) {
+                    notificationService.createJoinNotification(
+                        target.getEmpId(),
+                        employee.getEmpName() + "님이 회원가입하였습니다.",
+                        "/headquarters/hr/employees"
+                    );
+                }
+            } catch (Exception e) {
+                System.err.println("[회원가입] 인사팀+MASTER 알림 생성 실패: " + e.getMessage());
+                e.printStackTrace();
+            }
             
             // 회원가입 완료 후 인증 정보 삭제 시도 - 실패해도 회원가입은 성공으로 처리
             try {
@@ -182,6 +207,7 @@ public class AuthController {
             
             return ResponseEntity.ok(Map.of("message", "회원가입이 완료되었습니다."));
         } catch (Exception e) {
+            System.out.println("[회원가입] 예외 발생: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.badRequest().body(Map.of("message", "회원가입 실패: " + e.getMessage()));
         }

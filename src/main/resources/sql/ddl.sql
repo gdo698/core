@@ -498,21 +498,18 @@ CREATE TABLE `product_details` (
                                    FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`)
 );
 
-CREATE TABLE `stock_in_history` (
-                                    `history_id` INT NOT NULL COMMENT '입고고유번호',
-                                    `store_id` int NOT NULL COMMENT '매장고유번호',
-                                    `part_timer_id`	int	NOT NULL	COMMENT '아르바이트 고유 ID',
-                                    `product_id` int NOT NULL COMMENT '상품고유번호',
-                                    `order_id` int NOT NULL COMMENT '발주 고유 번호',
-                                    `in_quantity` INT NOT NULL COMMENT '입고수량',
-                                    `in_date` DATETIME NOT NULL COMMENT '입고날짜',
-                                    `expire_date` DATETIME NULL COMMENT '유통기한',
-                                    `history_status` TINYINT NOT NULL DEFAULT 1 COMMENT '1. 입고대기 2. 입고완료 3. 부분입고 4. 오입고 5. 폐기 6. 반품',
-                                    PRIMARY KEY (`history_id`),
-                                    FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`),
-                                    FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`),
-                                    FOREIGN KEY (`order_id`) REFERENCES `purchase_order` (`order_id`),
-                                    FOREIGN KEY (`part_timer_id`) REFERENCES `part_timer` (`part_timer_id`)
-);
-
+-- 알림 테이블 생성
+CREATE TABLE IF NOT EXISTS `notifications` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '알림 ID',
+    `user_id` INT NOT NULL COMMENT '사용자 ID',
+    `target_dept_id` INT NULL COMMENT '대상 부서 ID',
+    `event_type` VARCHAR(50) NULL COMMENT '알림 이벤트 타입',
+    `type` VARCHAR(20) NOT NULL COMMENT '알림 타입',
+    `content` VARCHAR(255) NOT NULL COMMENT '알림 내용',
+    `link` VARCHAR(255) NULL COMMENT '이동할 링크',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성 시간',
+    `is_read` BOOLEAN NOT NULL DEFAULT FALSE COMMENT '읽음 여부',
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`user_id`) REFERENCES `employee` (`emp_id`)
+) COMMENT='사용자 알림'; 
 
