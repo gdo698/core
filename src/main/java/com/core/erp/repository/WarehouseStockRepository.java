@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -28,6 +29,7 @@ public interface WarehouseStockRepository extends JpaRepository<WarehouseStockEn
             int productId
     );
 
+    @Transactional
     @Modifying
     @Query("""
     UPDATE WarehouseStockEntity w 
@@ -40,13 +42,14 @@ public interface WarehouseStockRepository extends JpaRepository<WarehouseStockEn
             @Param("storeId") Integer storeId,
             @Param("qty") int quantity);
 
+    @Transactional
     @Modifying
     @Query("""
-UPDATE StoreStockEntity s
-SET s.quantity = s.quantity + :qty,
-    s.lastInDate = CURRENT_TIMESTAMP
-WHERE s.product.productId = :productId
-  AND s.store.storeId = :storeId
+UPDATE WarehouseStockEntity w
+SET w.quantity = w.quantity + :qty,
+    w.lastInDate = CURRENT_TIMESTAMP
+WHERE w.product.productId = :productId
+  AND w.store.storeId = :storeId
 """)
     int increaseQuantityAndUpdateDate(@Param("productId") Long productId,
                                       @Param("storeId") Integer storeId,

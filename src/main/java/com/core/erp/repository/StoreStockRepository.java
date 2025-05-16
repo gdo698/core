@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,6 +62,7 @@ AND (:storeId IS NULL OR s.store.storeId = :storeId)
 
     Optional<Object> findTopByProduct_ProductIdOrderByLastInDateDesc(int productId);
 
+    @Transactional
     @Modifying
     @Query("""
 UPDATE StoreStockEntity s
@@ -71,6 +73,7 @@ WHERE s.product.productId = :productId AND s.store.storeId = :storeId
                                       @Param("storeId") Integer storeId,
                                       @Param("qty") int qty);
 
+    @Transactional
     @Modifying
     @Query("""
 UPDATE StoreStockEntity s
