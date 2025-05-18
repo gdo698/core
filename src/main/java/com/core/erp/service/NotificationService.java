@@ -70,13 +70,17 @@ public class NotificationService {
             NotificationDTO notificationDTO = NotificationDTO.fromEntity(savedNotification);
             // 웹소켓 전송 로그
             log.info("[알림 생성] 웹소켓 전송 시작: 개인={}, 부서={}, 이벤트={}, 관리자", userId, targetDeptId, eventType);
+            log.info("[알림 생성] [개인] /user/{}/topic/notifications 데이터: {}", userId, notificationDTO);
             messagingTemplate.convertAndSendToUser(userId.toString(), "/topic/notifications", notificationDTO);
             if (targetDeptId != null) {
+                log.info("[알림 생성] [부서] /topic/notifications/dept/{} 데이터: {}", targetDeptId, notificationDTO);
                 messagingTemplate.convertAndSend("/topic/notifications/dept/" + targetDeptId, notificationDTO);
             }
             if (eventType != null) {
+                log.info("[알림 생성] [이벤트] /topic/notifications/event/{} 데이터: {}", eventType, notificationDTO);
                 messagingTemplate.convertAndSend("/topic/notifications/event/" + eventType, notificationDTO);
             }
+            log.info("[알림 생성] [관리자] /topic/notifications/admin 데이터: {}", notificationDTO);
             messagingTemplate.convertAndSend("/topic/notifications/admin", notificationDTO);
             log.info("[알림 생성] 웹소켓 전송 완료");
             return notificationDTO;

@@ -4,6 +4,9 @@ import com.core.erp.domain.StoreEntity;
 import com.core.erp.domain.StoreInquiryEntity;
 import com.core.erp.dto.store.StoreInquiryRequestDTO;
 import com.core.erp.repository.StoreInquiryRepository;
+import com.core.erp.domain.EmployeeEntity;
+import com.core.erp.repository.EmployeeRepository;
+import com.core.erp.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +20,8 @@ public class CustomerInquiryService {
     private final StoreInquiryRepository storeInquiryRepository;
     private final CustomerStoreService customerStoreService;
     private final ProfanityFilterService profanityFilterService;
+    private final EmployeeRepository employeeRepository;
+    private final NotificationService notificationService;
 
     /**
      * 고객 문의 등록
@@ -46,6 +51,30 @@ public class CustomerInquiryService {
         
         // 저장
         StoreInquiryEntity savedInquiry = storeInquiryRepository.save(inquiry);
+        
+        // ===== 알림 생성 추가 =====
+        String typeLabel = switch (requestDTO.getInqType()) {
+            case 1 -> "컴플레인";
+            case 2 -> "칭찬글";
+            case 3 -> "문의글";
+            default -> "문의글";
+        };
+        String contentMsg = String.format("[지점 문의 관리] %s이 등록되었습니다.", typeLabel);
+        String link = "/headquarters/branches/inquiry";
+        for (int deptId : java.util.List.of(8, 10)) {
+            java.util.List<EmployeeEntity> targets = employeeRepository.findByDepartment_DeptId(deptId);
+            for (EmployeeEntity target : targets) {
+                notificationService.createNotification(
+                    target.getEmpId(),
+                    deptId,
+                    "STORE_INQUIRY",
+                    "INFO",
+                    contentMsg,
+                    link
+                );
+            }
+        }
+        // =========================
         return savedInquiry.getInquiryId();
     }
 }

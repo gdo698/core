@@ -79,23 +79,61 @@ public class HQStockService {
         
         if (product.isPresent()) {
             Optional<HQStockEntity> existingStock = hqStockRepository.findByProductProductId(productId);
-            
+            HQStockEntity stock = null;
             if (existingStock.isPresent()) {
-                HQStockEntity stock = existingStock.get();
-                // 기존 본사 재고와 새 재고의 차이를 계산
+                stock = existingStock.get();
                 int diff = quantity - stock.getQuantity();
-                // 총재고도 같은 양만큼 변경
                 stock.setQuantity(quantity);
                 stock.setTotalQuantity(stock.getTotalQuantity() + diff);
                 stock.setUpdatedBy(updatedBy);
                 hqStockRepository.save(stock);
             } else {
-                HQStockEntity newStock = new HQStockEntity();
-                newStock.setProduct(product.get());
-                newStock.setQuantity(quantity);
-                newStock.setTotalQuantity(quantity); // 총재고 = 본사재고 (매장재고 없음)
-                newStock.setUpdatedBy(updatedBy);
-                hqStockRepository.save(newStock);
+                stock = new HQStockEntity();
+                stock.setProduct(product.get());
+                stock.setQuantity(quantity);
+                stock.setTotalQuantity(quantity); // 총재고 = 본사재고 (매장재고 없음)
+                stock.setUpdatedBy(updatedBy);
+                hqStockRepository.save(stock);
+            }
+
+            // 재고 변경 후 즉시 알림 로직 추가
+            // 상품팀(5), MASTER(10) 부서 대상
+            if (stock != null) {
+                int qty = stock.getQuantity();
+                String proName = stock.getProduct().getProName();
+                List<EmployeeEntity> targets = new ArrayList<>();
+                targets.addAll(employeeRepository.findByDepartment_DeptId(5));
+                List<EmployeeEntity> masters = employeeRepository.findByDepartment_DeptId(10);
+                for (EmployeeEntity master : masters) {
+                    if (targets.stream().noneMatch(e -> e.getEmpId() == master.getEmpId())) {
+                        targets.add(master);
+                    }
+                }
+                if (qty < 100) {
+                    String message = "[위험] 상품 재고가 100개 미만입니다: " + proName;
+                    for (EmployeeEntity target : targets) {
+                        notificationService.createNotification(
+                            target.getEmpId(),
+                            5, // 상품팀
+                            "PRODUCT_STOCK_DANGER",
+                            "DANGER",
+                            message,
+                            "/headquarters/product/stock"
+                        );
+                    }
+                } else if (qty < 300) {
+                    String message = "[경고] 상품 재고가 300개 미만입니다: " + proName;
+                    for (EmployeeEntity target : targets) {
+                        notificationService.createNotification(
+                            target.getEmpId(),
+                            5, // 상품팀
+                            "PRODUCT_STOCK_LOW",
+                            "WARNING",
+                            message,
+                            "/headquarters/product/stock"
+                        );
+                    }
+                }
             }
         }
     }

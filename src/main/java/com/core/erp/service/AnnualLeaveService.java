@@ -153,8 +153,14 @@ public class AnnualLeaveService {
                             "/headquarters/hr/annual-leave"
                         );
                     }
+                    // 신청자(사원)에게도 알림 전송
+                    notificationService.createLeaveNotification(
+                        leaveReq.getEmployee().getEmpId(),
+                        "신청하신 연차가 승인되었습니다.",
+                        "/headquarters/hr/annual-leave"
+                    );
                 } catch (Exception e) {
-                    System.err.println("[연차승인] 인사팀+MASTER 알림 생성 실패: " + e.getMessage());
+                    System.err.println("[연차승인] 인사팀+MASTER+신청자 알림 생성 실패: " + e.getMessage());
                 }
             } else if (approveStatus == 2) { // 2: 반려
                 result.put("message", "연차가 반려되었습니다.");
@@ -175,8 +181,14 @@ public class AnnualLeaveService {
                             "/headquarters/hr/annual-leave"
                         );
                     }
+                    // 신청자(사원)에게도 알림 전송
+                    notificationService.createLeaveNotification(
+                        leaveReq.getEmployee().getEmpId(),
+                        "신청하신 연차가 반려되었습니다.",
+                        "/headquarters/hr/annual-leave"
+                    );
                 } catch (Exception e) {
-                    System.err.println("[연차반려] 인사팀+MASTER 알림 생성 실패: " + e.getMessage());
+                    System.err.println("[연차반려] 인사팀+MASTER+신청자 알림 생성 실패: " + e.getMessage());
                 }
             } else if (approveStatus == 0) { // 0: 대기 상태로 변경
                 result.put("message", "연차가 대기 상태로 변경되었습니다.");
@@ -451,8 +463,14 @@ public class AnnualLeaveService {
                                 "/headquarters/hr/annual-leave"
                             );
                         }
+                        // 신청자(사원)에게도 알림 전송
+                        notificationService.createLeaveNotification(
+                            leaveReq.getEmployee().getEmpId(),
+                            "신청하신 연차가 승인되었습니다.",
+                            "/headquarters/hr/annual-leave"
+                        );
                     } catch (Exception e) {
-                        System.err.println("[연차승인] 인사팀+MASTER 알림 생성 실패: " + e.getMessage());
+                        System.err.println("[연차승인] 인사팀+MASTER+신청자 알림 생성 실패: " + e.getMessage());
                     }
                 } else if (newStatus == 2 && previousStatus != 2) { // 2: 반려로 변경된 경우
                     result.put("message", "연차가 반려되었습니다.");
@@ -473,8 +491,14 @@ public class AnnualLeaveService {
                                 "/headquarters/hr/annual-leave"
                             );
                         }
+                        // 신청자(사원)에게도 알림 전송
+                        notificationService.createLeaveNotification(
+                            leaveReq.getEmployee().getEmpId(),
+                            "신청하신 연차가 반려되었습니다.",
+                            "/headquarters/hr/annual-leave"
+                        );
                     } catch (Exception e) {
-                        System.err.println("[연차반려] 인사팀+MASTER 알림 생성 실패: " + e.getMessage());
+                        System.err.println("[연차반려] 인사팀+MASTER+신청자 알림 생성 실패: " + e.getMessage());
                     }
                 } else if (newStatus == 0 && previousStatus != 0) { // 0: 대기 상태로 변경된 경우
                     result.put("message", "연차가 대기 상태로 변경되었습니다.");

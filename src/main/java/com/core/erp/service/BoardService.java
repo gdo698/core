@@ -129,12 +129,19 @@ public class BoardService {
         // 알림 생성 코드 추가
         System.out.println("[알림] 게시글 등록 알림 코드 진입");
         try {
-            String link = "/headquarters/branches/inquiry"; // 기본값
-            if (Objects.equals(dto.getBoardType(), 1)) { // 건의사항(공지)
+            String link = "/headquarters/board/notice"; // 기본값: 공지사항
+            String postTypeLabel = "게시글";
+            if (Objects.equals(dto.getBoardType(), 1)) { // 공지사항
+                link = "/headquarters/board/notice";
+                postTypeLabel = "공지사항";
+            } else if (Objects.equals(dto.getBoardType(), 2)) { // 건의사항
                 link = "/headquarters/board/suggestions";
-            } else if (Objects.equals(dto.getBoardType(), 2)) { // 점포 문의사항
+                postTypeLabel = "건의사항";
+            } else if (Objects.equals(dto.getBoardType(), 3)) { // 점포 문의 사항
                 link = "/headquarters/board/store-inquiries";
+                postTypeLabel = "점포 문의 사항";
             }
+            String contentMsg = String.format("[게시판] %s 글이 등록되었습니다.", postTypeLabel);
             List<EmployeeEntity> targets = new ArrayList<>();
             if (Objects.equals(dto.getBoardType(), 1)) {
                 // 공지사항: 본사 직원 전체(부서ID 4~10)
@@ -157,7 +164,7 @@ public class BoardService {
                     Objects.equals(dto.getBoardType(), 1) ? null : 8,
                     "BOARD_POST",
                     "INFO",
-                    "[게시판] 새 글이 등록되었습니다.",
+                    contentMsg,
                     link
                 );
             }
