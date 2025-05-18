@@ -13,5 +13,7 @@ public class SaleRequestDTO {
 
     private String paymentMethod;
     private List<SaleItemDTO> itemList;
+    private Integer partTimerId;
+
 }
 

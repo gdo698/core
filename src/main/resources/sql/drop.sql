@@ -34,6 +34,7 @@ DROP TABLE IF EXISTS `stock_inventory_check`;
 DROP TABLE IF EXISTS `hq_stock`;
 DROP TABLE IF EXISTS `stock_flow`;
 DROP TABLE IF EXISTS `stock_transfer`;
+DROP TABLE IF EXISTS `product_location_mapping`;
 DROP TABLE IF EXISTS `product`;
 DROP TABLE IF EXISTS `weather_data`;
 DROP TABLE IF EXISTS `ai_model`;

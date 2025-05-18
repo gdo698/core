@@ -14,7 +14,7 @@ public class BarcodeProductDTO {
     @JsonProperty("BSSH_NM")
     private String manufacturer;
 
-    @JsonProperty("BAR_CD")
+    @JsonProperty("BRCD_NO")
     private String barcode;
 
     @JsonProperty("PRDLST_DCNM")

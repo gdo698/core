@@ -43,6 +43,11 @@ public class PosService {
         tx.setEmployee(employee);
         tx.setStore(store);
 
+        // 아르바이트 ID 주입 (교대 정산용)
+        if (dto.getPartTimerId() != null) {
+            tx.setPartTimer(new PartTimerEntity(dto.getPartTimerId()));
+        }
+
         // null-safe 합계 계산
         tx.setTotalPrice(dto.getItemList().stream()
                 .mapToInt(item -> Optional.ofNullable(item.getUnitPrice()).orElse(0))

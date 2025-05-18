@@ -112,4 +112,9 @@ public class PartTimerEntity {
         return new PartTimerDTO(this);
     }
 
+    // ID만 받는 생성자 (정산용)
+    public PartTimerEntity(Integer partTimerId) {
+        this.partTimerId = partTimerId;
+    }
+
 }

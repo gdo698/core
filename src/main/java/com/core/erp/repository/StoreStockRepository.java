@@ -60,7 +60,7 @@ AND (:storeId IS NULL OR s.store.storeId = :storeId)
 """, nativeQuery = true)
     List<DisposalTargetProjection> findExpiredDisposals();
 
-    Optional<Object> findTopByProduct_ProductIdOrderByLastInDateDesc(int productId);
+    Optional<StoreStockEntity> findTopByProduct_ProductIdOrderByLastInDateDesc(Long productId);
 
     @Transactional
     @Modifying

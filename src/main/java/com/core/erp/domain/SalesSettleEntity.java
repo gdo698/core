@@ -64,7 +64,8 @@ public class SalesSettleEntity {
     private LocalDateTime updatedAt;
 
     public enum SettlementType {
-        daily, monthly, yearly
+        DAILY, MONTHLY, YEARLY, SHIFT;
+
     }
 
     public enum HqStatus {
