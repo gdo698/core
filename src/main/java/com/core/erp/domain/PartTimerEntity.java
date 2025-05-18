@@ -6,6 +6,8 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "part_timer")
@@ -76,6 +78,13 @@ public class PartTimerEntity {
     @Column(name = "part_img", length = 200)
     private String partImg;
 
+    @Column(name = "device_id", length = 255)
+    private String deviceId;
+
+    @Column(name = "device_name", length = 255)
+    private String deviceName;
+
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -106,6 +115,8 @@ public class PartTimerEntity {
         this.accountNumber = dto.getAccountNumber();
         this.partStatus = dto.getPartStatus();
         this.createdAt = dto.getCreatedAt();
+        this.deviceId = dto.getDeviceId();
+        this.deviceName = dto.getDeviceName();
     }
 
     public PartTimerDTO toDTO() {

@@ -26,8 +26,5 @@ public class ProductLocationMappingEntity {
     @Column(nullable = false)
     private Integer storeId;
 
-    @Column(nullable = false)
-    private Integer quantity;
 
-    // Getter, Setter
 }

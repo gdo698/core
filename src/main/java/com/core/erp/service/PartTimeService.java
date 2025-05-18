@@ -4,6 +4,7 @@ import com.core.erp.domain.PartTimerEntity;
 import com.core.erp.domain.StoreEntity;
 import com.core.erp.dto.partTimer.PartTimerDTO;
 import com.core.erp.dto.partTimer.PartTimerSearchDTO;
+import com.core.erp.repository.AttendanceRepository;
 import com.core.erp.repository.PartTimerRepository;
 import com.core.erp.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -32,6 +34,7 @@ public class PartTimeService {
 
     private final PartTimerRepository partTimerRepository;
     private final StoreRepository storeRepository;
+    private final AttendanceRepository attendanceRepository;
 
     private final String uploadDir = System.getProperty("user.dir") + "/uploads/parttimer/";
 
@@ -90,8 +93,19 @@ public class PartTimeService {
             throw new RuntimeException("권한이 없습니다.");
         }
 
-        return result.map(PartTimerDTO::new);
-    }
+        return result.map(pt -> {
+            PartTimerDTO dto = new PartTimerDTO(pt);
+
+            // 오늘 출근 여부 판단
+            boolean isCheckedIn = attendanceRepository.existsByPartTimerIdAndStoreIdAndAttendDate(
+                    (long) pt.getPartTimerId(),
+                    pt.getStore().getStoreId(),
+                    LocalDate.now()
+            );
+
+            dto.setCheckedInToday(isCheckedIn);
+            return dto;
+        });    }
 
     public PartTimerDTO findPartTimerById(String role, Integer storeId, Integer partTimerId) {
         PartTimerEntity entity = partTimerRepository.findById(partTimerId)
@@ -112,6 +126,9 @@ public class PartTimeService {
 
         PartTimerEntity entity = new PartTimerEntity(partTimerDTO, store);
 
+        entity.setDeviceId(partTimerDTO.getDeviceId());
+        entity.setDeviceName(partTimerDTO.getDeviceName());
+
         String uploadedPath = uploadFile(partTimerDTO.getFile());
         if (uploadedPath != null) {
             entity.setPartImg(uploadedPath);
@@ -119,6 +136,7 @@ public class PartTimeService {
 
         partTimerRepository.save(entity);
     }
+
 
     @Transactional
     public void updatePartTimer(String role, Integer storeId, Integer partTimerId, PartTimerDTO partTimerDTO) {

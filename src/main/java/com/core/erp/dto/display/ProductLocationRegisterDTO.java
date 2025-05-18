@@ -2,13 +2,12 @@ package com.core.erp.dto.display;
 
 import lombok.*;
 
+import java.util.List;
+
 @Data
-@Getter
-@Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class ProductLocationRegisterDTO {
     private Long productId;
-    private Long locationId;
-    private Integer quantity;
+    private List<Long> locationIds;
 }

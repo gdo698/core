@@ -35,7 +35,7 @@ public class DisplayLocationEntity {
     private Integer height;
 
     @Column(nullable = false)
-    private Integer type;  // 0: 진열대, 1: 창고
+    private Integer type;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

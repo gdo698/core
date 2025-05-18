@@ -14,64 +14,67 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-    @Service
-    @RequiredArgsConstructor
-    public class ProductLocationMappingService {
+import java.util.*;
+import java.util.stream.Collectors;
 
-        private final ProductLocationMappingRepository mappingRepository;
-        private final ProductRepository productRepository;
-        private final DisplayLocationRepository locationRepository;
+@Service
+@RequiredArgsConstructor
+public class ProductLocationMappingService {
 
-        /**
-         * 상품 진열 위치 등록 or 변경
-         */
-        @Transactional
-        public void register(ProductLocationRegisterDTO dto, Integer storeId) {
-            // 기존 매핑 삭제 (덮어쓰기)
-            mappingRepository.deleteByProduct_ProductIdAndStoreId(dto.getProductId(), storeId);
+    private final ProductLocationMappingRepository mappingRepository;
+    private final ProductRepository productRepository;
+    private final DisplayLocationRepository locationRepository;
 
-            // 진열 위치가 null이면 매핑 삭제로 간주
-            if (dto.getLocationId() == null) return;
+    /**
+     * 상품 진열 위치 등록 (다중)
+     */
+    @Transactional
+    public void register(ProductLocationRegisterDTO dto, Integer storeId) {
+        if (dto == null || dto.getLocationIds() == null || dto.getLocationIds().isEmpty()) return;
 
-            // 상품, 위치 유효성 확인
-            ProductEntity product = productRepository.findById(dto.getProductId())
-                    .orElseThrow(() -> new EntityNotFoundException("상품이 존재하지 않습니다."));
+        Long productId = dto.getProductId();
+        if (productId == null) throw new IllegalArgumentException("상품 ID는 필수입니다.");
 
-            DisplayLocationEntity location = locationRepository.findById(dto.getLocationId())
-                    .orElseThrow(() -> new EntityNotFoundException("진열 위치가 존재하지 않습니다."));
+        // 기존 매핑 제거
+        mappingRepository.deleteByProduct_ProductIdAndStoreId(productId, storeId);
 
-            // 매핑 생성 및 저장
+        // 상품 조회
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new EntityNotFoundException("상품이 존재하지 않습니다."));
+
+        // 위치 목록 조회 (유효성 확인 포함)
+        List<DisplayLocationEntity> locations = locationRepository.findAllById(dto.getLocationIds());
+
+        for (DisplayLocationEntity location : locations) {
             ProductLocationMappingEntity mapping = new ProductLocationMappingEntity();
             mapping.setProduct(product);
             mapping.setLocation(location);
             mapping.setStoreId(storeId);
-            mapping.setQuantity(dto.getQuantity() != null ? dto.getQuantity() : 0);
-
             mappingRepository.save(mapping);
-        }
-
-        /**
-         * 상품 진열 위치 해제
-         */
-        @Transactional
-        public void unmap(Long productId, Integer storeId) {
-            mappingRepository.deleteByProduct_ProductIdAndStoreId(productId, storeId);
-        }
-
-        /**
-         * 상품에 매핑된 위치 조회
-         */
-        public DisplayLocationDTO getMappingByProductId(Long productId) {
-            return mappingRepository.findByProduct_ProductId(productId)
-                    .map(mapping -> {
-                        DisplayLocationEntity loc = mapping.getLocation();
-                        DisplayLocationDTO dto = new DisplayLocationDTO();
-                        BeanUtils.copyProperties(loc, dto);
-                        return dto;
-                    })
-                    .orElse(null);
         }
     }
 
+    /**
+     * 상품의 매핑된 모든 위치 조회 (진열대 / 창고 구분)
+     */
+    public Map<String, List<DisplayLocationDTO>> getMappingByProductId(Long productId, Integer storeId) {
+        List<ProductLocationMappingEntity> mappings =
+                mappingRepository.findAllByProduct_ProductIdAndStoreId(productId, storeId);
 
+        List<DisplayLocationDTO> shelves = new ArrayList<>();
+        List<DisplayLocationDTO> warehouses = new ArrayList<>();
 
+        for (ProductLocationMappingEntity m : mappings) {
+            DisplayLocationDTO dto = new DisplayLocationDTO();
+            BeanUtils.copyProperties(m.getLocation(), dto);
+
+            if (dto.getType() == 0) shelves.add(dto); // 진열대
+            else warehouses.add(dto); // 창고
+        }
+
+        Map<String, List<DisplayLocationDTO>> result = new HashMap<>();
+        result.put("shelf", shelves);
+        result.put("warehouse", warehouses);
+        return result;
+    }
+}

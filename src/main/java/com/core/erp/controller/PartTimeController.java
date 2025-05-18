@@ -1,8 +1,13 @@
 package com.core.erp.controller;
 
+import com.core.erp.domain.PartTimerEntity;
 import com.core.erp.dto.CustomPrincipal;
 import com.core.erp.dto.partTimer.PartTimerDTO;
 import com.core.erp.dto.partTimer.PartTimerSearchDTO;
+import com.core.erp.dto.partTimer.PhoneRequestDTO;
+import com.core.erp.dto.partTimer.VerifyDeviceDTO;
+import com.core.erp.repository.PartTimerRepository;
+import com.core.erp.service.CoolSmsService;
 import com.core.erp.service.PartTimeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/store/parttimer")
@@ -23,6 +30,8 @@ import java.util.List;
 public class PartTimeController {
 
     private final PartTimeService partTimerService;
+    private final CoolSmsService smsService;
+    private final PartTimerRepository partTimerRepository;
 
     // 현재 로그인한 사용자 정보 추출
     private CustomPrincipal getCurrentUser() {
@@ -99,5 +108,38 @@ public class PartTimeController {
         List<PartTimerDTO> list = partTimerService.findAllByStore(storeId, role);
         return ResponseEntity.ok(list);
     }
+
+    @PostMapping("/send-code")
+    public ResponseEntity<?> sendCode(@RequestBody PhoneRequestDTO dto) {
+        smsService.sendVerificationCode(dto.getPhone());
+        return ResponseEntity.ok(Map.of("message", "인증번호가 전송되었습니다."));
+    }
+
+    @PostMapping("/verify-device")
+    public ResponseEntity<String> verifyDevice(@RequestBody VerifyDeviceDTO dto) {
+        // 1. 인증 코드 확인
+        if (!smsService.verify(dto.getPhone(), dto.getCode())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("인증 실패");
+        }
+
+        // 2. 등록된 아르바이트 찾기
+        Optional<PartTimerEntity> optionalPt = partTimerRepository.findByPartPhone(dto.getPhone());
+
+        if (optionalPt.isPresent()) {
+            PartTimerEntity pt = optionalPt.get();
+
+            // 3. 기기 정보 덮어쓰기
+            pt.setDeviceId(dto.getDeviceId());
+            pt.setDeviceName(dto.getDeviceName());
+
+            partTimerRepository.save(pt);
+            return ResponseEntity.ok("기기 정보가 업데이트되었습니다.");
+        }
+
+        // 4. 등록되지 않은 사용자일 경우 → 등록 폼에서 처리
+        return ResponseEntity.ok("인증 성공. 신규 등록 가능");
+    }
+
+
 
 }

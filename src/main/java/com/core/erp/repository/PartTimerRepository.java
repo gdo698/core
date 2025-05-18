@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PartTimerRepository extends JpaRepository<PartTimerEntity, Integer> {
@@ -55,8 +56,11 @@ public interface PartTimerRepository extends JpaRepository<PartTimerEntity, Inte
 
     List<PartTimerEntity> findByStore_StoreId(Integer storeId);
 
-    // 근무 중인 아르바이트 목록 (storeId 기준)
     List<PartTimerEntity> findByStore_StoreIdAndPartStatus(Integer storeId, int partStatus);
+
+    Optional<PartTimerEntity> findByPartPhone(String phone);
+
+    Optional<PartTimerEntity> findByDeviceId(String deviceId);
 
 }
 

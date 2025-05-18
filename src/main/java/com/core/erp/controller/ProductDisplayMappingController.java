@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/display-mapping")
 @RequiredArgsConstructor
@@ -16,22 +19,28 @@ public class ProductDisplayMappingController {
 
     private final ProductLocationMappingService mappingService;
 
-    @GetMapping("/product/{productId}")
-    public ResponseEntity<DisplayLocationDTO> getMapping(@PathVariable Long productId) {
-        return ResponseEntity.ok(mappingService.getMappingByProductId(productId));
-    }
-
+    /**
+     * 상품 진열 위치 매핑 저장 (다중)
+     */
     @PostMapping
-    public ResponseEntity<Void> map(@RequestBody ProductLocationRegisterDTO dto,
-                                    @AuthenticationPrincipal CustomPrincipal user) {
+    public ResponseEntity<Void> map(
+            @RequestBody ProductLocationRegisterDTO dto,
+            @AuthenticationPrincipal CustomPrincipal user
+    ) {
         mappingService.register(dto, user.getStoreId());
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/product/{productId}")
-    public ResponseEntity<Void> unmap(@PathVariable Long productId,
-                                      @AuthenticationPrincipal CustomPrincipal user) {
-        mappingService.unmap(productId, user.getStoreId());
-        return ResponseEntity.noContent().build();
+    /**
+     * 상품에 매핑된 위치 조회 (진열대/창고 구분)
+     */
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<Map<String, List<DisplayLocationDTO>>> getMapping(
+            @PathVariable Long productId,
+            @AuthenticationPrincipal CustomPrincipal user
+    ) {
+        Map<String, List<DisplayLocationDTO>> result =
+                mappingService.getMappingByProductId(productId, user.getStoreId());
+        return ResponseEntity.ok(result);
     }
 }

@@ -22,8 +22,9 @@ public class AttendanceDTO {
     private LocalDateTime inTime;
     private LocalDateTime outTime;
     private int attendStatus;
+    private String partName;
+    private String position;
 
-    private MultipartFile file;
 
     // Entity → DTO 변환 생성자
     public AttendanceDTO(AttendanceEntity entity) {
@@ -36,5 +37,7 @@ public class AttendanceDTO {
         this.inTime = entity.getInTime();
         this.outTime = entity.getOutTime();
         this.attendStatus = entity.getAttendStatus();
+        this.partName = entity.getPartTimer() != null ? entity.getPartTimer().getPartName() : null;
+        this.position = entity.getPartTimer() != null ? entity.getPartTimer().getPosition() : null;
     }
 }
