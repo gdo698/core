@@ -24,6 +24,9 @@ public class CoolSmsService implements SmsService {
     @Value("${sms.senderPhone}")
     private String senderPhone;
 
+    @Value("${sms.enabled:true}")
+    private boolean smsEnabled;
+
     private final Map<String, String> codeStorage = new ConcurrentHashMap<>();
 
     private DefaultMessageService messageService;
@@ -39,6 +42,12 @@ public class CoolSmsService implements SmsService {
     public void sendVerificationCode(String phone) {
         String code = String.valueOf(new Random().nextInt(900000) + 100000);
         codeStorage.put(phone, code);
+
+        // ✅ 개발 환경이면 발송 생략
+        if (!smsEnabled) {
+            log.info("🛠 [개발모드] 인증번호 [{}] 발송 생략 → 대상: {}", code, phone);
+            return;
+        }
 
         Message message = new Message();
         message.setFrom(senderPhone);
