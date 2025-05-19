@@ -1,6 +1,5 @@
 package com.core.erp.domain;
 
-import com.core.erp.dto.sales.SalesStatsDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,13 +39,4 @@ public class SalesStatsEntity {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    // DTO → Entity 변환 생성자
-    public SalesStatsEntity(SalesStatsDTO dto) {
-        this.salesStatsId = dto.getSalesStatsId();
-        this.sstDate = dto.getSstDate();
-        this.sstQuantity = dto.getSstQuantity();
-        this.sstTotal = dto.getSstTotal();
-        this.createdAt = dto.getCreatedAt();
-    }
 }

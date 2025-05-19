@@ -1,6 +1,5 @@
 package com.core.erp.domain;
 
-import com.core.erp.dto.sales.SalesHourlyDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,14 +39,4 @@ public class SalesHourlyEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    // DTO → Entity 변환 생성자
-    public SalesHourlyEntity(SalesHourlyDTO dto) {
-        this.salesHourlyId = dto.getSalesHourlyId();
-        // store는 별도 매핑 필요
-        this.shoDate = dto.getShoDate();
-        this.shoHour = dto.getShoHour();
-        this.shoQuantity = dto.getShoQuantity();
-        this.shoTotal = dto.getShoTotal();
-        this.createdAt = dto.getCreatedAt();
-    }
 }
