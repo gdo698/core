@@ -6,6 +6,7 @@ import com.core.erp.domain.ProductDetailsEntity;
 import com.core.erp.domain.ProductEntity;
 import com.core.erp.repository.ProductDetailsRepository;
 import com.core.erp.repository.ProductRepository;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +41,7 @@ public class BarcodeApiService {
                 dto.setManufacturer(detailsOpt.map(ProductDetailsEntity::getManufacturer).orElse("제조사 정보 없음"));
                 dto.setCategory(product.getCategory() != null ? product.getCategory().getCategoryName() : "기타");
                 dto.setExpirationInfo(detailsOpt.map(ProductDetailsEntity::getShelfLife).orElse("유통기한 정보 없음"));
+                dto.setIsPromo(product.getIsPromo());
 
 
                 return dto;
@@ -56,9 +58,11 @@ public class BarcodeApiService {
             BarcodeProductDTO dto = new BarcodeProductDTO();
             dto.setBarcode(raw.getBarcode());
             dto.setProductName(raw.getProductName());
-            dto.setManufacturer(raw.getManufacturer());
-            dto.setCategory(raw.getCategory());
-            dto.setExpirationInfo(raw.getExpirationInfo());
+            dto.setManufacturer(raw.getManufacturer() != null ? raw.getManufacturer() : "제조사 정보 없음");
+            dto.setCategory(raw.getCategory() != null ? raw.getCategory() : "카테고리 없음");
+            dto.setExpirationInfo(raw.getExpirationInfo() != null ? raw.getExpirationInfo() : "유통기한 정보 없음");
+            dto.setPrice(0);
+            dto.setIsPromo(0);
 
             return dto;
         }
@@ -66,4 +70,6 @@ public class BarcodeApiService {
         return null;
 
     }
+
+
 }

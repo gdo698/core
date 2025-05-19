@@ -16,6 +16,7 @@ public class SalesTransactionDTO {
     private int transactionId;
     private Integer storeId; // FK (id만 관리)
     private Integer empId; // FK (id만 관리)
+    private Integer partTimerId;
     private Integer  totalPrice;
     private Integer  discountTotal;
     private Integer  finalAmount;
@@ -36,6 +37,7 @@ public class SalesTransactionDTO {
         this.transactionId = entity.getTransactionId();
         this.storeId = entity.getStore() != null ? entity.getStore().getStoreId() : null;
         this.empId = entity.getEmployee() != null ? entity.getEmployee().getEmpId() : null;
+        this.partTimerId = entity.getPartTimer() != null ? entity.getPartTimer().getPartTimerId() : null;
         this.totalPrice = entity.getTotalPrice();
         this.discountTotal = entity.getDiscountTotal();
         this.finalAmount = entity.getFinalAmount();

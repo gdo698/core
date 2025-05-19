@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Formula;
 
+import java.util.Optional;
+
 @Entity
 @Table(name = "stock_inventory_check_item")
 @Getter
@@ -48,4 +50,5 @@ public class StockInventoryCheckItemEntity {
 
     @Column(name = "is_applied", nullable = false)
     private Boolean isApplied = false;
+
 }

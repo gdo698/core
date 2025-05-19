@@ -3,8 +3,10 @@ package com.core.erp.repository;
 import com.core.erp.domain.StoreStockEntity;
 import com.core.erp.dto.disposal.DisposalTargetProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +14,18 @@ import java.util.Optional;
 public interface StoreStockRepository extends JpaRepository<StoreStockEntity, Long>, StockRepositoryCustom {
     @Query("SELECT SUM(s.quantity) FROM StoreStockEntity s WHERE s.product.productId = :productId")
     Integer sumStockByProductId(Long productId);
+
+
+    //  상품 ID로 매장 재고 목록 조회
+    @Query("""
+SELECT s FROM StoreStockEntity s
+WHERE s.product.productId = :productId
+AND (:storeId IS NULL OR s.store.storeId = :storeId)
+""")
+    List<StoreStockEntity> findByProduct_ProductId(
+            @Param("productId") int productId,
+            @Param("storeId") Integer storeId
+    );
 
     //  상품 ID로 매장 재고 목록 조회
     List<StoreStockEntity> findByProduct_ProductId(int productId);
@@ -48,7 +62,30 @@ public interface StoreStockRepository extends JpaRepository<StoreStockEntity, Lo
 """, nativeQuery = true)
     List<DisposalTargetProjection> findExpiredDisposals();
 
-    Optional<Object> findTopByProduct_ProductIdOrderByLastInDateDesc(int productId);
+    Optional<StoreStockEntity> findTopByProduct_ProductIdOrderByLastInDateDesc(Long productId);
 
+    @Transactional
+    @Modifying
+    @Query("""
+UPDATE StoreStockEntity s
+SET s.quantity = s.quantity + :qty, s.lastInDate = CURRENT_TIMESTAMP
+WHERE s.product.productId = :productId AND s.store.storeId = :storeId
+""")
+    int increaseQuantityAndUpdateDate(@Param("productId") Long productId,
+                                      @Param("storeId") Integer storeId,
+                                      @Param("qty") int qty);
+
+    @Transactional
+    @Modifying
+    @Query("""
+UPDATE StoreStockEntity s
+SET s.quantity = s.quantity - :qty
+WHERE s.product.productId = :productId AND s.store.storeId = :storeId AND s.quantity >= :qty
+""")
+    int decreaseQuantity(@Param("productId") Long productId,
+                         @Param("storeId") Integer storeId,
+                         @Param("qty") int qty);
+
+    Optional<StoreStockEntity> findByProduct_ProductIdAndStore_StoreId(Long productId, Integer storeId);
 
 }

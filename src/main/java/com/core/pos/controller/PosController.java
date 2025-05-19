@@ -4,7 +4,6 @@ import com.core.erp.dto.CustomPrincipal;
 import com.core.pos.dto.DisposalRequestDTO;
 import com.core.pos.dto.SaleRequestDTO;
 import com.core.pos.dto.SalesHistoryDTO;
-import com.core.pos.dto.SettlementRequestDTO;
 import com.core.pos.service.PosService;
 import com.core.pos.service.SettlementService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,6 @@ import java.util.List;
 public class PosController {
 
     private final PosService posService;
-    private final SettlementService settlementService;
 
     // 결제 저장 API
     @PostMapping("/pay")
@@ -75,10 +73,10 @@ public class PosController {
         }
     }
 
-    // 매출 정산 API
-    @PostMapping("/settlement/daily")
-    public ResponseEntity<?> calculateDailySettlement(@RequestBody SettlementRequestDTO dto) {
-        settlementService.calculateDailySettlement(dto);
-        return ResponseEntity.ok("정산 완료");
+    // 영수증
+    @GetMapping("/receipt/{transactionId}")
+    public ResponseEntity<SalesHistoryDTO> getReceipt(@PathVariable Integer transactionId) {
+        return ResponseEntity.ok(posService.getReceiptByTransactionId(transactionId));
     }
+
 }

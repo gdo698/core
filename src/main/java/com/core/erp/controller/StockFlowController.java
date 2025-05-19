@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/stock-flow")
@@ -20,7 +19,7 @@ public class StockFlowController {
     private final StockFlowService stockFlowService;
 
     /**
-     * 상품별 재고 흐름 로그 조회
+     * 상품별 재고 흐름 로그 조회 (매장/본사 공통)
      */
     @GetMapping("/{productId}")
     public ResponseEntity<Page<StockFlowLogDTO>> getLogs(
@@ -29,21 +28,20 @@ public class StockFlowController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        Page<StockFlowLogDTO> result = stockFlowService.getLogs(user.getStoreId(), productId, page, size);
+        Page<StockFlowLogDTO> result = stockFlowService.getLogs(user, productId, page, size);
         return ResponseEntity.ok(result);
     }
 
+    /**
+     * 조건 기반 재고 흐름 로그 검색 (매장/본사 공통)
+     */
     @PostMapping("/search")
     public ResponseEntity<Page<StockFlowLogDTO>> searchStockFlows(
             @RequestBody StockFlowSearchCondition condition,
-            @AuthenticationPrincipal CustomPrincipal userDetails
+            @AuthenticationPrincipal CustomPrincipal user
     ) {
-        if (!"ROLE_HQ".equals(userDetails.getRole())) {
-            condition.setStoreId(userDetails.getStoreId());
-        }
+        stockFlowService.bindUserStoreIfNeeded(condition, user);
         Page<StockFlowLogDTO> result = stockFlowService.searchFlows(condition);
         return ResponseEntity.ok(result);
     }
-
 }
-

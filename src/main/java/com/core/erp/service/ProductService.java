@@ -1,11 +1,13 @@
 package com.core.erp.service;
 
 import com.core.erp.domain.*;
+import com.core.erp.dto.CustomPrincipal;
 import com.core.erp.dto.product.ProductDTO;
 import com.core.erp.dto.product.ProductDetailResponseDTO;
 import com.core.erp.dto.product.ProductRegisterRequestDTO;
 import com.core.erp.dto.product.ProductUpdateRequestDTO;
 import com.core.erp.repository.*;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,6 +37,11 @@ public class ProductService {
     private CategoryRepository categoryRepository;
     @Autowired
     private HQStockRepository hqStockRepository;
+    @Autowired
+    private WarehouseStockRepository warehouseStockRepository;
+
+    @Autowired
+    private StockInventoryCheckItemRepository stockInventoryCheckItemRepository;
 
     // 전체 제품 목록 (기존 메서드)
     public List<ProductDTO> getAllProducts() {
@@ -91,15 +98,15 @@ public class ProductService {
     // 페이징된 제품 목록
     public Page<ProductDTO> getPagedProducts(Pageable pageable) {
         Page<ProductEntity> productPage = productRepository.findAll(pageable);
-        
+
         return productPage.map(product -> {
             ProductDTO dto = new ProductDTO(product);
-            
+
             // 매장 재고 정보 설정
             Integer storeStock = storeStockRepository.sumStockByProductId(Long.valueOf(product.getProductId()));
             if (storeStock == null) storeStock = 0;
             dto.setProStock(storeStock);
-            
+
             // 본사 재고 정보 설정 및 lastUpdate 가져오기
             Optional<HQStockEntity> hqStockOpt = hqStockRepository.findByProductProductId(product.getProductId());
             if (hqStockOpt.isPresent()) {
@@ -115,36 +122,34 @@ public class ProductService {
                     dto.setRecentStockInDate(recentStockIn.getInDate());
                 }
             }
-            
+
             // 카테고리 이름 설정
             if (product.getCategory() != null) {
                 dto.setCategoryName(product.getCategory().getCategoryName());
             }
-            
+
             return dto;
         });
     }
 
     // 상세페이지용 상세 정보
-    public ProductDetailResponseDTO getProductDetail(int productId) {
-        Optional<ProductEntity> optProduct = productRepository.findById(Long.valueOf(productId));
-        
-        if (!optProduct.isPresent()) {
-            return null; // 또는 예외 처리
-        }
-        
+    public ProductDetailResponseDTO getProductDetail(int productId, CustomPrincipal user) {
+        Optional<ProductEntity> optProduct = productRepository.findById((long) productId);
+        if (optProduct.isEmpty()) return null;
+
         ProductEntity product = optProduct.get();
-        
-        // 매장 재고 합계 조회 (기존 코드)
-        Integer totalStock = storeStockRepository.sumStockByProductId(Long.valueOf(productId));
+        Integer storeId = user.getStoreId();
+
+        // 총 매장 재고
+        Integer totalStock = storeStockRepository.sumStockByProductId((long) productId);
         if (totalStock == null) totalStock = 0;
-        
-        // 본사 재고 조회 (추가된 코드)
+
+        // 본사 재고
         int hqStock = hqStockRepository.findByProductProductId(productId)
-            .map(hqStockEntity -> hqStockEntity.getQuantity())
-            .orElse(0);
-        
-        String categoryName = product.getCategory().getCategoryName();
+                .map(HQStockEntity::getQuantity)
+                .orElse(0);
+
+        // 판매 상태
         String status = switch (product.getIsPromo()) {
             case 1 -> "단종";
             case 2 -> "1+1 이벤트";
@@ -152,32 +157,81 @@ public class ProductService {
             default -> "판매중";
         };
 
-        List<ProductDetailResponseDTO.StoreStockInfo> storeStocks = storeStockRepository.findByProduct_ProductId(productId)
-                .stream()
-                .map(ss -> new ProductDetailResponseDTO.StoreStockInfo(
-                        ss.getStore().getStoreName(), ss.getQuantity()
-                )).toList();
+        // 카테고리
+        String categoryName = product.getCategory() != null ? product.getCategory().getCategoryName() : null;
 
-        List<ProductDetailResponseDTO.StockInInfo> recentStockIns = stockInHistoryRepository.findTop3ByProduct_ProductIdOrderByInDateDesc(productId)
+        // 점포 재고 정보
+        List<ProductDetailResponseDTO.StoreStockInfo> storeStocks;
+        if (storeId != null) {
+            storeStocks = storeStockRepository
+                    .findByStore_StoreIdAndProduct_ProductId(storeId, productId)
+                    .map(ss -> List.of(new ProductDetailResponseDTO.StoreStockInfo(
+                            ss.getStore().getStoreName(), ss.getQuantity())))
+                    .orElse(List.of());
+        } else {
+            storeStocks = storeStockRepository
+                    .findByProduct_ProductId(productId, null) // 전체 매장 조회
+                    .stream()
+                    .map(ss -> new ProductDetailResponseDTO.StoreStockInfo(
+                            ss.getStore().getStoreName(), ss.getQuantity()))
+                    .toList();
+        }
+
+        // 최근 입고 내역
+        List<ProductDetailResponseDTO.StockInInfo> recentStockIns = stockInHistoryRepository
+                .findTop3ByProduct_ProductIdOrderByInDateDesc(productId)
                 .stream()
                 .map(si -> new ProductDetailResponseDTO.StockInInfo(
-                        si.getStore().getStoreName(), si.getInDate().toLocalDate().toString(), si.getInQuantity()
-                )).toList();
+                        si.getStore().getStoreName(),
+                        si.getInDate().toLocalDate().toString(),
+                        si.getInQuantity()))
+                .toList();
 
-        ProductDetailsEntity detail = productDetailsRepository.findByProduct_ProductId(productId);
+        // 상세 정보
         ProductDetailResponseDTO.ProductDetailInfo detailInfo = null;
+        ProductDetailsEntity detail = productDetailsRepository.findByProduct_ProductId(productId);
         if (detail != null) {
             detailInfo = new ProductDetailResponseDTO.ProductDetailInfo(
-                    detail.getManufacturer(), detail.getManuNum(), detail.getShelfLife(),
-                    detail.getAllergens(), detail.getStorageMethod()
-            );
+                    detail.getManufacturer(), detail.getManuNum(),
+                    detail.getShelfLife(), detail.getAllergens(), detail.getStorageMethod());
         }
+
+        // 가격 계산
         int cost = product.getProCost();
         int sell = product.getProSellCost();
-        double profitRate = sell > 0 ? ((double)(sell - cost) / sell) * 100 : 0;
-        double costRate = sell > 0 ? ((double)cost / sell) * 100 : 0;
+        double profitRate = sell > 0 ? ((double) (sell - cost) / sell) * 100 : 0;
+        double costRate = sell > 0 ? ((double) cost / sell) * 100 : 0;
 
-        // 카테고리 경로 구하기
+        // 실사 관련: 기본 초기값
+        int storeExpectedQty = 0;
+        int warehouseExpectedQty = 0;
+        Integer storeRealQty = null;
+        Integer warehouseRealQty = null;
+
+        if (storeId != null) {
+            storeExpectedQty = storeStockRepository
+                    .findQuantityByProductAndStore(productId, storeId)
+                    .orElse(0);
+
+            warehouseExpectedQty = warehouseStockRepository
+                    .findQuantityByProductAndStore(productId, storeId)
+                    .orElse(0);
+
+            PageRequest pageRequest = PageRequest.of(0, 1);
+            List<StockInventoryCheckItemEntity> result = stockInventoryCheckItemRepository
+                    .findLatestAppliedCheckItemList(productId, storeId, pageRequest);
+
+            if (!result.isEmpty()) {
+                StockInventoryCheckItemEntity check = result.get(0);
+                storeRealQty = check.getStoreRealQuantity();
+                warehouseRealQty = check.getWarehouseRealQuantity();
+            }
+        }
+
+        int totalExpectedQty = storeExpectedQty + warehouseExpectedQty;
+        int totalRealQty = (storeRealQty != null ? storeRealQty : 0) + (warehouseRealQty != null ? warehouseRealQty : 0);
+
+        // 카테고리 경로
         List<String> categoryPath = new ArrayList<>();
         CategoryEntity cat = product.getCategory();
         while (cat != null) {
@@ -189,11 +243,10 @@ public class ProductService {
         String eventStart = product.getEventStart() != null ? product.getEventStart().toString() : null;
         String eventEnd = product.getEventEnd() != null ? product.getEventEnd().toString() : null;
 
-        // 정기 입고 정보 가져오기
+        // 정기 입고 정보
         Integer regularInDay = null;
         Integer regularInQuantity = null;
         Boolean regularInActive = false;
-
         Optional<HQStockEntity> hqStockOpt = hqStockRepository.findByProductProductId(productId);
         if (hqStockOpt.isPresent()) {
             HQStockEntity hqStockEntity = hqStockOpt.get();
@@ -218,14 +271,20 @@ public class ProductService {
                 storeStocks,
                 recentStockIns,
                 detailInfo,
-                product.getCategory().getCategoryId(), // categoryId
-                categoryPath, // categoryPath
-                eventStart,   // eventStart
-                eventEnd,     // eventEnd
-                hqStock,      // hqStock
-                regularInDay, // 정기 입고일
-                regularInQuantity, // 정기 입고 수량
-                regularInActive    // 정기 입고 활성화 여부
+                product.getCategory().getCategoryId(),
+                categoryPath,
+                eventStart,
+                eventEnd,
+                hqStock,
+                regularInDay,
+                regularInQuantity,
+                regularInActive,
+                storeRealQty,
+                warehouseRealQty,
+                totalRealQty,
+                storeExpectedQty,
+                warehouseExpectedQty,
+                totalExpectedQty
         );
     }
 

@@ -1,5 +1,6 @@
 package com.core.pos.domain;
 
+import com.core.pos.dto.SettlementRequestDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,6 +24,12 @@ public class SalesSettlementEntity {
     @Column(name = "store_id", nullable = false)
     private Integer storeId;
 
+    @Column(name = "emp_id")
+    private Integer empId;
+
+    @Column(name = "part_timer_id")
+    private Integer partTimerId;
+
     @Column(name = "settlement_date", nullable = false)
     private LocalDate settlementDate;
 
@@ -31,6 +38,12 @@ public class SalesSettlementEntity {
 
     @Column(name = "end_date")
     private LocalDate endDate;
+
+    @Column(name = "shift_start_time")
+    private LocalDateTime shiftStartTime;
+
+    @Column(name = "shift_end_time")
+    private LocalDateTime shiftEndTime;
 
     @Column(name = "total_revenue", nullable = false)
     private Integer totalRevenue;
@@ -54,6 +67,9 @@ public class SalesSettlementEntity {
     @Column(name = "refund_count")
     private Integer refundCount;
 
+    @Column(name = "is_manual")
+    private Integer isManual; // 0: 자동, 1: 수동
+
     @Column(name = "hq_sent_at")
     private LocalDateTime hqSentAt;
 
@@ -68,10 +84,25 @@ public class SalesSettlementEntity {
     private LocalDateTime updatedAt;
 
     public enum SettlementType {
-        daily, monthly, yearly
+        DAILY, MONTHLY, YEARLY, SHIFT
     }
 
     public enum HqStatus {
         PENDING, SENT, FAILED
     }
+
+    public static SalesSettlementEntity fromRequestDTO(SettlementRequestDTO dto) {
+        return SalesSettlementEntity.builder()
+                .storeId(dto.getStoreId())
+                .empId(dto.getEmpId())
+                .partTimerId(dto.getPartTimerId())
+                .settlementDate(dto.getTargetDate())
+                .startDate(dto.getStartDate())
+                .endDate(dto.getEndDate())
+                .shiftStartTime(dto.getShiftStartTime())
+                .shiftEndTime(dto.getShiftEndTime())
+                .isManual(dto.getIsManual())
+                .build();
+    }
+
 }

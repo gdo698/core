@@ -160,7 +160,7 @@ public class OrderService {
         PurchaseOrderEntity order = purchaseOrderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 발주서가 존재하지 않습니다."));
 
-        if (!"ROLE_HQ".equals(role) && order.getStore().getStoreId() != loginStoreId) {
+        if (!"ROLE_MASTER".equals(role) && order.getStore().getStoreId() != loginStoreId) {
             throw new SecurityException("해당 발주서에 접근할 수 없습니다.");
         }
 
@@ -183,7 +183,7 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("입고 처리 알바를 찾을 수 없습니다."));
 
         // 2. 접근 권한 검증 (본인 매장이 아니고 HQ도 아니면 거절)
-        if (!"ROLE_HQ".equals(role) && order.getStore().getStoreId() != loginStoreId) {
+        if (!"ROLE_MASTER".equals(role) && order.getStore().getStoreId() != loginStoreId) {
             throw new SecurityException("입고 완료 권한이 없습니다.");
         }
 
@@ -254,7 +254,7 @@ public class OrderService {
         PurchaseOrderEntity order = purchaseOrderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("발주서가 존재하지 않습니다."));
 
-        if (!"ROLE_HQ".equals(role) && order.getStore().getStoreId() != loginStoreId) {
+        if (!"ROLE_MASTER".equals(role) && order.getStore().getStoreId() != loginStoreId) {
             throw new SecurityException("입고 권한이 없습니다.");
         }
 
@@ -405,7 +405,7 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("발주서가 존재하지 않습니다."));
 
         // 본사 이외 매장에 대해 권한 및 시간대 체크
-        if (!"ROLE_HQ".equals(role)) {
+        if (!"ROLE_MASTER".equals(role)) {
             if (order.getStore().getStoreId() != (loginStoreId)) {
                 throw new SecurityException("해당 발주에 대한 수정 권한이 없습니다.");
             }
@@ -475,7 +475,7 @@ public class OrderService {
         PurchaseOrderEntity order = purchaseOrderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("발주서가 존재하지 않습니다."));
 
-        if (!"ROLE_HQ".equals(role) && order.getStore().getStoreId() != (loginStoreId)) {
+        if (!"ROLE_MASTER".equals(role) && order.getStore().getStoreId() != (loginStoreId)) {
             throw new SecurityException("해당 발주서에 대한 취소 권한이 없습니다.");
         }
 
@@ -486,7 +486,7 @@ public class OrderService {
     @Transactional
     public void deleteOrder(Long orderId, Integer loginStoreId, String role) {
         // HQ는 삭제 금지
-        if ("ROLE_HQ".equals(role)) {
+        if ("ROLE_MASTER".equals(role)) {
             throw new SecurityException("본사는 발주 삭제 권한이 없습니다.");
         }
 

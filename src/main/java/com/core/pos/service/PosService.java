@@ -43,6 +43,11 @@ public class PosService {
         tx.setEmployee(employee);
         tx.setStore(store);
 
+        // 아르바이트 ID 주입 (교대 정산용)
+        if (dto.getPartTimerId() != null) {
+            tx.setPartTimer(new PartTimerEntity(dto.getPartTimerId()));
+        }
+
         // null-safe 합계 계산
         tx.setTotalPrice(dto.getItemList().stream()
                 .mapToInt(item -> Optional.ofNullable(item.getUnitPrice()).orElse(0))
@@ -229,4 +234,19 @@ public class PosService {
                 dto.getDisposalReason()
         );
     }
+
+    // 영수증
+    public SalesHistoryDTO getReceiptByTransactionId(Integer txId) {
+        SalesTransactionEntity tx = salesTransactionRepository.findById(txId)
+                .orElseThrow(() -> new RuntimeException("거래를 찾을 수 없습니다."));
+
+        List<SalesDetailEntity> details = salesDetailRepository.findByTransaction_TransactionId(txId);
+
+        List<SalesDetailDTO> items = details.stream()
+                .map(SalesDetailDTO::new)
+                .collect(Collectors.toList());
+
+        return new SalesHistoryDTO(tx, items);
+    }
+
 }

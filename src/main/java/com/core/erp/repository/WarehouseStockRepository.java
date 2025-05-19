@@ -2,8 +2,10 @@ package com.core.erp.repository;
 
 import com.core.erp.domain.WarehouseStockEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -26,4 +28,34 @@ public interface WarehouseStockRepository extends JpaRepository<WarehouseStockEn
             Integer storeId,
             int productId
     );
+
+    @Transactional
+    @Modifying
+    @Query("""
+    UPDATE WarehouseStockEntity w 
+    SET w.quantity = w.quantity - :qty 
+    WHERE w.product.productId = :productId 
+      AND w.store.storeId = :storeId
+""")
+    int decreaseQuantity(
+            @Param("productId") Long productId,
+            @Param("storeId") Integer storeId,
+            @Param("qty") int quantity);
+
+    @Transactional
+    @Modifying
+    @Query("""
+UPDATE WarehouseStockEntity w
+SET w.quantity = w.quantity + :qty,
+    w.lastInDate = CURRENT_TIMESTAMP
+WHERE w.product.productId = :productId
+  AND w.store.storeId = :storeId
+""")
+    int increaseQuantityAndUpdateDate(@Param("productId") Long productId,
+                                      @Param("storeId") Integer storeId,
+                                      @Param("qty") int qty);
+
+
+    Optional<WarehouseStockEntity> findByProduct_ProductIdAndStore_StoreId(Long productId, Integer storeId);
+
 }

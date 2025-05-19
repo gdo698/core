@@ -50,7 +50,6 @@ public class InventoryStatisticsEntity {
     @Column(name = "inven_created_at")
     private LocalDateTime invenCreatedAt;
 
-    // DTO → Entity 변환 생성자
     public InventoryStatisticsEntity(InventoryStatisticsDTO dto) {
         this.statsId = dto.getStatsId();
         // store, category는 별도 매핑 필요

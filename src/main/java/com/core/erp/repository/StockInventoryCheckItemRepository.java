@@ -3,6 +3,7 @@ package com.core.erp.repository;
 import com.core.erp.domain.StockInventoryCheckItemEntity;
 import com.core.erp.dto.stock.StoreStockProjection;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -75,5 +76,22 @@ public interface StockInventoryCheckItemRepository extends JpaRepository<StockIn
             @Param("storeId") int storeId,
             @Param("productId") int productId
     );
+
+
+    @Query("""
+SELECT i FROM StockInventoryCheckItemEntity i
+JOIN i.inventoryCheck c
+WHERE i.product.productId = :productId
+  AND c.store.storeId = :storeId
+  AND i.isApplied = false
+ORDER BY c.checkDate DESC
+""")
+    List<StockInventoryCheckItemEntity> findLatestAppliedCheckItemList(
+            @Param("productId") int productId,
+            @Param("storeId") int storeId,
+            Pageable pageable
+    );
+
+
 }
 

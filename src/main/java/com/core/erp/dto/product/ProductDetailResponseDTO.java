@@ -46,6 +46,20 @@ public class ProductDetailResponseDTO {
     private Integer regularInQuantity;
     private Boolean regularInActive;
 
+    // 실사 관련 정보
+    private Integer storeRealQty;        // 매장 실사 수량
+    private Integer warehouseRealQty;    // 창고 실사 수량
+    private Integer totalRealQty;        // 총 실사 수량
+
+    private Integer storeExpectedQty;    // 매장 기존 수량 (store_stock)
+    private Integer warehouseExpectedQty;// 창고 기존 수량 (warehouse_stock)
+    private Integer totalExpectedQty;    // 총 기존 수량
+
+    private Integer storeDiffQty;        // 매장 오차 (real - expected)
+    private Integer warehouseDiffQty;    // 창고 오차
+    private Integer totalDiffQty;        // 총 오차
+
+
     public ProductDetailResponseDTO(
             int productId,
             String proName,
@@ -69,8 +83,14 @@ public class ProductDetailResponseDTO {
             int hqStock,
             Integer regularInDay,
             Integer regularInQuantity,
-            Boolean regularInActive
-    ) {
+            Boolean regularInActive,
+            Integer storeRealQty,
+            Integer warehouseRealQty,
+            Integer totalRealQty,
+            Integer storeExpectedQty,
+            Integer warehouseExpectedQty,
+            Integer totalExpectedQty
+            ) {
         this.productId = productId;
         this.proName = proName;
         this.categoryName = categoryName;
@@ -94,6 +114,13 @@ public class ProductDetailResponseDTO {
         this.regularInDay = regularInDay;
         this.regularInQuantity = regularInQuantity;
         this.regularInActive = regularInActive;
+        this.storeRealQty = storeRealQty;
+        this.warehouseRealQty = warehouseRealQty;
+        this.totalRealQty = totalRealQty;
+        this.storeExpectedQty = storeExpectedQty;
+        this.warehouseExpectedQty = warehouseExpectedQty;
+        this.totalExpectedQty = totalExpectedQty;
+
     }
 
     @Getter

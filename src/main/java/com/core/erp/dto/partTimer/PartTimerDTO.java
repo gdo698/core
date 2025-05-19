@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+
 public class PartTimerDTO {
 
     private int partTimerId;
@@ -34,6 +35,9 @@ public class PartTimerDTO {
 
     private String position;
     private String workType;
+    private String deviceId;
+    private String deviceName;
+    private boolean isCheckedInToday;
 
     // Entity → DTO 변환 생성자
     public PartTimerDTO(PartTimerEntity entity) {
@@ -55,6 +59,8 @@ public class PartTimerDTO {
         this.position = entity.getPosition();
         this.workType = entity.getWorkType();
         this.partImg = entity.getPartImg();
+        this.deviceId = entity.getDeviceId();
+        this.deviceName = entity.getDeviceName();
 
     }
 }

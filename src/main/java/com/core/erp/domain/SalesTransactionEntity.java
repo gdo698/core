@@ -29,6 +29,10 @@ public class SalesTransactionEntity {
     @JoinColumn(name = "emp_id")
     private EmployeeEntity employee;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "part_timer_id")
+    private PartTimerEntity partTimer;
+
     @Column(name = "total_price", nullable = false)
     private Integer totalPrice;
 
