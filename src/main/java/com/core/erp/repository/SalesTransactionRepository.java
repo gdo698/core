@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -51,4 +52,31 @@ public interface SalesTransactionRepository extends JpaRepository<SalesTransacti
 
     // 정산 계산 시 거래목록 조회용
     List<SalesTransactionEntity> findByStoreStoreIdAndPaidAtBetween(Integer storeId, LocalDateTime start, LocalDateTime end);
+
+    // KPI: 오늘 날짜 기준, 매장의 총 매출액 합계 (거래 상태: 완료만)
+    @Query("SELECT COALESCE(SUM(t.finalAmount), 0) " +
+            "FROM SalesTransactionEntity t " +
+            "WHERE t.store.storeId = :storeId AND FUNCTION('DATE', t.paidAt) = :date " +
+            "AND t.transactionStatus = 0")
+    int sumFinalAmountByStoreIdAndDate(
+            @Param("storeId") Integer storeId,
+            @Param("date") LocalDate date
+    );
+
+    // 시간대별 매출 통계: 특정 매장의 특정 날짜에 시간별 매출 합계 조회
+
+    @Query("""
+    SELECT FUNCTION('HOUR', t.paidAt) AS hour,
+           COALESCE(SUM(t.finalAmount), 0)
+    FROM SalesTransactionEntity t
+    WHERE t.store.storeId = :storeId
+      AND FUNCTION('DATE', t.paidAt) = :date
+      AND t.transactionStatus = 0
+    GROUP BY FUNCTION('HOUR', t.paidAt)
+    ORDER BY hour
+""")
+    List<Object[]> getHourlySalesByStoreAndDate(
+            @Param("storeId") Integer storeId,
+            @Param("date") LocalDate date
+    );
 }

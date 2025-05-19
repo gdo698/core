@@ -43,4 +43,17 @@ public interface StockInHistoryRepository extends JpaRepository<StockInHistoryEn
             @Param("barcode") String barcode,
             Pageable pageable
     );
+
+    // KPI: 오늘 날짜 기준, 특정 매장의 입고 수량 합계
+    @Query("""
+    SELECT COALESCE(SUM(s.inQuantity), 0)
+    FROM StockInHistoryEntity s
+    WHERE s.store.storeId = :storeId
+      AND FUNCTION('DATE', s.inDate) = :date
+""")
+    int sumStockInQuantityByStoreAndDate(
+            @Param("storeId") Integer storeId,
+            @Param("date") java.time.LocalDate date
+    );
+
 }

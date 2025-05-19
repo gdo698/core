@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Repository
@@ -44,6 +45,15 @@ ORDER BY o.order_date DESC
             @Param("startDate") String startDate,
             @Param("endDate") String endDate,
             Pageable pageable
+    );
+
+    // KPI: 오늘 날짜 기준, 매장의 총 발주 금액 합계
+    @Query("SELECT COALESCE(SUM(p.totalAmount), 0) " +
+            "FROM PurchaseOrderEntity p " +
+            "WHERE p.store.storeId = :storeId AND p.orderDate = :date")
+    int sumTotalAmountByStoreAndDate(
+            @Param("storeId") Integer storeId,
+            @Param("date") LocalDate date
     );
 
 }
