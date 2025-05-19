@@ -48,12 +48,16 @@ ORDER BY o.order_date DESC
     );
 
     // KPI: 오늘 날짜 기준, 매장의 총 발주 금액 합계
-    @Query("SELECT COALESCE(SUM(p.totalAmount), 0) " +
-            "FROM PurchaseOrderEntity p " +
-            "WHERE p.store.storeId = :storeId AND p.orderDate = :date")
-    int sumTotalAmountByStoreAndDate(
+    @Query("""
+SELECT COALESCE(SUM(p.totalAmount), 0)
+FROM PurchaseOrderEntity p
+WHERE p.store.storeId = :storeId
+  AND p.orderDate BETWEEN :startDate AND :endDate
+""")
+    int sumTotalAmountByStoreAndPeriod(
             @Param("storeId") Integer storeId,
-            @Param("date") LocalDate date
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
     );
 
 }

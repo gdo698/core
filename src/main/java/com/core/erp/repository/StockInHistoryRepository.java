@@ -46,14 +46,16 @@ public interface StockInHistoryRepository extends JpaRepository<StockInHistoryEn
 
     // KPI: 오늘 날짜 기준, 특정 매장의 입고 수량 합계
     @Query("""
-    SELECT COALESCE(SUM(s.inQuantity), 0)
-    FROM StockInHistoryEntity s
-    WHERE s.store.storeId = :storeId
-      AND FUNCTION('DATE', s.inDate) = :date
+SELECT COALESCE(SUM(s.inQuantity), 0)
+FROM StockInHistoryEntity s
+WHERE s.store.storeId = :storeId
+  AND s.inDate BETWEEN :start AND :end
 """)
-    int sumStockInQuantityByStoreAndDate(
+    int sumStockInQuantityByStoreAndPeriod(
             @Param("storeId") Integer storeId,
-            @Param("date") java.time.LocalDate date
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
     );
+
 
 }

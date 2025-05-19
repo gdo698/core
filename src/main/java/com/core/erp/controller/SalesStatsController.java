@@ -23,16 +23,22 @@ public class SalesStatsController {
     @GetMapping("/kpis")
     public KpiStatsDTO getKpis(
             @RequestParam Integer storeId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return salesStatsService.getKpis(storeId, date);
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        return salesStatsService.getKpis(storeId, startDate, endDate);
     }
 
     // 시간대별 매출 통계
     @GetMapping("/sales/hourly")
-    public List<HourlySalesDTO> getHourlySales(@RequestParam Integer storeId,
-                                               @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return salesStatsService.getHourlySales(storeId, date);
+    public List<HourlySalesDTO> getHourlySales(
+            @RequestParam Integer storeId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        return salesStatsService.getHourlySales(storeId, startDate, endDate);
     }
+
 
     // 상품별 매출 순위
     @GetMapping("/sales/products")

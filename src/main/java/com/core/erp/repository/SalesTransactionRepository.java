@@ -54,29 +54,20 @@ public interface SalesTransactionRepository extends JpaRepository<SalesTransacti
     List<SalesTransactionEntity> findByStoreStoreIdAndPaidAtBetween(Integer storeId, LocalDateTime start, LocalDateTime end);
 
     // KPI: 오늘 날짜 기준, 매장의 총 매출액 합계 (거래 상태: 완료만)
-    @Query("SELECT COALESCE(SUM(t.finalAmount), 0) " +
-            "FROM SalesTransactionEntity t " +
-            "WHERE t.store.storeId = :storeId AND FUNCTION('DATE', t.paidAt) = :date " +
-            "AND t.transactionStatus = 0")
-    int sumFinalAmountByStoreIdAndDate(
-            @Param("storeId") Integer storeId,
-            @Param("date") LocalDate date
-    );
-
-    // 시간대별 매출 통계: 특정 매장의 특정 날짜에 시간별 매출 합계 조회
-
     @Query("""
-    SELECT FUNCTION('HOUR', t.paidAt) AS hour,
-           COALESCE(SUM(t.finalAmount), 0)
-    FROM SalesTransactionEntity t
-    WHERE t.store.storeId = :storeId
-      AND FUNCTION('DATE', t.paidAt) = :date
-      AND t.transactionStatus = 0
-    GROUP BY FUNCTION('HOUR', t.paidAt)
-    ORDER BY hour
+SELECT COALESCE(SUM(t.finalAmount), 0)
+FROM SalesTransactionEntity t
+WHERE t.store.storeId = :storeId
+  AND t.paidAt BETWEEN :start AND :end
+  AND t.transactionStatus = :status
 """)
-    List<Object[]> getHourlySalesByStoreAndDate(
+    int sumFinalAmountByStoreIdAndPaidAtBetween(
             @Param("storeId") Integer storeId,
-            @Param("date") LocalDate date
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end,
+            @Param("status") Integer status
     );
+
+
+
 }

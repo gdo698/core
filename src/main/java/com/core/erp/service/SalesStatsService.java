@@ -6,9 +6,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface SalesStatsService {
-    KpiStatsDTO getKpis(Integer storeId, LocalDate date);
+    KpiStatsDTO getKpis(Integer storeId, LocalDate startDate, LocalDate endDate);
 
-    List<HourlySalesDTO> getHourlySales(Integer storeId, LocalDate date);
+    List<HourlySalesDTO> getHourlySales(Integer storeId, LocalDate startDate, LocalDate endDate);
 
     List<ProductSalesDTO> getTopSalesProducts(Integer storeId, LocalDate date);
 

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,36 +20,40 @@ public class SalesStatsServiceImpl implements SalesStatsService {
     private final StockInHistoryRepository stockInHistoryRepository;
     private final PurchaseOrderItemRepository purchaseOrderItemRepository;
 
-
     @Override
-    public KpiStatsDTO getKpis(Integer storeId, LocalDate date) {
-        int totalSales = salesTransactionRepository.sumFinalAmountByStoreIdAndDate(storeId, date);
-        int totalOrders = purchaseOrderRepository.sumTotalAmountByStoreAndDate(storeId, date);
-        int todaySalesQuantity = salesDetailRepository.sumSalesQuantityByStoreAndDate(storeId, date);
-        int stockInCount = stockInHistoryRepository.sumStockInQuantityByStoreAndDate(storeId, date);
+    public KpiStatsDTO getKpis(Integer storeId, LocalDate startDate, LocalDate endDate) {
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.plusDays(1).atStartOfDay();
 
-        KpiStatsDTO dto = new KpiStatsDTO();
-        dto.setTotalSales(totalSales);
-        dto.setTotalOrders(totalOrders);
-        dto.setTodaySalesQuantity(todaySalesQuantity);
-        dto.setStockInCount(stockInCount);
+        int totalSales = salesTransactionRepository.sumFinalAmountByStoreIdAndPaidAtBetween(storeId, start, end, 0);
+        int totalOrders = purchaseOrderRepository.sumTotalAmountByStoreAndPeriod(storeId, start, end);
+        int todaySalesQuantity = salesDetailRepository.sumSalesQuantityByStoreAndPeriod(storeId, start, end);
+        int stockInCount = stockInHistoryRepository.sumStockInQuantityByStoreAndPeriod(storeId, start, end);
 
-        return dto;
+        return new KpiStatsDTO(totalSales, totalOrders, todaySalesQuantity, stockInCount);
     }
 
+
     @Override
-    public List<HourlySalesDTO> getHourlySales(Integer storeId, LocalDate date) {
-        List<Object[]> result = salesTransactionRepository.getHourlySalesByStoreAndDate(storeId, date);
+    public List<HourlySalesDTO> getHourlySales(Integer storeId, LocalDate startDate, LocalDate endDate) {
+        List<Object[]> result = salesDetailRepository.getHourlySalesByStoreAndPeriod(storeId, startDate.atStartOfDay(), endDate.plusDays(1).atStartOfDay());
 
         return result.stream()
                 .map(row -> {
                     int hour = (Integer) row[0];
-                    int sales = ((Number) row[1]).intValue();
-                    String hourLabel = String.format("%02d", hour);  // 예: 6 → "06"
-                    return new HourlySalesDTO(hourLabel, sales);
+                    int salesQuantity = ((Number) row[1]).intValue();
+                    int salesTotal = ((Number) row[2]).intValue();
+                    String hourLabel = String.format("%02d", hour); // 6 → "06"
+
+                    HourlySalesDTO dto = new HourlySalesDTO();
+                    dto.setHour(hourLabel);
+                    dto.setQuantity(salesQuantity);
+                    dto.setTotal(salesTotal);
+                    return dto;
                 })
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public List<ProductSalesDTO> getTopSalesProducts(Integer storeId, LocalDate date) {
