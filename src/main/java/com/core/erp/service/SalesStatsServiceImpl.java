@@ -16,10 +16,11 @@ public class SalesStatsServiceImpl implements SalesStatsService {
 
     private final SalesTransactionRepository salesTransactionRepository;
     private final PurchaseOrderRepository purchaseOrderRepository;
+    private final PurchaseOrderItemRepository purchaseOrderItemRepository;
     private final SalesDetailRepository salesDetailRepository;
     private final StockInHistoryRepository stockInHistoryRepository;
-    private final PurchaseOrderItemRepository purchaseOrderItemRepository;
 
+    //  1. KPI
     @Override
     public KpiStatsDTO getKpis(Integer storeId, LocalDate startDate, LocalDate endDate) {
         LocalDateTime start = startDate.atStartOfDay();
@@ -33,65 +34,87 @@ public class SalesStatsServiceImpl implements SalesStatsService {
         return new KpiStatsDTO(totalSales, totalOrders, todaySalesQuantity, stockInCount);
     }
 
-
+    //  2. 시간대별 매출
     @Override
     public List<HourlySalesDTO> getHourlySales(Integer storeId, LocalDate startDate, LocalDate endDate) {
-        List<Object[]> result = salesDetailRepository.getHourlySalesByStoreAndPeriod(storeId, startDate.atStartOfDay(), endDate.plusDays(1).atStartOfDay());
+        List<Object[]> result = salesDetailRepository.getHourlySalesByStoreAndPeriod(
+                storeId, startDate.atStartOfDay(), endDate.plusDays(1).atStartOfDay()
+        );
 
         return result.stream()
                 .map(row -> {
                     int hour = (Integer) row[0];
-                    int salesQuantity = ((Number) row[1]).intValue();
-                    int salesTotal = ((Number) row[2]).intValue();
-                    String hourLabel = String.format("%02d", hour); // 6 → "06"
-
-                    HourlySalesDTO dto = new HourlySalesDTO();
-                    dto.setHour(hourLabel);
-                    dto.setQuantity(salesQuantity);
-                    dto.setTotal(salesTotal);
-                    return dto;
+                    int quantity = ((Number) row[1]).intValue();
+                    int total = ((Number) row[2]).intValue();
+                    return new HourlySalesDTO(String.format("%02d", hour), quantity, total);
                 })
                 .collect(Collectors.toList());
     }
 
-
+    //  3. 상품별 매출
     @Override
-    public List<ProductSalesDTO> getTopSalesProducts(Integer storeId, LocalDate date) {
-        List<Object[]> result = salesDetailRepository.getTopProductSalesByStoreAndDate(storeId, date);
+    public List<ProductSalesDTO> getTopSalesProducts(
+            Integer storeId,
+            LocalDate startDate,
+            LocalDate endDate,
+            List<Long> categoryIds,
+            String sortBy
+    ) {
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.plusDays(1).atStartOfDay();
 
-        return result.stream()
+        List<Object[]> raw = salesDetailRepository.getTopProductSales(
+                storeId, start, end, categoryIds, sortBy
+        );
+
+        return raw.stream()
                 .map(row -> new ProductSalesDTO(
-                        (String) row[0],                       // productName
-                        ((Number) row[1]).intValue(),          // quantity
-                        (String) row[2]                        // category
+                        (String) row[0],
+                        ((Number) row[1]).intValue(),
+                        ((Number) row[2]).intValue(),
+                        (String) row[3]
                 ))
-                .limit(10) // TOP 10 제한
                 .collect(Collectors.toList());
     }
 
+
+    //  4. 카테고리별 매출
     @Override
-    public List<CategorySalesDTO> getCategorySales(Integer storeId, LocalDate date) {
-        List<Object[]> result = salesDetailRepository.getCategorySalesByStoreAndDate(storeId, date);
+    public List<CategorySalesDTO> getCategorySales(Integer storeId, LocalDate startDate, LocalDate endDate, List<Long> categoryIds) {
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.plusDays(1).atStartOfDay();
+
+        List<Object[]> result = salesDetailRepository.getCategorySalesByStoreAndPeriod(storeId, start, end, categoryIds);
 
         return result.stream()
                 .map(row -> new CategorySalesDTO(
-                        (String) row[0],                         // category name
-                        ((Number) row[1]).intValue()             // total sales
+                        (String) row[0],                         // categoryName
+                        ((Number) row[1]).intValue()             // totalAmount
                 ))
                 .collect(Collectors.toList());
     }
 
+    //  5. 발주 상품 순위
     @Override
-    public List<OrderProductDTO> getTopOrderProducts(Integer storeId, LocalDate date) {
-        List<Object[]> result = purchaseOrderItemRepository.getTopOrderedProductsByStoreAndDate(storeId, date);
+    public List<OrderProductDTO> getTopOrderProducts(
+            Integer storeId,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.plusDays(1).atStartOfDay();
+
+        List<Object[]> result = salesDetailRepository.getTopOrderedProductsByStoreAndPeriod(
+                storeId, start, end
+        );
 
         return result.stream()
                 .map(row -> new OrderProductDTO(
-                        (String) row[0],
-                        ((Number) row[1]).intValue(),
-                        ((Number) row[2]).intValue()
+                        (String) row[0],                   // product_name
+                        ((Number) row[1]).intValue(),      // quantity
+                        ((Number) row[2]).intValue()       // amount
                 ))
-                .limit(10)
                 .collect(Collectors.toList());
     }
+
 }

@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface SalesDetailRepository extends JpaRepository<SalesDetailEntity, Integer> {
+public interface SalesDetailRepository extends JpaRepository<SalesDetailEntity, Integer>, SalesDetailRepositoryCustom {
 
     @Query("SELECT d FROM SalesDetailEntity d " + "JOIN FETCH d.product p " +
             "LEFT JOIN FETCH p.category " + "WHERE d.transaction.transactionId = :transactionId")
