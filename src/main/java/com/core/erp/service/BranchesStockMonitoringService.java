@@ -7,6 +7,7 @@ import com.core.erp.dto.category.CategoryDTO;
 import com.core.erp.dto.stock.StockCategoryStatDTO;
 import com.core.erp.dto.stock.StockStatusSummaryDTO;
 import com.core.erp.dto.store.StoreDTO;
+import com.core.erp.dto.statistics.CategoryStockStatDTO;
 import com.core.erp.repository.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -30,6 +31,7 @@ public class BranchesStockMonitoringService {
     private final StoreRepository storeRepository;
     private final CategoryRepository categoryRepository;
     private final BranchStockRepositoryImpl branchStockRepository;
+    private final ProductRepository productRepository;
     
     @PersistenceContext
     private final EntityManager entityManager;
@@ -199,5 +201,41 @@ public class BranchesStockMonitoringService {
                 barcode, 
                 categoryId, 
                 pageable);
+    }
+
+    // 카테고리별(재귀) 재고 합산
+    private int getTotalStockByCategoryRecursive(CategoryEntity category) {
+        List<CategoryEntity> children = categoryRepository.findByParentCategory_CategoryId(category.getCategoryId());
+        int sum = 0;
+        if (children == null || children.isEmpty()) {
+            Integer stock = productRepository.sumStockByCategory(category.getCategoryId());
+            sum += (stock == null ? 0 : stock);
+        } else {
+            for (CategoryEntity child : children) {
+                sum += getTotalStockByCategoryRecursive(child);
+            }
+        }
+        return sum;
+    }
+
+    public List<CategoryStockStatDTO> getCategoryStatsByParent(Integer parentCategoryId) {
+        List<CategoryEntity> categories = (parentCategoryId == null)
+            ? categoryRepository.findByParentCategoryIsNull()
+            : categoryRepository.findByParentCategory_CategoryId(parentCategoryId);
+
+        int totalStock = 0;
+        Map<Integer, Integer> stockMap = new HashMap<>();
+        for (CategoryEntity cat : categories) {
+            int stock = getTotalStockByCategoryRecursive(cat);
+            stockMap.put(cat.getCategoryId(), stock);
+            totalStock += stock;
+        }
+        List<CategoryStockStatDTO> result = new ArrayList<>();
+        for (CategoryEntity cat : categories) {
+            int stock = stockMap.get(cat.getCategoryId());
+            double percentage = (totalStock == 0) ? 0 : (stock * 100.0 / totalStock);
+            result.add(new CategoryStockStatDTO(cat.getCategoryId(), cat.getCategoryName(), percentage, cat.getCategoryFilter()));
+        }
+        return result;
     }
 } 

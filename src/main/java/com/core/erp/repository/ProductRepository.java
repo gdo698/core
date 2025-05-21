@@ -81,4 +81,7 @@ LEFT JOIN store_stock s\s
 
     /* 바코드로 상품 조회 (POS 바코드 기능용) */
     Optional<ProductEntity> findByProBarcode(Long proBarcode);
+
+    @Query("SELECT SUM(s.quantity) FROM StoreStockEntity s WHERE s.product.category.categoryId = :categoryId")
+    Integer sumStockByCategory(@Param("categoryId") Integer categoryId);
 }

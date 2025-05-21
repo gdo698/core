@@ -3,6 +3,7 @@ package com.core.erp.controller;
 import com.core.erp.dto.stock.StockCategoryStatDTO;
 import com.core.erp.dto.stock.StockStatusSummaryDTO;
 import com.core.erp.dto.TotalStockDTO;
+import com.core.erp.dto.statistics.CategoryStockStatDTO;
 import com.core.erp.service.BranchesStockMonitoringService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -61,9 +62,8 @@ public class BranchesStockMonitoringController {
      * @return 카테고리별 재고 비율
      */
     @GetMapping("/category-stats")
-    public ResponseEntity<List<StockCategoryStatDTO>> getCategoryStats(
-            @RequestParam(required = false) Integer storeId) {
-        return ResponseEntity.ok(stockMonitoringService.getCategoryStats(storeId));
+    public List<CategoryStockStatDTO> getCategoryStats(@RequestParam(required = false) Integer parentCategoryId) {
+        return stockMonitoringService.getCategoryStatsByParent(parentCategoryId);
     }
 
     /**
