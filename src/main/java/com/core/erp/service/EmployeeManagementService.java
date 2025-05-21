@@ -105,15 +105,18 @@ public class EmployeeManagementService {
         }
         
         EmployeeEntity updatedEmployee = employeeRepository.save(existingEmployee);
-        // 알림 생성 (수정 시)
-        try {
-            notificationService.createJoinNotification(
-                updatedEmployee.getEmpId(),
-                updatedEmployee.getEmpName() + "님의 정보가 수정되었습니다.",
-                "/headquarters/hr/employees"
-            );
-        } catch (Exception e) {
-            System.err.println("사원 수정 알림 생성 실패: " + e.getMessage());
+        // 알림 생성 (수정 시) - 본사 직원(부서ID 4~10)만 생성
+        Integer deptId = updatedEmployee.getDepartment() != null ? updatedEmployee.getDepartment().getDeptId() : null;
+        if (deptId != null && deptId >= 4 && deptId <= 10) {
+            try {
+                notificationService.createJoinNotification(
+                    updatedEmployee.getEmpId(),
+                    updatedEmployee.getEmpName() + "님의 정보가 수정되었습니다.",
+                    "/headquarters/hr/employees"
+                );
+            } catch (Exception e) {
+                System.err.println("사원 수정 알림 생성 실패: " + e.getMessage());
+            }
         }
         return convertToDTO(updatedEmployee);
     }
