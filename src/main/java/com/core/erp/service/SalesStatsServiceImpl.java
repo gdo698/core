@@ -1,5 +1,6 @@
 package com.core.erp.service;
 
+import com.core.erp.domain.ProductEntity;
 import com.core.erp.dto.statistics.*;
 import com.core.erp.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class SalesStatsServiceImpl implements SalesStatsService {
     private final PurchaseOrderItemRepository purchaseOrderItemRepository;
     private final SalesDetailRepository salesDetailRepository;
     private final StockInHistoryRepository stockInHistoryRepository;
+    private final ProductRepository productRepository;
 
     //  1. KPI
     @Override
@@ -89,7 +91,9 @@ public class SalesStatsServiceImpl implements SalesStatsService {
         return result.stream()
                 .map(row -> new CategorySalesDTO(
                         (String) row[0],                         // categoryName
-                        ((Number) row[1]).intValue()             // totalAmount
+                        ((Number) row[1]).intValue(),
+                        ((Number) row[2]).intValue(),
+                        ((Number) row[3]).intValue()
                 ))
                 .collect(Collectors.toList());
     }
@@ -117,4 +121,7 @@ public class SalesStatsServiceImpl implements SalesStatsService {
                 .collect(Collectors.toList());
     }
 
+
 }
+
+

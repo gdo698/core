@@ -50,14 +50,16 @@ WHERE d.transaction.store.storeId = :storeId
 
     // 카테고리별 매출 비율: 매장과 날짜 기준, category별 총 매출 집계
     @Query("""
-        SELECT d.product.category.categoryName,
-               SUM(d.unitPrice * d.salesQuantity - d.discountPrice)
-        FROM SalesDetailEntity d
-        WHERE d.transaction.store.storeId = :storeId
-          AND FUNCTION('DATE', d.transaction.paidAt) = :date
-          AND d.transaction.transactionStatus = 0
-        GROUP BY d.product.category.categoryId
-    """)
+    SELECT d.product.category.categoryName,
+           SUM(d.finalAmount),
+           SUM(d.salesQuantity),
+           COUNT(DISTINCT d.transaction.transactionId)
+    FROM SalesDetailEntity d
+    WHERE d.transaction.store.storeId = :storeId
+      AND FUNCTION('DATE', d.transaction.paidAt) = :date
+      AND d.transaction.transactionStatus = 0
+    GROUP BY d.product.category.categoryId, d.product.category.categoryName
+""")
     List<Object[]> getCategorySalesByStoreAndDate(
             @Param("storeId") Integer storeId,
             @Param("date") LocalDate date
@@ -81,6 +83,5 @@ ORDER BY FUNCTION('HOUR', t.paidAt)
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end
     );
-
 }
 
