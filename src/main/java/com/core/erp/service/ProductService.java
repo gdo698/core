@@ -177,9 +177,9 @@ public class ProductService {
                     .toList();
         }
 
-        // 최근 입고 내역
+        // 최근 입고 내역 (이제 전체 내역)
         List<ProductDetailResponseDTO.StockInInfo> recentStockIns = stockInHistoryRepository
-                .findTop3ByProduct_ProductIdOrderByInDateDesc(productId)
+                .findByProduct_ProductIdOrderByInDateDesc(productId)
                 .stream()
                 .map(si -> new ProductDetailResponseDTO.StockInInfo(
                         si.getStore().getStoreName(),

@@ -13,6 +13,7 @@ import java.util.List;
 public interface StockInHistoryRepository extends JpaRepository<StockInHistoryEntity, Long> {
     List<StockInHistoryEntity> findTop3ByProduct_ProductIdOrderByInDateDesc(int productId);
     StockInHistoryEntity findTop1ByProduct_ProductIdOrderByInDateDesc(int productId);
+    List<StockInHistoryEntity> findByProduct_ProductIdOrderByInDateDesc(int productId);
 
     /**
      * 점주 기본 조회 (본인 매장 입고 이력)
