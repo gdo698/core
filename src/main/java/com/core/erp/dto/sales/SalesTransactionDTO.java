@@ -33,7 +33,7 @@ public class SalesTransactionDTO {
 
 
     // Entity → DTO 변환 생성자
-    public SalesTransactionDTO(SalesTransactionEntity entity) {
+    public SalesTransactionDTO(SalesTransactionEntity entity, List<SalesDetailDTO> details) {
         this.transactionId = entity.getTransactionId();
         this.storeId = entity.getStore() != null ? entity.getStore().getStoreId() : null;
         this.empId = entity.getEmployee() != null ? entity.getEmployee().getEmpId() : null;
@@ -50,6 +50,7 @@ public class SalesTransactionDTO {
         this.createdAt = entity.getCreatedAt();
         this.ageGroup = entity.getAgeGroup();
         this.gender = entity.getGender();
+        this.details = details;
 
     }
 

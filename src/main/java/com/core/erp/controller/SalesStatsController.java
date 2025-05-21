@@ -59,7 +59,7 @@ public class SalesStatsController {
         return salesStatsService.getCategorySales(storeId, startDate, endDate, categoryIds);
     }
 
-    // ✅ 5. 발주 상품 순위 (날짜 범위 기반으로 확장)
+    // 5. 발주 상품 순위 (날짜 범위 기반으로 확장)
     @GetMapping("/orders/products")
     public List<OrderProductDTO> getTopOrderProducts(
             @RequestParam Integer storeId,
@@ -69,3 +69,4 @@ public class SalesStatsController {
         return salesStatsService.getTopOrderProducts(storeId, startDate, endDate);
     }
 }
+

@@ -22,18 +22,13 @@ public class TransactionService {
                 transactionRepository.findByStore_StoreIdOrderByPaidAtDesc(storeId);
 
         return transactions.stream().map(transaction -> {
-            SalesTransactionDTO dto = new SalesTransactionDTO(transaction);
-
-            // fetch join으로 상품/카테고리 정보까지 로딩
-            List<SalesDetailEntity> detailEntities =
-                    detailRepository.findWithProductByTransactionId(transaction.getTransactionId());
-
-            List<SalesDetailDTO> detailDTOs = detailEntities.stream()
+            List<SalesDetailDTO> detailDTOs = detailRepository
+                    .findWithProductByTransactionId(transaction.getTransactionId())
+                    .stream()
                     .map(SalesDetailDTO::new)
                     .toList();
 
-            dto.setDetails(detailDTOs);
-            return dto;
+            return new SalesTransactionDTO(transaction, detailDTOs);
         }).toList();
     }
 }

@@ -8,4 +8,6 @@ import lombok.Data;
 public class CategorySalesDTO {
     private String category;
     private int totalSales;
+    private int quantity;
+    private int transactionCount;
 }

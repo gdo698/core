@@ -83,7 +83,9 @@ public class SalesDetailRepositoryCustomImpl implements SalesDetailRepositoryCus
         //  SQL
         StringBuilder sql = new StringBuilder("""
         SELECT c.category_name,
-               SUM(sd.final_amount) AS total_amount
+               SUM(sd.final_amount) AS total_amount,
+               SUM(sd.sales_quantity) AS total_quantity,
+               COUNT(DISTINCT sd.transaction_id) AS transaction_count
         FROM sales_detail sd
         JOIN product p ON sd.product_id = p.product_id
         JOIN category c ON p.category_id = c.category_id
